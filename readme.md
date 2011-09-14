@@ -1,15 +1,16 @@
-# MuonRadiator
+# NanoIoc
 
-A build radiator for Hudson.
+A tiny IoC container, does exactly what you want, and only that.
 
 ## Getting Started
 
-Download the code and open up radiator.html.
+`Container.Current` is a static instance of `IContainer`. You can use this as your entry point.
 
-Add a hash component on the end of the URI with the path to the json api for your Hudson build server (URI encoded), for example: `radiator.html#http%3A%2F%2Fhudson.lan%2Fapi%2Fjson`
+### Registering Dependencies
 
-## Ignoring jobs
+Use either of these methods:
 
-Simply click the job you want to ignore. 
-Ignored items are stored in a cookie (so you will need to be running radiator.html on a domain). 
-No unignore yet, just wipe the cookie.
+<pre>
+Container.Current.Register<TAbstract, TConcrete>(Lifecycle lifecycle);
+Container.Current.Register(Type abstract, Type concrete, Lifecycle lifecycle);
+</pre>
