@@ -11,7 +11,7 @@ A tiny IoC container, does exactly what you want, and only that.
 Use either of these methods:
 
 <pre>
-void IContainer.Register<TAbstract, TConcrete>(Lifecycle lifecycle);
+void IContainer.Register&lt;TAbstract, TConcrete&gt;(Lifecycle lifecycle);
 void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle);
 </pre>
 
@@ -20,7 +20,7 @@ void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle);
 Use either of these methods:
 
 <pre>
-T IContainer.Resolve<T>();
+T IContainer.Resolve&lt;T&gt;();
 object IContainer.Resolve(Type type);
 </pre>
 
