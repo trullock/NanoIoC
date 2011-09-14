@@ -6,7 +6,7 @@ namespace NanoIoC.Tests
 	public class CyclicDependencies
 	{
 		[Test]
-		public void ShouldThrow()
+		public void ShouldThrowForUnregisteredTypes()
 		{
 			var container = new Container();
 
@@ -23,6 +23,27 @@ namespace NanoIoC.Tests
 			}
 		}
 
+		[Test]
+		public void ShouldThrowForRegisteredTypes()
+		{
+			var container = new Container();
+			container.Register<InterfaceC, ClassC>();
+			container.Register<InterfaceD, ClassD>();
+
+
+			try
+			{
+				container.Resolve<InterfaceC>();
+			}
+			catch (CyclicDependencyException e)
+			{
+				Assert.AreEqual("Cyclic dependency detected when trying to construct `NanoIoC.Tests.CyclicDependencies+ClassC, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
+				Assert.AreEqual(typeof(ClassC), e.DependencyStack[0]);
+				Assert.AreEqual(typeof(ClassD), e.DependencyStack[1]);
+				Assert.AreEqual(2, e.DependencyStack.Length);
+			}
+		}
+
 		public class ClassA
 		{
 			public ClassA(ClassB b)
@@ -33,6 +54,30 @@ namespace NanoIoC.Tests
 		public class ClassB
 		{
 			public ClassB(ClassA a)
+			{
+			}
+		}
+
+		public interface InterfaceC
+		{
+			
+		}
+
+		public class ClassC : InterfaceC
+		{
+			public ClassC(InterfaceD d)
+			{
+			}
+		}
+
+		public interface InterfaceD
+		{
+			
+		}
+
+		public class ClassD
+		{
+			public ClassD(InterfaceC c)
 			{
 			}
 		}
