@@ -11,5 +11,10 @@ namespace NanoIoC
 		{
 			container.Register(typeof(TAbstract), typeof(TConcrete), lifecycle);
 		}
+
+		public static T Resolve<T>(this IContainer container)
+		{
+			return (T) container.Resolve(typeof (T));
+		}
 	}
 }
