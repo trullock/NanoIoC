@@ -1,4 +1,4 @@
-# NanoIoc
+# NanoIoC
 
 A tiny IoC container, does exactly what you want, and only that.
 
