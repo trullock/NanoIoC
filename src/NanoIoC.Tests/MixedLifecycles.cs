@@ -9,7 +9,7 @@ namespace NanoIoC.Tests
         public void ShouldThrowWhenADependencyHasAShorterLifecycle()
         {
             var container = new Container();
-            container.Register<TestSingletonClass>();
+            container.Register<TestSingletonClass>(Lifecycle.Singleton);
             container.Register<TestTransientClass>(Lifecycle.Transient);
 
 			try
@@ -18,7 +18,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("foo", e.Message);
+				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.MixedLifecycles+TestTransientClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`. It's lifecycle (Transient) is shorter than the dependee's (Singleton)", e.Message);
 			}
         }
 

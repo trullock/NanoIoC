@@ -9,7 +9,7 @@ namespace NanoIoC.Tests
 		public void ShouldUseExistingInstancesForDependencies()
 		{
 			var container = new Container();
-			container.Register<TestSingletonClass>();
+			container.Register<TestSingletonClass>(Lifecycle.Singleton);
 			container.Register<TestTransientClass>(Lifecycle.Transient);
 
 			var singleton = container.Resolve<TestSingletonClass>();

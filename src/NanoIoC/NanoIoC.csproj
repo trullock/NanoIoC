@@ -40,6 +40,7 @@
     <Compile Include="ContainerException.cs" />
     <Compile Include="ContainerExtensions.cs" />
     <Compile Include="CyclicDependencyException.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IInstanceStore.cs" />
     <Compile Include="Lifecycle.cs" />

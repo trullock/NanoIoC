@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace NanoIoC
@@ -8,26 +9,37 @@ namespace NanoIoC
 	/// </summary>
     internal sealed class SingletonInstanceStore : IInstanceStore
     {
-        readonly IDictionary<Type, object> instanceStore;
+        readonly IDictionary<Type, IList<object>> instanceStore;
 
         public SingletonInstanceStore()
         {
-            this.instanceStore = new Dictionary<Type, object>();
+            this.instanceStore = new Dictionary<Type, IList<object>>();
         }
 
         public void Insert(Type type, object instance)
         {
-            this.instanceStore.Add(type, instance);
+			if(!this.instanceStore.ContainsKey(type))
+				this.instanceStore.Add(type, new List<object>());
+
+            this.instanceStore[type].Add(instance);
         }
 
-        public bool ContainsInstanceFor(Type type)
+        public bool ContainsInstancesFor(Type type)
         {
             return this.instanceStore.ContainsKey(type);
         }
 
-        public object GetInstance(Type type)
+        public object GetSingleInstance(Type type)
         {
-            return this.instanceStore[type];
+			if(this.instanceStore[type].Count != 1)
+				throw new ContainerException("TODO");
+
+            return this.instanceStore[type][0];
         }
+
+		public IEnumerable GetAllInstances(Type type)
+		{
+			return this.instanceStore[type];
+		}
     }
 }

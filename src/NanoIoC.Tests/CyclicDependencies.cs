@@ -75,7 +75,7 @@ namespace NanoIoC.Tests
 			
 		}
 
-		public class ClassD
+		public class ClassD : InterfaceD
 		{
 			public ClassD(InterfaceC c)
 			{

@@ -26,9 +26,29 @@ namespace NanoIoC.Tests
 			Assert.AreSame(instance, instance2);
 		}
 
-        public class TestClass
+		[Test]
+		public void ShouldThrowWhenConcreteDoesNotImplementAbstract()
+		{
+			var container = new Container();
+
+			try
+			{
+				container.Register<TestInterface, TestClass>();
+			}
+			catch(ContainerException e)
+			{
+				Assert.AreEqual("Concrete type `NanoIoC.Tests.RegisteredConcreteTypes+TestClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` is not assignable to abstract type `NanoIoC.Tests.RegisteredConcreteTypes+TestInterface, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
+			}
+		}
+
+    	public class TestClass
         {
             
         }
+
+		public interface TestInterface
+		{
+			
+		}
     }
 }

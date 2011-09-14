@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,10 +30,11 @@ namespace NanoIoC
         	if (this.registeredTypes.ContainsKey(type))
         		return GetInstance(type, registeredTypes[type][0]);
 
-			if (this.singletonInstanceStore.ContainsInstanceFor(type))
-				return this.singletonInstanceStore.GetInstance(type);
+			if (this.singletonInstanceStore.ContainsInstancesFor(type))
+				return this.singletonInstanceStore.GetSingleInstance(type);
 
-        	return this.Create(type, new List<Type>());
+			var typeToCreate = GetTypeToCreate(type);
+			return this.GetInstance(typeToCreate, new List<Type>());
         }
 
     	object GetInstance(Type type, Registration registration)
@@ -42,33 +44,40 @@ namespace NanoIoC
     			case Lifecycle.Singleton:
     				return this.GetInstance(type, this.singletonInstanceStore);
     			default:
-    				return this.Create(type, new List<Type>());
+					var typeToCreate = GetTypeToCreate(type);
+					return this.GetInstance(typeToCreate, new List<Type>());
     		}
     	}
 
     	object GetInstance(Type type, IInstanceStore instanceStore)
         {
-            if (instanceStore.ContainsInstanceFor(type))
-                return instanceStore.GetInstance(type);
+			if (instanceStore.ContainsInstancesFor(type))
+                return instanceStore.GetSingleInstance(type);
 
-			var instance = this.Create(type, new List<Type>());
+			var typeToCreate = GetTypeToCreate(type);
+			var instance = this.GetInstance(typeToCreate, new List<Type>());
             instanceStore.Insert(type, instance);
             return instance;
         }
-
 
         public bool HasRegistrationFor(Type type)
         {
             return this.registeredTypes.ContainsKey(type);
         }
 
-    	public Registration GetRegisterationFor(Type type)
+    	public IEnumerable<Registration> GetRegistrationsFor(Type type)
     	{
-    		return this.registeredTypes[type][0];
+			if(this.registeredTypes.ContainsKey(type))
+    			return this.registeredTypes[type];
+
+    		return new Registration[0];
     	}
 
         public void Register(Type abstractType, Type concreteType, Lifecycle lifecycle = Lifecycle.Singleton)
         {
+			if(!abstractType.IsAssignableFrom(concreteType))
+				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
+
             if(!this.registeredTypes.ContainsKey(abstractType))
                 this.registeredTypes.Add(abstractType, new List<Registration>());
 
@@ -90,52 +99,57 @@ namespace NanoIoC
 			}
     	}
 
-    	object Create(Type type, ICollection<Type> buildStack)
+    	object GetInstance(Registration registration, ICollection<Type> buildStack)
 		{
-			var typeToCreate = GetTypeToCreate(type);
-
-			if (buildStack.Contains(typeToCreate.Type))
+			if (buildStack.Contains(registration.Type))
 			{
 				var types = new Type[buildStack.Count];
 				buildStack.CopyTo(types, 0);
-				throw new CyclicDependencyException("Cyclic dependency detected when trying to construct `" + typeToCreate.Type.AssemblyQualifiedName + "`", types);
+				throw new CyclicDependencyException("Cyclic dependency detected when trying to construct `" + registration.Type.AssemblyQualifiedName + "`", types);
 			}
 
-			buildStack.Add(typeToCreate.Type);
+			buildStack.Add(registration.Type);
 
-    		switch (typeToCreate.Lifecycle)
+			switch (registration.Lifecycle)
     		{
     			case Lifecycle.Singleton:
-					if (this.singletonInstanceStore.ContainsInstanceFor(typeToCreate.Type))
-						return this.singletonInstanceStore.GetInstance(typeToCreate.Type);
+					if (this.singletonInstanceStore.ContainsInstancesFor(registration.Type))
+						return this.singletonInstanceStore.GetSingleInstance(registration.Type);
     				break;
+				case Lifecycle.HttpContextOrThreadLocal:
+					throw new NotImplementedException();
     		}
 
-			var constructors = typeToCreate.Type.GetConstructors();
+			var constructors = registration.Type.GetConstructors();
 			var ctorsWithParams = constructors.Select(c => new { ctor = c, parameters = c.GetParameters() });
 			var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
 			foreach (var ctor in orderedEnumerable)
 			{
 				var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
-				if (this.CanCreateAllDependencies(parameterInfos, typeToCreate.Lifecycle))
+				
+				this.CheckDependencies(parameterInfos, registration.Lifecycle);
+				
+				var parameters = new object[ctor.parameters.Length];
+				for (var i = 0; i < ctor.parameters.Length; i++)
 				{
-					var parameters = new object[ctor.parameters.Length];
-					for (var i = 0; i < ctor.parameters.Length; i++)
-					{
-						parameters[i] = this.Create(ctor.parameters[i].ParameterType, buildStack);
-					}
-
-					return ctor.ctor.Invoke(parameters);
+					var typeToCreate = GetTypeToCreate(ctor.parameters[i].ParameterType);
+					// TODO: if ienumerable, get all instances
+					parameters[i] = this.GetInstance(typeToCreate, buildStack);
 				}
+
+				return ctor.ctor.Invoke(parameters);
 			}
 
-			throw new ContainerException("Unable to construct `" + typeToCreate.Type.AssemblyQualifiedName + "`");
+			throw new ContainerException("Unable to construct `" + registration.Type.AssemblyQualifiedName + "`");
 		}
 
 		Registration GetTypeToCreate(Type requestedType)
 		{
 			if (this.HasRegistrationFor(requestedType))
-				return this.GetRegisterationFor(requestedType);
+			{
+				var typeToCreate = this.GetRegistrationsFor(requestedType);
+				return typeToCreate.FirstOrDefault();
+			}
 
 			if (requestedType.IsGenericType)
 			{
@@ -143,7 +157,8 @@ namespace NanoIoC
 				if (this.HasRegistrationFor(genericTypeDefinition))
 				{
 					var genericArguments = requestedType.GetGenericArguments();
-					var registeredTypeFor = this.GetRegisterationFor(genericTypeDefinition);
+					var registeredTypesFor = this.GetRegistrationsFor(genericTypeDefinition);
+					var registeredTypeFor = registeredTypesFor.First();
 					var genericType = registeredTypeFor.Type.MakeGenericType(genericArguments);
 					return new Registration(genericType, registeredTypeFor.Lifecycle);
 				}
@@ -152,27 +167,63 @@ namespace NanoIoC
 			if (!requestedType.IsAbstract && !requestedType.IsInterface)
 				return new Registration(requestedType, Lifecycle.Transient);
 
-			throw new ContainerException("No idea what type to create");
+			throw new ContainerException("Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.");
 		}
 
-		bool CanCreateAllDependencies(IEnumerable<Type> parameters, Lifecycle lifecycle)
+		void CheckDependencies(IEnumerable<Type> parameters, Lifecycle lifecycle)
 		{
-			return parameters.All(p =>
+			parameters.All(p =>
 			                      	{
-										if (this.HasRegistrationFor(p))
-										{
-											var registration = this.GetRegisterationFor(p);
-											if (registration.Lifecycle < lifecycle)
-												throw new ContainerException("foo");
-
+										if (CanCreateDependency(p, lifecycle))
 											return true;
+
+										if (p.IsOrDerivesFrom(typeof(IEnumerable<>)))
+										{
+											var genericArgument = p.GetGenericInterfaceArgumentsFor(typeof(IEnumerable<>))[0];
+											if (this.CanCreateDependency(genericArgument, lifecycle))
+												return true;
 										}
 
-										if (!p.IsAbstract && !p.IsInterface)
+			                      		if (!p.IsAbstract && !p.IsInterface)
 											return true;
 
-			                      		return false;
+										throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "`");
 			                      	});
 		}
+
+    	bool CanCreateDependency(Type p, Lifecycle lifecycle)
+    	{
+    		if (this.HasRegistrationFor(p))
+    		{
+    			var registrations = this.GetRegistrationsFor(p).ToArray();
+											
+    			if (registrations.Length > 1)
+					throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "`, there are multiple concrete types registered for it.");
+
+    			if (registrations[0].Lifecycle < lifecycle)
+					throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's (" + lifecycle + ")");
+
+    			return true;
+    		}
+
+    		return false;
+    	}
+
+    	public IEnumerable ResolveAll(Type abstractType)
+    	{
+    		var registrations = this.GetRegistrationsFor(abstractType);
+
+			if(!registrations.Any())
+				throw new ContainerException("No types registered for `" + abstractType.AssemblyQualifiedName + "`");
+
+    		var objects = new List<object>();
+			foreach(var registration in registrations)
+			{
+				var instance = this.GetInstance(registration, new List<Type>());
+				objects.Add(instance);
+			}
+
+    		return objects;
+    	}
     }
 }

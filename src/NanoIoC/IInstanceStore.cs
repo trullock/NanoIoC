@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace NanoIoC
 {
@@ -19,13 +20,21 @@ namespace NanoIoC
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		bool ContainsInstanceFor(Type type);
+		bool ContainsInstancesFor(Type type);
 
 		/// <summary>
-		/// Get the instance for the given type
+		/// Get the single instance for the given type.
+		/// Will throw if there are multiple instances
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-        object GetInstance(Type type);
+        object GetSingleInstance(Type type);
+
+		/// <summary>
+		/// Gets all instances for the given type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		IEnumerable GetAllInstances(Type type);
     }
 }

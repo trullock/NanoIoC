@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using NanoIoC;
 
 namespace NanoIoC
@@ -20,11 +22,11 @@ namespace NanoIoC
         bool HasRegistrationFor(Type type);
 
 		/// <summary>
-		/// Gets the registered concrete type for the requested type
+		/// Gets the registered concrete types for the requested type
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-        Registration GetRegisterationFor(Type type);
+        IEnumerable<Registration> GetRegistrationsFor(Type type);
 
 		/// <summary>
 		/// Registers the given concrete type against the given abstract type with the given lifecycle
@@ -41,5 +43,7 @@ namespace NanoIoC
     	/// <param name="type"></param>
     	/// <param name="lifecycle">Must not be Transient</param>
     	void Inject(object instance, Type type, Lifecycle lifecycle);
+
+    	IEnumerable ResolveAll(Type abstractType);
     }
 }
