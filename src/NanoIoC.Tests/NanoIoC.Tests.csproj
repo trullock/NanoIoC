@@ -8,8 +8,8 @@
     <ProjectGuid>{421F01D9-2D1C-4D75-AAAF-EE13131B455C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MuonIoC.Tests</RootNamespace>
-    <AssemblyName>MuonIoC.Tests</AssemblyName>
+    <RootNamespace>NanoIoC.Tests</RootNamespace>
+    <AssemblyName>NanoIoC.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

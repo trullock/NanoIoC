@@ -1,3 +1,5 @@
 ﻿name: NanoIoC
 depends: openwrap anchored content
+depends: nunit
+
 use-symlinks: false
