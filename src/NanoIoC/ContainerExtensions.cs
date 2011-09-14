@@ -1,5 +1,3 @@
-using NanoIoC;
-
 namespace NanoIoC
 {
 	public static class ContainerExtensions

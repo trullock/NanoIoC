@@ -1,5 +1,4 @@
-﻿using NanoIoC;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
