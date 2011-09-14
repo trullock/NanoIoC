@@ -16,5 +16,10 @@ namespace NanoIoC
 		{
 			return (T) container.Resolve(typeof (T));
 		}
+
+		public static void Inject<T>(this IContainer container, T instance, Lifecycle lifeCycle = Lifecycle.Singleton)
+		{
+			container.Inject(instance, typeof(T), lifeCycle);
+		}
 	}
 }

@@ -4,15 +4,15 @@ A tiny IoC container, does exactly what you want, and only that.
 
 ## Getting Started
 
-`Container.Current` is a static instance of `IContainer`. You can use this as your entry point.
+`Container.Global` is a static instance of `IContainer`. You can use this as your entry point.
 
 ### Registering Dependencies
 
 Use either of these methods:
 
 <pre>
-void Container.Current.Register<TAbstract, TConcrete>(Lifecycle lifecycle);
-void Container.Current.Register(Type abstract, Type concrete, Lifecycle lifecycle);
+void IContainer.Register<TAbstract, TConcrete>(Lifecycle lifecycle);
+void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle);
 </pre>
 
 ### Resolving Dependencies:
@@ -20,8 +20,8 @@ void Container.Current.Register(Type abstract, Type concrete, Lifecycle lifecycl
 Use either of these methods:
 
 <pre>
-T Container.Current.Resolve<T>();
-object Container.Current.Resolve(Type type);
+T IContainer.Resolve<T>();
+object IContainer.Resolve(Type type);
 </pre>
 
 You can resolve concrete types that aren't registered, as long as all their dependencies are registered.

@@ -9,13 +9,25 @@ namespace NanoIoC.Tests
         public void ShouldConstruct()
         {
             var container = new Container();
-            var instance = container.Resolve<TestClass>();
-            Assert.IsInstanceOf<TestClass>(instance);
+            var instance = container.Resolve<ClassA>();
+
+            Assert.IsInstanceOf<ClassA>(instance);
+			Assert.IsInstanceOf<ClassB>(instance.B);
         }
 
-        public class TestClass
+        public class ClassA
         {
-            
+        	public readonly ClassB B;
+
+        	public ClassA(ClassB b)
+        	{
+        		this.B = b;
+        	}
         }
+
+		public class ClassB
+		{
+
+		}
     }
 }

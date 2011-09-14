@@ -3,7 +3,8 @@ using System.Runtime.Serialization;
 
 namespace NanoIoC
 {
-    public sealed class ContainerException : Exception
+	[Serializable]
+    public class ContainerException : Exception
     {
         internal ContainerException(string message) : base(message)
         {

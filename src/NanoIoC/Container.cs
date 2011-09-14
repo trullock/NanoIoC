@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NanoIoC;
 
 namespace NanoIoC
 {
@@ -25,11 +24,6 @@ namespace NanoIoC
             this.singletonInstanceStore = new SingletonInstanceStore();
         }
 
-        public T Resolve<T>()
-        {
-            return (T)this.Resolve(typeof (T));
-        }
-
         public object Resolve(Type type)
         {
         	if (this.registeredTypes.ContainsKey(type))
@@ -38,7 +32,7 @@ namespace NanoIoC
 			if (this.singletonInstanceStore.ContainsInstanceFor(type))
 				return this.singletonInstanceStore.GetInstance(type);
 
-        	return this.Create(type);
+        	return this.Create(type, new List<Type>());
         }
 
     	object GetInstance(Type type, Registration registration)
@@ -48,7 +42,7 @@ namespace NanoIoC
     			case Lifecycle.Singleton:
     				return this.GetInstance(type, this.singletonInstanceStore);
     			default:
-    				return this.Create(type);
+    				return this.Create(type, new List<Type>());
     		}
     	}
 
@@ -56,8 +50,8 @@ namespace NanoIoC
         {
             if (instanceStore.ContainsInstanceFor(type))
                 return instanceStore.GetInstance(type);
-            
-            var instance = this.Create(type);
+
+			var instance = this.Create(type, new List<Type>());
             instanceStore.Insert(type, instance);
             return instance;
         }
@@ -81,29 +75,33 @@ namespace NanoIoC
             this.registeredTypes[abstractType].Add(new Registration(concreteType, lifecycle));
         }
 
-    	public void Inject(object instance, Type type, Lifecycle lifecycle)
+    	public void Inject(object instance, Type type, Lifecycle lifeCycle)
     	{
-    		throw new NotImplementedException();
-    	}
+			if (lifeCycle == Lifecycle.Transient)
+				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 
-    	public void Inject<T>(T instance, Lifecycle lifeCycle = Lifecycle.Singleton)
-        {
-            if(lifeCycle == Lifecycle.Transient)
-                throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
-
-        	switch (lifeCycle)
-        	{
-        		case Lifecycle.Singleton:
-					this.singletonInstanceStore.Insert(typeof(T), instance);
-        			break;
+			switch (lifeCycle)
+			{
+				case Lifecycle.Singleton:
+					this.singletonInstanceStore.Insert(type, instance);
+					break;
 				default:
 					throw new NotSupportedException();
-        	}
-        }
+			}
+    	}
 
-    	object Create(Type type)
+    	object Create(Type type, ICollection<Type> buildStack)
 		{
 			var typeToCreate = GetTypeToCreate(type);
+
+			if (buildStack.Contains(typeToCreate.Type))
+			{
+				var types = new Type[buildStack.Count];
+				buildStack.CopyTo(types, 0);
+				throw new CyclicDependencyException("Cyclic dependency detected when trying to construct `" + typeToCreate.Type.AssemblyQualifiedName + "`", types);
+			}
+
+			buildStack.Add(typeToCreate.Type);
 
     		switch (typeToCreate.Lifecycle)
     		{
@@ -124,7 +122,7 @@ namespace NanoIoC
 					var parameters = new object[ctor.parameters.Length];
 					for (var i = 0; i < ctor.parameters.Length; i++)
 					{
-						parameters[i] = this.Create(ctor.parameters[i].ParameterType);
+						parameters[i] = this.Create(ctor.parameters[i].ParameterType, buildStack);
 					}
 
 					return ctor.ctor.Invoke(parameters);
@@ -161,14 +159,19 @@ namespace NanoIoC
 		{
 			return parameters.All(p =>
 			                      	{
-										if (!this.HasRegistrationFor(p))
-											return false;
+										if (this.HasRegistrationFor(p))
+										{
+											var registration = this.GetRegisterationFor(p);
+											if (registration.Lifecycle < lifecycle)
+												throw new ContainerException("foo");
 
-			                      		var registration = this.GetRegisterationFor(p);
-										if(registration.Lifecycle < lifecycle)
-											throw new ContainerException("foo");
+											return true;
+										}
 
-			                      		return true;
+										if (!p.IsAbstract && !p.IsInterface)
+											return true;
+
+			                      		return false;
 			                      	});
 		}
     }
