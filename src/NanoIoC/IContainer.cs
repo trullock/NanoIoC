@@ -44,5 +44,7 @@ namespace NanoIoC
     	void Inject(object instance, Type type, Lifecycle lifecycle);
 
     	IEnumerable ResolveAll(Type abstractType);
+
+    	void RemoveAllRegistrationsAndInstancesOf(Type type);
     }
 }

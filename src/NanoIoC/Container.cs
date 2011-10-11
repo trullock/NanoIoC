@@ -237,6 +237,12 @@ namespace NanoIoC
     		return ResolveAll(abstractType, new List<Type>());
     	}
 
+		public void RemoveAllRegistrationsAndInstancesOf(Type type)
+		{
+			if (this.registeredTypes.ContainsKey(type))
+				this.registeredTypes.Remove(type);
+		}
+
 		IEnumerable ResolveAll(Type abstractType, ICollection<Type> buildStack)
 		{
 			var registrations = this.GetRegistrationsFor(abstractType);

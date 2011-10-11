@@ -65,6 +65,15 @@ namespace NanoIoC
 			return container.ResolveAll(typeof (T)).Cast<T>();
 		}
 
+		public static void RemoveAllRegistrationsAndInstancesOf<T>(this IContainer container)
+		{
+			container.RemoveAllRegistrationsAndInstancesOf(typeof(T));
+		}
+
+		public static bool HasRegistrationFor<T>(this IContainer container)
+		{
+			return container.HasRegistrationFor(typeof (T));
+		}
 
 		public static void FindAndRunAllTypeProcessors(this IContainer container)
 		{
