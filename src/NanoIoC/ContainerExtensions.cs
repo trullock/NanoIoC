@@ -42,17 +42,31 @@ namespace NanoIoC
 			return (T) container.Resolve(typeof (T));
 		}
 
+		/// <summary>
+		/// Injects an instance 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="container"></param>
+		/// <param name="instance"></param>
+		/// <param name="lifeCycle"></param>
 		public static void Inject<T>(this IContainer container, T instance, Lifecycle lifeCycle = Lifecycle.Singleton)
 		{
 			container.Inject(instance, typeof(T), lifeCycle);
 		}
 
+		/// <summary>
+		/// Resolves all registered instances of T
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="container"></param>
+		/// <returns></returns>
 		public static IEnumerable<T> ResolveAll<T>(this IContainer container)
 		{
 			return container.ResolveAll(typeof (T)).Cast<T>();
 		}
 
-		public static void RunAllTypeProcessors(this IContainer container)
+
+		public static void FindAndRunAllTypeProcessors(this IContainer container)
 		{
 			var allTypeProcessors = GetAllTypeProcessors();
 

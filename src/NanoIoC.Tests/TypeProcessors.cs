@@ -12,7 +12,7 @@ namespace NanoIoC.Tests
         {
             var container = new Container();
 
-        	container.RunAllTypeProcessors();
+        	container.FindAndRunAllTypeProcessors();
 
         	var instances = container.ResolveAll<TestInterface>().ToArray();
 

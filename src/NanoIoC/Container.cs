@@ -26,6 +26,9 @@ namespace NanoIoC
             this.registeredTypes = new Dictionary<Type, IList<Registration>>();
             this.singletonInstanceStore = new SingletonInstanceStore();
             this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
+
+			// the contain can resolve itself
+			this.Inject<IContainer>(this);
         }
 
         public object Resolve(Type type)
