@@ -25,3 +25,10 @@ object IContainer.Resolve(Type type);
 </pre>
 
 You can resolve concrete types that aren't registered, as long as all their dependencies are registered.
+
+### Injecting instances:
+
+You can inject existing instances:
+
+<pre>
+T

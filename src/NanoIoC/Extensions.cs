@@ -1,26 +1,66 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NanoIoC
 {
-	public static class Extensions
+	internal static class Extensions
 	{
-		public static bool IsOrDerivesFrom(this Type self, Type other)
+		public static IEnumerable Cast(this IEnumerable self, Type innerType)
 		{
-			return other.IsAssignableFrom(self);
+			return typeof (Enumerable).GetMethod("Cast").MakeGenericMethod(innerType).Invoke(null, new [] { self }) as IEnumerable;
 		}
 
-		public static Type[] GetGenericInterfaceArgumentsFor(this Type self, Type other)
+		/// <summary>
+		/// Determines if the current type is or derives from the given type.
+		/// </summary>
+		/// <param name="self"></param>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public static bool IsOrDerivesFrom(this Type self, Type other)
 		{
-			var interfaces = self.GetInterfaces();
-			foreach (var @interface in interfaces)
+			// same
+			if (self.Equals(other))
+				return true;
+
+			// derived classes
+			if (self.IsSubclassOf(other))
+				return true;
+
+			if (other.IsAssignableFrom(self))
+				return true;
+
+			// interfaces
+			IEnumerable<Type> interfaces = self.GetInterfaces();
+			if (self.IsInterface)
+				interfaces = interfaces.Union(new[] { self });
+
+			foreach (var face in interfaces)
 			{
-				if(@interface.IsGenericType && @interface.GetGenericTypeDefinition() == other)
+				if (face.IsGenericType)
 				{
-					return @interface.GetGenericArguments();
+					var genericFace = face.GetGenericTypeDefinition();
+					if (genericFace.IsAssignableFrom(other))
+						return true;
 				}
 			}
 
-			throw new ArgumentException("Interface `" + other.AssemblyQualifiedName + "` is not closed by `" + self.AssemblyQualifiedName + "`");
+			// generic base classes
+			var baseType = self.BaseType;
+			while (baseType != null && baseType != typeof(object))
+			{
+				if (baseType.IsGenericType)
+				{
+					var genericBase = baseType.GetGenericTypeDefinition();
+					if (genericBase.IsAssignableFrom(other))
+						return true;
+				}
+
+				baseType = baseType.BaseType;
+			}
+
+			return false;
 		}
 	}
 }

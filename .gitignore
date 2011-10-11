@@ -11,3 +11,4 @@ _cache
 _ReSharper*/
 *.user
 *.resharper*
+*.wrap

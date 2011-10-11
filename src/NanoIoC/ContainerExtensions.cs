@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
 
 namespace NanoIoC
 {
@@ -51,6 +50,41 @@ namespace NanoIoC
 		public static IEnumerable<T> ResolveAll<T>(this IContainer container)
 		{
 			return container.ResolveAll(typeof (T)).Cast<T>();
+		}
+
+		public static void RunAllTypeProcessors(this IContainer container)
+		{
+			var allTypeProcessors = GetAllTypeProcessors();
+
+			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
+			foreach (var assembly in assemblies)
+			{
+				var types = assembly.GetTypes();
+				foreach (var type in types)
+				{
+					foreach(var typeProcessor in allTypeProcessors)
+						typeProcessor.Process(type, container);
+				}
+			}
+		}
+
+		static IEnumerable<ITypeProcessor> GetAllTypeProcessors()
+		{
+			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
+			foreach(var assembly in assemblies)
+			{
+				var types = assembly.GetTypes();
+				foreach(var type in types)
+				{
+					if (!typeof(ITypeProcessor).IsAssignableFrom(type))
+						continue;
+
+					if(type.IsInterface || type.IsAbstract)
+						continue;
+
+					yield return Activator.CreateInstance(type) as ITypeProcessor;
+				}
+			}
 		}
 	}
 }
