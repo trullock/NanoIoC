@@ -31,6 +31,11 @@ namespace NanoIoC
 			container.Register(typeof(TAbstract), typeof(TConcrete), lifecycle);
 		}
 
+		public static void Register<TAbstract>(this IContainer container, Func<IContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton)
+		{
+			container.Register(typeof(TAbstract), c => ctor(c), lifecycle);
+		}
+
 		/// <summary>
 		/// Resolves
 		/// </summary>
@@ -116,5 +121,7 @@ namespace NanoIoC
 				}
 			}
 		}
+
+		
 	}
 }

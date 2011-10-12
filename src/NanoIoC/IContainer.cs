@@ -35,6 +35,8 @@ namespace NanoIoC
 		/// <param name="lifecycle"></param>
         void Register(Type abstractType, Type concreteType, Lifecycle lifecycle);
 
+		void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle);
+
     	/// <summary>
     	/// Injects the given instance as the given type with the given lifecycle
     	/// </summary>
@@ -46,5 +48,6 @@ namespace NanoIoC
     	IEnumerable ResolveAll(Type abstractType);
 
     	void RemoveAllRegistrationsAndInstancesOf(Type type);
+    	
     }
 }

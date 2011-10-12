@@ -47,33 +47,39 @@ namespace NanoIoC
 
 			buildStack.Add(registration.Type);
 
-			var constructors = registration.Type.GetConstructors();
-			var ctorsWithParams = constructors.Select(c => new { ctor = c, parameters = c.GetParameters() });
-			var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
-			foreach (var ctor in orderedEnumerable)
-			{
-				var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
+			var constructor = registration.Ctor ??
+			                   (container =>
+			                    	{
+			                    		var constructors = registration.Type.GetConstructors();
+			                    		var ctorsWithParams = constructors.Select(c => new {ctor = c, parameters = c.GetParameters()});
+			                    		var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
+			                    		foreach (var ctor in orderedEnumerable)
+			                    		{
+			                    			var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
-				this.CheckDependencies(parameterInfos, registration.Lifecycle);
+			                    			this.CheckDependencies(parameterInfos, registration.Lifecycle);
 
-				var parameters = new object[ctor.parameters.Length];
-				for (var i = 0; i < ctor.parameters.Length; i++)
-				{
-					if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-					{
-						var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
-						parameters[i] = ResolveAll(genericArgument, buildStack);
-					}
-					else
-					{
-						parameters[i] = Resolve(ctor.parameters[i].ParameterType, buildStack);
-					}
-				}
+			                    			var parameters = new object[ctor.parameters.Length];
+			                    			for (var i = 0; i < ctor.parameters.Length; i++)
+			                    			{
+			                    				if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+			                    				{
+			                    					var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
+			                    					parameters[i] = this.ResolveAll(genericArgument, buildStack);
+			                    				}
+			                    				else
+			                    				{
+			                    					parameters[i] = this.Resolve(ctor.parameters[i].ParameterType, buildStack);
+			                    				}
+			                    			}
 
-				return ctor.ctor.Invoke(parameters);
-			}
+			                    			return ctor.ctor.Invoke(parameters);
+			                    		}
 
-			throw new ContainerException("Unable to construct `" + registration.Type.AssemblyQualifiedName + "`");
+			                    		throw new ContainerException("Unable to construct `" + registration.Type.AssemblyQualifiedName + "`");
+			                    	});
+
+			return constructor(this);
 		}
 
 		object Resolve(Type type, ICollection<Type> buildStack)
@@ -147,10 +153,18 @@ namespace NanoIoC
             if(!this.registeredTypes.ContainsKey(abstractType))
                 this.registeredTypes.Add(abstractType, new List<Registration>());
 
-            this.registeredTypes[abstractType].Add(new Registration(concreteType, lifecycle));
+            this.registeredTypes[abstractType].Add(new Registration(concreteType, null, lifecycle));
         }
 
-    	public void Inject(object instance, Type type, Lifecycle lifeCycle)
+		public void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle)
+		{
+			if (!this.registeredTypes.ContainsKey(abstractType))
+				this.registeredTypes.Add(abstractType, new List<Registration>());
+
+			this.registeredTypes[abstractType].Add(new Registration(null, ctor, lifecycle));
+		}
+
+		public void Inject(object instance, Type type, Lifecycle lifeCycle)
     	{
 			if (lifeCycle == Lifecycle.Transient)
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
@@ -183,12 +197,12 @@ namespace NanoIoC
 					var registeredTypesFor = this.GetRegistrationsFor(genericTypeDefinition);
 					var registeredTypeFor = registeredTypesFor.First();
 					var genericType = registeredTypeFor.Type.MakeGenericType(genericArguments);
-					return new Registration(genericType, registeredTypeFor.Lifecycle);
+					return new Registration(genericType, null, registeredTypeFor.Lifecycle);
 				}
 			}
 
 			if (!requestedType.IsAbstract && !requestedType.IsInterface)
-				return new Registration(requestedType, Lifecycle.Transient);
+				return new Registration(requestedType, null, Lifecycle.Transient);
 
 			throw new ContainerException("Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.");
 		}
