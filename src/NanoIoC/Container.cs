@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NanoIoC
 {
-	internal class Container : IContainer
+	public class Container : IContainer
     {
         readonly IDictionary<Type, IList<Registration>> registeredTypes;
         readonly IInstanceStore singletonInstanceStore;
@@ -14,7 +14,7 @@ namespace NanoIoC
 		/// <summary>
 		/// Global container instance
 		/// </summary>
-    	static readonly IContainer Global;
+    	public static readonly IContainer Global;
 
 		static Container()
 		{
@@ -259,5 +259,7 @@ namespace NanoIoC
 
 			return objects.Cast(abstractType);
 		}
+
+		
     }
 }

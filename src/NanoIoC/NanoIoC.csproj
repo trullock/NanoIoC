@@ -47,6 +47,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IInstanceStore.cs" />
+    <Compile Include="IContainerRegistry.cs" />
     <Compile Include="ITypeProcessor.cs" />
     <Compile Include="Lifecycle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

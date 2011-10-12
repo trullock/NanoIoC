@@ -77,7 +77,7 @@ namespace NanoIoC
 
 		public static void FindAndRunAllTypeProcessors(this IContainer container)
 		{
-			var allTypeProcessors = GetAllTypeProcessors();
+			var allTypeProcessors = GetAll<ITypeProcessor>();
 
 			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
 			foreach (var assembly in assemblies)
@@ -91,7 +91,14 @@ namespace NanoIoC
 			}
 		}
 
-		static IEnumerable<ITypeProcessor> GetAllTypeProcessors()
+		public static void FindAndRunAllRegistries(this IContainer container)
+		{
+			var allRegistries = GetAll<IContainerRegistry>();
+			foreach(var registry in allRegistries)
+				registry.Register(container);
+		}
+
+		static IEnumerable<T> GetAll<T>() where T : class
 		{
 			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
 			foreach(var assembly in assemblies)
@@ -99,13 +106,13 @@ namespace NanoIoC
 				var types = assembly.GetTypes();
 				foreach(var type in types)
 				{
-					if (!typeof(ITypeProcessor).IsAssignableFrom(type))
+					if (!typeof(T).IsAssignableFrom(type))
 						continue;
 
 					if(type.IsInterface || type.IsAbstract)
 						continue;
 
-					yield return Activator.CreateInstance(type) as ITypeProcessor;
+					yield return Activator.CreateInstance(type) as T;
 				}
 			}
 		}
