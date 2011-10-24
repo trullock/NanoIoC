@@ -27,7 +27,7 @@ namespace NanoIoC
         public object GetSingleInstance(Type type)
         {
 			if(this.Store[type].Count != 1)
-				throw new ContainerException("TODO");
+				throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.");
 
             return this.Store[type][0];
         }

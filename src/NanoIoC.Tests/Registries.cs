@@ -10,7 +10,7 @@ namespace NanoIoC.Tests
         {
             var container = new Container();
 
-        	container.FindAndRunAllRegistries();
+        	container.RunAllRegistries();
 
         	var instance = container.Resolve<TestInterface>();
 			Assert.AreEqual(typeof(TestClass1), instance.GetType());

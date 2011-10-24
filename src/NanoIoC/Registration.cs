@@ -4,13 +4,15 @@ namespace NanoIoC
 {
 	public struct Registration
     {
-		public readonly Type Type;
+		public readonly Type AbstractType;
+		public readonly Type ConcreteType;
 		public readonly Func<IContainer, object> Ctor;
 		public readonly Lifecycle Lifecycle;
 
-    	internal Registration(Type type, Func<IContainer, object> ctor, Lifecycle lifecycle)
+    	internal Registration(Type abstractType, Type concreteType, Func<IContainer, object> ctor, Lifecycle lifecycle)
         {
-            this.Type = type;
+    		this.AbstractType = abstractType;
+    		this.ConcreteType = concreteType;
     		this.Ctor = ctor;
     		this.Lifecycle = lifecycle;
         }

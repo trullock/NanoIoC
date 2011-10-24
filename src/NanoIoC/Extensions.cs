@@ -62,5 +62,30 @@ namespace NanoIoC
 
 			return false;
 		}
+
+
+		public static Type[] GetGenericArgumentsClosing(this Type self, Type other)
+		{
+			if(other.IsInterface)
+			{
+				if(!other.IsGenericType)
+					throw new ArgumentException("Must be open generic", "other");
+
+				var genericDefinition = other.GetGenericTypeDefinition();
+				if(genericDefinition != other)
+					throw new ArgumentException("Must be open generic", "other");
+
+				var interfaces = self.GetInterfaces();
+				foreach(var @interface in interfaces)
+				{
+					if (@interface.IsGenericType && @interface.GetGenericTypeDefinition() == other)
+						return @interface.GetGenericArguments();
+				}
+
+				throw new ArgumentException("Current type does not close other type", "other");
+			}
+
+			return null;
+		}
 	}
 }

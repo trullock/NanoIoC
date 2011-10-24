@@ -9,9 +9,9 @@ namespace NanoIoC.Tests
         public void ShouldConstruct()
         {
             var container = new Container();
-            container.Register<object, TestClass>(Lifecycle.HttpContextOrThreadLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrThreadLocal);
 
-            var instance = container.Resolve<object>();
+			var instance = container.Resolve<TestInterface>();
             Assert.IsInstanceOf<TestClass>(instance);
         }
 
@@ -19,14 +19,14 @@ namespace NanoIoC.Tests
 		public void ShouldAlwaysBeTheSameInstance()
 		{
 			var container = new Container();
-			container.Register<object, TestClass>();
+			container.Register<TestInterface, TestClass>();
 
-			var instance = container.Resolve<object>();
-			var instance2 = container.Resolve<object>();
+			var instance = container.Resolve<TestInterface>();
+			var instance2 = container.Resolve<TestInterface>();
 			Assert.AreSame(instance, instance2);
 		}
 
-    	public class TestClass
+    	public class TestClass : TestInterface
         {
             
         }

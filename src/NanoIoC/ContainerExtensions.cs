@@ -26,7 +26,7 @@ namespace NanoIoC
 		/// <typeparam name="TConcrete">The concrete type implementing the abstract type</typeparam>
 		/// <param name="container"></param>
 		/// <param name="lifecycle"></param>
-		public static void Register<TAbstract, TConcrete>(this IContainer container, Lifecycle lifecycle = Lifecycle.Singleton)
+		public static void Register<TAbstract, TConcrete>(this IContainer container, Lifecycle lifecycle = Lifecycle.Singleton) where TConcrete : TAbstract
 		{
 			container.Register(typeof(TAbstract), typeof(TConcrete), lifecycle);
 		}
@@ -35,7 +35,7 @@ namespace NanoIoC
 		{
 			container.Register(typeof(TAbstract), c => ctor(c), lifecycle);
 		}
-
+		
 		/// <summary>
 		/// Resolves
 		/// </summary>
@@ -80,48 +80,24 @@ namespace NanoIoC
 			return container.HasRegistrationFor(typeof (T));
 		}
 
-		public static void FindAndRunAllTypeProcessors(this IContainer container)
+		public static void RunAllTypeProcessors(this IContainer container)
 		{
-			var allTypeProcessors = GetAll<ITypeProcessor>();
-
 			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
 			foreach (var assembly in assemblies)
 			{
 				var types = assembly.GetTypes();
 				foreach (var type in types)
 				{
-					foreach(var typeProcessor in allTypeProcessors)
+					foreach(var typeProcessor in Container.TypeProcessors)
 						typeProcessor.Process(type, container);
 				}
 			}
 		}
 
-		public static void FindAndRunAllRegistries(this IContainer container)
+		public static void RunAllRegistries(this IContainer container)
 		{
-			var allRegistries = GetAll<IContainerRegistry>();
-			foreach(var registry in allRegistries)
+			foreach(var registry in Container.Registries)
 				registry.Register(container);
 		}
-
-		static IEnumerable<T> GetAll<T>() where T : class
-		{
-			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
-			foreach(var assembly in assemblies)
-			{
-				var types = assembly.GetTypes();
-				foreach(var type in types)
-				{
-					if (!typeof(T).IsAssignableFrom(type))
-						continue;
-
-					if(type.IsInterface || type.IsAbstract)
-						continue;
-
-					yield return Activator.CreateInstance(type) as T;
-				}
-			}
-		}
-
-		
 	}
 }

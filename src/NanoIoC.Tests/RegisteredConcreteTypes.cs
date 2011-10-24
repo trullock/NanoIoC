@@ -33,7 +33,7 @@ namespace NanoIoC.Tests
 
 			try
 			{
-				container.Register<TestInterface, TestClass>();
+				container.Register(typeof(TestInterface), typeof(TestClass));
 			}
 			catch(ContainerException e)
 			{

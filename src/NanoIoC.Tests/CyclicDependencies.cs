@@ -44,6 +44,16 @@ namespace NanoIoC.Tests
 			}
 		}
 
+		[Test]
+		public void ShouldNotThrowForNonCyclingDependencies()
+		{
+			var container = new Container();
+
+			var classE = container.Resolve<ClassE>();
+
+			Assert.IsNotNull(classE);
+		}
+
 		public class ClassA
 		{
 			public ClassA(ClassB b)
@@ -56,6 +66,18 @@ namespace NanoIoC.Tests
 			public ClassB(ClassA a)
 			{
 			}
+		}
+
+		public class ClassE
+		{
+			public ClassE(ClassF c, ClassF c2)
+			{
+			}
+		}
+
+		public class ClassF
+		{
+			
 		}
 
 		public interface InterfaceC

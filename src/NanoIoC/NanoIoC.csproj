@@ -41,6 +41,7 @@
     <Compile Include="Container.cs" />
     <Compile Include="ContainerException.cs" />
     <Compile Include="ContainerExtensions.cs" />
+    <Compile Include="OpenGenericTypeProcessor.cs" />
     <Compile Include="InstanceStore.cs" />
     <Compile Include="HttpContextOrThreadLocalInstanceStore.cs" />
     <Compile Include="CyclicDependencyException.cs" />

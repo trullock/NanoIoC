@@ -27,6 +27,19 @@ namespace NanoIoC.Tests
             Assert.AreSame(testClass, instance);
         }
 
+//		[Test]
+//		public void ShouldWorkWhenInjectedTwice()
+//		{
+//			var container = new Container();
+//			var testClass1 = new TestClass();
+//			var testClass2 = new TestClass();
+//			container.Inject<object>(testClass1, Lifecycle.Singleton);
+//			container.Inject<object>(testClass2, Lifecycle.HttpContextOrThreadLocal);
+//
+//			var instance = container.Resolve<object>();
+//			Assert.AreSame(testClass2, instance);
+//		}
+
         public class TestClass
         {
             
