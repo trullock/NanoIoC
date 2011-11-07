@@ -63,7 +63,6 @@ namespace NanoIoC
 			return false;
 		}
 
-
 		public static Type[] GetGenericArgumentsClosing(this Type self, Type other)
 		{
 			if(other.IsInterface)

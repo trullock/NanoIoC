@@ -48,6 +48,11 @@ namespace NanoIoC
     	IEnumerable ResolveAll(Type abstractType);
 
     	void RemoveAllRegistrationsAndInstancesOf(Type type);
-    	
+
+		/// <summary>
+		/// Removes all instances with the given lifecycle
+		/// </summary>
+		/// <param name="lifecycle"></param>
+		void RemoveAllInstancesWithLifecycle(Lifecycle lifecycle);
     }
 }

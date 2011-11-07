@@ -36,5 +36,10 @@ namespace NanoIoC
 		/// <param name="type"></param>
 		/// <returns></returns>
 		IEnumerable GetAllInstances(Type type);
+
+		/// <summary>
+		/// Removes all stored instances
+		/// </summary>
+		void Clear();
     }
 }

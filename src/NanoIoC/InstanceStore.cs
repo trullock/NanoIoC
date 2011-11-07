@@ -36,5 +36,10 @@ namespace NanoIoC
 		{
 			return this.Store[type];
 		}
+
+		public void Clear()
+		{
+			this.Store.Clear();
+		}
     }
 }

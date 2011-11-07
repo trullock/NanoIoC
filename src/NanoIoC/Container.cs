@@ -350,6 +350,22 @@ namespace NanoIoC
 			{
 				if (this.registeredTypes.ContainsKey(type))
 					this.registeredTypes.Remove(type);
+				//TODO: shouldnt this remove instances too?
+			}
+		}
+
+		public void RemoveAllInstancesWithLifecycle(Lifecycle lifecycle)
+		{
+			switch (lifecycle)
+			{
+				case Lifecycle.HttpContextOrThreadLocal:
+					this.httpContextOrThreadLocalStore.Clear();
+					break;
+				case Lifecycle.Singleton:
+					this.singletonInstanceStore.Clear();
+					break;
+				case Lifecycle.Transient:
+					throw new ArgumentException("Can't clear transient instances, they're transient!");
 			}
 		}
 

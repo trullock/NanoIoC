@@ -5,12 +5,12 @@ using System.Web;
 namespace NanoIoC
 {
 	/// <summary>
-	/// Stores instances for the life of the application
+	/// Stores instances in the current Httpcontext.Item or threadstatic variable
 	/// </summary>
     internal sealed class HttpContextOrThreadLocalInstanceStore : InstanceStore
 	{
 		[ThreadStatic]
-		static IDictionary<Type, IList<object>> instanceStore;
+		static IDictionary<Type, IList<object>> threadStore;
 		static readonly object mutex;
 
 		static HttpContextOrThreadLocalInstanceStore()
@@ -30,12 +30,12 @@ namespace NanoIoC
 					return HttpContext.Current.Items["__NanoIoC_InstanceStore"] as IDictionary<Type, IList<object>>;
 				}
 
-				if(instanceStore == null)
+				if(threadStore == null)
 					lock(mutex)
-						if(instanceStore == null)
-							instanceStore = new Dictionary<Type, IList<object>>();
+						if(threadStore == null)
+							threadStore = new Dictionary<Type, IList<object>>();
 
-				return instanceStore;
+				return threadStore;
 			}
 		}
     }
