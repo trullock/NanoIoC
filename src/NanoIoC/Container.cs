@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NanoIoC
 {
@@ -34,7 +35,17 @@ namespace NanoIoC
 			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
 			foreach (var assembly in assemblies)
 			{
-				var types = assembly.GetTypes();
+				Type[] types;
+
+				try
+				{
+					types = assembly.GetTypes();
+				}
+				catch(ReflectionTypeLoadException e)
+				{
+					throw new ContainerException("Unable to load one or more types: " + string.Join(", ", e.LoaderExceptions.Select(x => x.Message).ToArray()), e);
+				}
+
 				foreach (var type in types)
 				{
 					if (typeof (IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
