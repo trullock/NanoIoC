@@ -386,15 +386,7 @@ namespace NanoIoC
 			{
 				var registrations = this.GetRegistrationsFor(abstractType);
 
-				if (!registrations.Any())
-					throw new ContainerException("No types registered for `" + abstractType.AssemblyQualifiedName + "`");
-
-				var objects = new List<object>();
-				foreach (var registration in registrations)
-				{
-					var instance = this.GetInstance(registration, buildStack);
-					objects.Add(instance);
-				}
+				var objects = registrations.Select(registration => this.GetInstance(registration, buildStack));
 
 				return objects.Cast(abstractType);
 			}

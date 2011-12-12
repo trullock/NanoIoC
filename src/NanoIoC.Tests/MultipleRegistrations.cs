@@ -50,6 +50,16 @@ namespace NanoIoC.Tests
 			Assert.IsInstanceOf<ClassA2>(b.As[1]);
 		}
 
+		[Test]
+		public void ShouldReturnEmptyEnumerable()
+		{
+			var container = new Container();
+
+			var xs = container.ResolveAll<InterfaceA>();
+
+			Assert.AreEqual(0, xs.Count());
+		}
+
 		public interface InterfaceA
 		{
 			
