@@ -12,6 +12,25 @@ namespace NanoIoC
 			return typeof (Enumerable).GetMethod("Cast").MakeGenericMethod(innerType).Invoke(null, new [] { self }) as IEnumerable;
 		}
 
+		public static object First(this IEnumerable self)
+		{
+			var enumerator = self.GetEnumerator();
+			if (enumerator.MoveNext())
+				return enumerator.Current;
+
+			throw new ArgumentException("Enumerable contains no elements");
+		}
+
+
+		public static T First<T>(this IEnumerable<T> self)
+		{
+			var enumerator = self.GetEnumerator();
+			if (enumerator.MoveNext())
+				return enumerator.Current;
+
+			throw new ArgumentException("Enumerable contains no elements");
+		}
+
 		/// <summary>
 		/// Determines if the current type is or derives from the given type.
 		/// </summary>

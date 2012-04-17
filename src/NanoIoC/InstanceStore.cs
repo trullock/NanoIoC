@@ -9,30 +9,32 @@ namespace NanoIoC
 	/// </summary>
     internal abstract class InstanceStore : IInstanceStore
     {
-		protected abstract IDictionary<Type, IList<object>> Store { get; }
+		public abstract IDictionary<Type, IList<object>> Store { get; }
+		public abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
+		protected abstract Lifecycle Lifecycle { get; }
 
-        public void Insert(Type type, object instance)
+		public void Insert(Type type, object instance)
         {
 			if(!this.Store.ContainsKey(type))
 				this.Store.Add(type, new List<object>());
-
             this.Store[type].Add(instance);
         }
+
+		public void Inject(Type type, object instance)
+		{
+			if (!this.InjectedRegistrations.ContainsKey(type))
+				this.InjectedRegistrations.Add(type, new List<Registration>());
+			this.InjectedRegistrations[type].Add(new Registration(type, instance.GetType(), null, this.Lifecycle));
+
+			this.Insert(type, instance);
+		}
 
         public bool ContainsInstancesFor(Type type)
         {
             return this.Store.ContainsKey(type);
         }
 
-        public object GetSingleInstance(Type type)
-        {
-			if(this.Store[type].Count != 1)
-				throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.");
-
-            return this.Store[type][0];
-        }
-
-		public IEnumerable GetAllInstances(Type type)
+		public IEnumerable GetInstances(Type type)
 		{
 			return this.Store[type];
 		}
@@ -40,6 +42,7 @@ namespace NanoIoC
 		public void Clear()
 		{
 			this.Store.Clear();
+			this.InjectedRegistrations.Clear();
 		}
     }
 }

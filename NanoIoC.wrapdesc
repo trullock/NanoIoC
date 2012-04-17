@@ -4,4 +4,4 @@ depends: nunit
 
 use-symlinks: false
 
-build: msbuild;project=src\NanoIoC\NanoIoC.csproj;profile=net35;profile=net40
+build: msbuild;project=src\NanoIoC\NanoIoC.csproj;profile=net40

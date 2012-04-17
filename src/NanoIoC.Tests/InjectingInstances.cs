@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
@@ -27,22 +28,56 @@ namespace NanoIoC.Tests
             Assert.AreSame(testClass, instance);
         }
 
-//		[Test]
-//		public void ShouldWorkWhenInjectedTwice()
-//		{
-//			var container = new Container();
-//			var testClass1 = new TestClass();
-//			var testClass2 = new TestClass();
-//			container.Inject<object>(testClass1, Lifecycle.Singleton);
-//			container.Inject<object>(testClass2, Lifecycle.HttpContextOrThreadLocal);
-//
-//			var instance = container.Resolve<object>();
-//			Assert.AreSame(testClass2, instance);
-//		}
+		[Test]
+		public void ShouldResolveRegisteredAndInjected()
+		{
+			var container = new Container();
 
-        public class TestClass
+			container.Register<TestInterface, TestClass>();
+
+			var testClass = new TestClass2();
+			container.Inject<TestInterface>(testClass);
+
+			var instances = container.ResolveAll<TestInterface>().ToArray();
+
+			Assert.AreEqual(2, instances.Length);
+
+			Assert.AreNotSame(instances[0], instances[1]);
+		}
+
+		[Test]
+		public void ShouldResolveRegisteredResolvedAndInjected()
+		{
+			var container = new Container();
+
+			container.Register<TestInterface, TestClass>();
+			container.Resolve<TestInterface>();
+
+			var testClass = new TestClass2();
+			container.Inject<TestInterface>(testClass);
+
+			var instances = container.ResolveAll<TestInterface>().ToArray();
+
+			Assert.AreEqual(2, instances.Length);
+
+			Assert.AreNotSame(instances[0], instances[1]);
+		}
+
+
+		public class TestClass : TestInterface
         {
             
         }
+
+		public class TestClass2 : TestInterface
+		{
+
+		}
+
+
+		public interface TestInterface
+		{
+			
+		}
     }
 }

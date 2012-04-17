@@ -77,7 +77,7 @@ namespace NanoIoC
 
 		public static bool HasRegistrationFor<T>(this IContainer container)
 		{
-			return container.HasRegistrationFor(typeof (T));
+			return container.HasRegistrationsFor(typeof (T));
 		}
 
 		public static void RunAllTypeProcessors(this IContainer container)
@@ -98,6 +98,22 @@ namespace NanoIoC
 		{
 			foreach(var registry in Container.Registries)
 				registry.Register(container);
+		}
+
+		public static IContainer With<T>(this IContainer container, T replacement)
+		{
+			// dirty
+			if(!(container is Container))
+				throw new ArgumentException("container is not a `" + typeof(Container).FullName + "`");
+			
+			var newContainer = new Container(container as Container);
+
+			if (newContainer.HasRegistrationFor<T>())
+				newContainer.RemoveAllRegistrationsAndInstancesOf<T>();
+
+			newContainer.Inject<T>(replacement);
+
+			return newContainer;
 		}
 	}
 }

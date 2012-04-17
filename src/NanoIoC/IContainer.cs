@@ -18,7 +18,7 @@ namespace NanoIoC
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-        bool HasRegistrationFor(Type type);
+        bool HasRegistrationsFor(Type type);
 
 		/// <summary>
 		/// Gets the registered concrete types for the requested type
@@ -54,5 +54,8 @@ namespace NanoIoC
 		/// </summary>
 		/// <param name="lifecycle"></param>
 		void RemoveAllInstancesWithLifecycle(Lifecycle lifecycle);
+
+		// Empty the container of everything! (apart from itself)
+    	void Reset();
     }
 }

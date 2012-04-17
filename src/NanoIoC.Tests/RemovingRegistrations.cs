@@ -8,7 +8,7 @@ namespace NanoIoC.Tests
     public class RemovingRegistrations
     {
         [Test]
-        public void ShouldResolveAll()
+        public void ShouldntHaveRegistrations()
         {
             var container = new Container();
         	container.Register<InterfaceA, ClassA1>();
@@ -21,17 +21,15 @@ namespace NanoIoC.Tests
         }
 
 		[Test]
-		public void ShouldInjectAll()
+		public void ShouldRemoveInstances()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>();
+			container.Inject<InterfaceA>(new ClassA1());
 			container.Register<InterfaceA, ClassA2>();
 
-			var b = container.Resolve<ClassB>();
+			container.RemoveAllRegistrationsAndInstancesOf<InterfaceA>();
 
-			Assert.AreEqual(2, b.As.Length);
-			Assert.IsInstanceOf<ClassA1>(b.As[0]);
-			Assert.IsInstanceOf<ClassA2>(b.As[1]);
+			Assert.AreEqual(0, container.ResolveAll<InterfaceA>().Count());
 		}
 
 		public interface InterfaceA

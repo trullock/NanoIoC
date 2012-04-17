@@ -37,6 +37,23 @@ namespace NanoIoC.Tests
         }
 
 		[Test]
+		public void ShouldNotBuildTwice()
+		{
+			var container = new Container();
+			container.Register<InterfaceA, ClassA1>();
+			container.Register<InterfaceA, ClassA2>();
+
+			var all = container.ResolveAll<InterfaceA>().ToArray();
+			var all2 = container.ResolveAll<InterfaceA>().ToArray();
+
+			Assert.AreEqual(2, all.Length);
+			Assert.AreEqual(2, all2.Length);
+
+			Assert.AreSame(all[0], all2[0]);
+			Assert.AreSame(all[1], all2[1]);
+		}
+
+		[Test]
 		public void ShouldInjectAll()
 		{
 			var container = new Container();
@@ -58,6 +75,16 @@ namespace NanoIoC.Tests
 			var xs = container.ResolveAll<InterfaceA>();
 
 			Assert.AreEqual(0, xs.Count());
+		}
+
+		[Test]
+		public void ShouldReturnEmptyEnumerableForDependencies()
+		{
+			var container = new Container();
+
+			var x = container.Resolve<ClassB>();
+
+			Assert.AreEqual(0, x.As.Count());
 		}
 
 		public interface InterfaceA
