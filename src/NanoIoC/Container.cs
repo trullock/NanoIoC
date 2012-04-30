@@ -378,10 +378,14 @@ namespace NanoIoC
 				if (this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type))
 					this.singletonInstanceStore.InjectedRegistrations.Remove(type);
 
+				if (this.singletonInstanceStore.Store.ContainsKey(type))
+					this.singletonInstanceStore.Store.Remove(type);
+
 				if (this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type))
 					this.httpContextOrThreadLocalStore.InjectedRegistrations.Remove(type);
 
-				//TODO: remove the actual instances too
+				if (this.httpContextOrThreadLocalStore.Store.ContainsKey(type))
+					this.httpContextOrThreadLocalStore.Store.Remove(type);
 			}
 		}
 
