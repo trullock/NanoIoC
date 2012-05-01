@@ -44,5 +44,14 @@ namespace NanoIoC
 			this.Store.Clear();
 			this.InjectedRegistrations.Clear();
 		}
+
+		public void Remove(Type type)
+		{
+			if (this.InjectedRegistrations.ContainsKey(type))
+				this.InjectedRegistrations.Remove(type);
+
+			if (this.Store.ContainsKey(type))
+				this.Store.Remove(type);
+		}
     }
 }

@@ -49,6 +49,23 @@ namespace NanoIoC.Tests
 			Assert.AreSame(class2, classA1);
 		}
 
+		[Test]
+		public void ShouldRemoveInstances3()
+		{
+			var container = new Container();
+			var class1 = new ClassA1();
+			var class2 = new ClassA1();
+
+			container.Inject(class1, Lifecycle.HttpContextOrThreadLocal);
+
+			container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrThreadLocal);
+
+			container.Inject(class2, Lifecycle.HttpContextOrThreadLocal);
+
+			var classA1 = container.Resolve<ClassA1>();
+			Assert.AreSame(class2, classA1);
+		}
+
 		public interface InterfaceA
 		{
 			

@@ -46,5 +46,11 @@ namespace NanoIoC
 		IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
 
 		void Inject(Type type, object instance);
+
+		/// <summary>
+		/// Removes all instances ang registrations of the given type
+		/// </summary>
+		/// <param name="type"></param>
+		void Remove(Type type);
     }
 }

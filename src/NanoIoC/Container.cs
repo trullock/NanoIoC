@@ -375,17 +375,8 @@ namespace NanoIoC
 				if (this.registeredTypes.ContainsKey(type))
 					this.registeredTypes.Remove(type);
 
-				if (this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type))
-					this.singletonInstanceStore.InjectedRegistrations.Remove(type);
-
-				if (this.singletonInstanceStore.Store.ContainsKey(type))
-					this.singletonInstanceStore.Store.Remove(type);
-
-				if (this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type))
-					this.httpContextOrThreadLocalStore.InjectedRegistrations.Remove(type);
-
-				if (this.httpContextOrThreadLocalStore.Store.ContainsKey(type))
-					this.httpContextOrThreadLocalStore.Store.Remove(type);
+				this.singletonInstanceStore.Remove(type);
+				this.httpContextOrThreadLocalStore.Remove(type);
 			}
 		}
 
