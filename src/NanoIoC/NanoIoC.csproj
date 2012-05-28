@@ -44,7 +44,6 @@
     <Compile Include="OpenGenericTypeProcessor.cs" />
     <Compile Include="InstanceStore.cs" />
     <Compile Include="HttpContextOrThreadLocalInstanceStore.cs" />
-    <Compile Include="CyclicDependencyException.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IInstanceStore.cs" />

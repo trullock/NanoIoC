@@ -18,7 +18,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.MixedLifecycles+TestTransientClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`. It's lifecycle (Transient) is shorter than the dependee's `NanoIoC.Tests.MixedLifecycles+TestSingletonClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` (Singleton)", e.Message);
+				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.MixedLifecycles+TestTransientClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`. It's lifecycle (Transient) is shorter than the dependee's `NanoIoC.Tests.MixedLifecycles+TestSingletonClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` (Singleton)\nBuild Stack:\nNanoIoC.Tests.MixedLifecycles+TestSingletonClass", e.Message);
 			}
         }
 

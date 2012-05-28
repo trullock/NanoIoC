@@ -112,11 +112,7 @@ namespace NanoIoC
 		object GetInstance(Registration registration, Stack<Type> buildStack)
 		{
 			if (buildStack.Contains(registration.ConcreteType))
-			{
-				var types = new Type[buildStack.Count];
-				buildStack.CopyTo(types, 0);
-				throw new CyclicDependencyException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", types);
-			}
+				throw new ContainerException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
 
 			buildStack.Push(registration.ConcreteType);
 
@@ -135,7 +131,7 @@ namespace NanoIoC
 			                    			var parameters = new object[ctor.parameters.Length];
 			                    			for (var i = 0; i < ctor.parameters.Length; i++)
 			                    			{
-			                    				var newBuildStack = new Stack<Type>(buildStack);
+												var newBuildStack = new Stack<Type>(buildStack.Reverse());
 			                    				if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
 			                    				{
 			                    					var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
