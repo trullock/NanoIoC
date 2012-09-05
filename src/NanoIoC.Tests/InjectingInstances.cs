@@ -7,7 +7,17 @@ namespace NanoIoC.Tests
     public class InjectingInstances
     {
         [Test]
-        public void ShouldWorkForTheDefaultType()
+		public void ShouldWorkForNullInstances()
+        {
+            var container = new Container();
+            container.Inject(new TestClass());
+            container.Inject<TestClass2>(null);
+
+            var instance = container.Resolve<TestClass3>();
+        }
+
+        [Test]
+		public void ShouldWorkForTheDefaultType()
         {
             var container = new Container();
             var testClass = new TestClass();
@@ -72,6 +82,13 @@ namespace NanoIoC.Tests
 		public class TestClass2 : TestInterface
 		{
 
+		}
+
+		public class TestClass3
+		{
+			public TestClass3(TestClass tc, TestClass2 tc2)
+			{
+			}
 		}
 
 

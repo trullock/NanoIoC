@@ -24,7 +24,7 @@ namespace NanoIoC
 		{
 			if (!this.InjectedRegistrations.ContainsKey(type))
 				this.InjectedRegistrations.Add(type, new List<Registration>());
-			this.InjectedRegistrations[type].Add(new Registration(type, instance.GetType(), null, this.Lifecycle));
+			this.InjectedRegistrations[type].Add(new Registration(type, instance != null ? instance.GetType() : type, null, this.Lifecycle));
 
 			this.Insert(type, instance);
 		}

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace NanoIoC
 {
-	public sealed class Container : IContainer
+	public sealed class Container : MarshalByRefObject, IContainer
     {
         readonly IDictionary<Type, IList<Registration>> registeredTypes;
         readonly IInstanceStore singletonInstanceStore;
@@ -200,7 +200,7 @@ namespace NanoIoC
 
     		foreach (var registration in typesToCreate)
     		{
-    			if(!instances.Any(i => i.GetType() == registration.ConcreteType))
+    			if(!instances.Any(i => i != null && i.GetType() == registration.ConcreteType))
     			{
 					var newinstance = this.GetInstance(registration, buildStack);
 
