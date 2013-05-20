@@ -18,6 +18,19 @@ namespace NanoIoC.Tests
         }
 
         [Test]
+        public void ShouldResolveSameInstance()
+        {
+            var container = new Container();
+
+			container.Register<TestInterface>(c => new TestClass());
+
+			var resolved1 = container.Resolve<TestInterface>();
+			var resolved2 = container.Resolve<TestInterface>();
+
+            Assert.AreSame(resolved1, resolved2);
+        }
+
+        [Test]
         public void ShouldResolveNullCtors()
         {
             var container = new Container();
