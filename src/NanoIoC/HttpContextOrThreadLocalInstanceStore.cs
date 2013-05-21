@@ -32,7 +32,7 @@ namespace NanoIoC
 			if(HttpContext.Current != null)
 			{
 				// todo: replace ILists with new lists
-				HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<object>>(HttpContext.Current.Items["__NanoIoC_InstanceStore_" + httpContextOrThreadLocalInstanceStore.id] as IDictionary<Type, IList<object>>);
+				HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>(HttpContext.Current.Items["__NanoIoC_InstanceStore_" + httpContextOrThreadLocalInstanceStore.id] as IDictionary<Type, IList<Tuple<Registration, object>>>);
 				HttpContext.Current.Items["__NanoIoC_InjectedRegistrations_" + this.id] = new Dictionary<Type, IList<Registration>>(HttpContext.Current.Items["__NanoIoC_InjectedRegistrations_" + httpContextOrThreadLocalInstanceStore.id] as IDictionary<Type, IList<Registration>>);
 			}
 			else
@@ -49,7 +49,7 @@ namespace NanoIoC
 				if(HttpContext.Current != null)
 				{
 					if (HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] == null)
-						HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<object>>();
+						HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>();
 
 					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] as IDictionary<Type, IList<Tuple<Registration, object>>>;
 				}
