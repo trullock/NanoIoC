@@ -193,24 +193,24 @@ namespace NanoIoC
         {
 			var typesToCreate = GetTypesToCreate(requestType, buildStack);
 
-    		var instances = new List<object>();
+			var instances = new List<Tuple<Registration, object>>();
 
     		if (instanceStore.ContainsInstancesFor(requestType))
-                instances.AddRange(instanceStore.GetInstances(requestType).Cast<object>());
+				instances.AddRange(instanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
 
     		foreach (var registration in typesToCreate)
     		{
-    			if(!instances.Any(i => i != null && i.GetType() == registration.ConcreteType))
+    			if(!instances.Any(i => i != null && i.Item1 == registration))
     			{
 					var newinstance = this.GetInstance(registration, buildStack);
 
-					instanceStore.Insert(requestType, newinstance);
+					instanceStore.Insert(registration, requestType, newinstance);
 
-					instances.Add(newinstance);
+					instances.Add(new Tuple<Registration, object>(registration, newinstance));
     			}
     		}
     		
-            return instances;
+            return instances.Select(i => i.Item2).ToArray();
         }
 
 		/// <summary>

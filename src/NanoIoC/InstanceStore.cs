@@ -9,24 +9,27 @@ namespace NanoIoC
 	/// </summary>
     internal abstract class InstanceStore : IInstanceStore
     {
-		public abstract IDictionary<Type, IList<object>> Store { get; }
+		public abstract IDictionary<Type, IList<Tuple<Registration, object>>> Store { get; }
 		public abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
 		protected abstract Lifecycle Lifecycle { get; }
 
-		public void Insert(Type type, object instance)
+		public void Insert(Registration registration, Type type, object instance)
         {
 			if(!this.Store.ContainsKey(type))
-				this.Store.Add(type, new List<object>());
-            this.Store[type].Add(instance);
+				this.Store.Add(type, new List<Tuple<Registration, object>>());
+
+            this.Store[type].Add(new Tuple<Registration, object>(registration, instance));
         }
 
 		public void Inject(Type type, object instance)
 		{
 			if (!this.InjectedRegistrations.ContainsKey(type))
 				this.InjectedRegistrations.Add(type, new List<Registration>());
-			this.InjectedRegistrations[type].Add(new Registration(type, instance != null ? instance.GetType() : type, null, this.Lifecycle));
 
-			this.Insert(type, instance);
+			var registration = new Registration(type, instance != null ? instance.GetType() : type, null, this.Lifecycle);
+			this.InjectedRegistrations[type].Add(registration);
+
+			this.Insert(registration, type, instance);
 		}
 
         public bool ContainsInstancesFor(Type type)

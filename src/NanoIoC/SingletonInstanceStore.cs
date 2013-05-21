@@ -8,23 +8,23 @@ namespace NanoIoC
 	/// </summary>
     internal sealed class SingletonInstanceStore : InstanceStore
     {
-        readonly IDictionary<Type, IList<object>> instanceStore;
+		readonly IDictionary<Type, IList<Tuple<Registration, object>>> instanceStore;
 		readonly IDictionary<Type, IList<Registration>> injectedRegistrations;
 
 		public SingletonInstanceStore()
         {
-            this.instanceStore = new Dictionary<Type, IList<object>>();
+			this.instanceStore = new Dictionary<Type, IList<Tuple<Registration, object>>>();
 			this.injectedRegistrations = new Dictionary<Type, IList<Registration>>();
         }
 
 		public SingletonInstanceStore(IInstanceStore store)
 		{
 			// todo: replace ILists with new lists
-			this.instanceStore = new Dictionary<Type, IList<object>>(store.Store);
+			this.instanceStore = new Dictionary<Type, IList<Tuple<Registration, object>>>(store.Store);
 			this.injectedRegistrations = new Dictionary<Type, IList<Registration>>(store.InjectedRegistrations);
 		}
 
-		public override IDictionary<Type, IList<object>> Store
+		public override IDictionary<Type, IList<Tuple<Registration, object>>> Store
 		{
 			get { return this.instanceStore; }
 		}

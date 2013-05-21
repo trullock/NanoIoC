@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
@@ -26,6 +27,9 @@ namespace NanoIoC.Tests
 
 			var resolved1 = container.Resolve<TestInterface>();
 			var resolved2 = container.Resolve<TestInterface>();
+			
+			var resolvedAll = container.ResolveAll<TestInterface>().ToArray();
+			Assert.AreEqual(1, resolvedAll.Length);
 
             Assert.AreSame(resolved1, resolved2);
         }

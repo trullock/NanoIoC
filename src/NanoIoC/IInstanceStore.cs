@@ -12,9 +12,10 @@ namespace NanoIoC
 		/// <summary>
 		/// Inserts an instance
 		/// </summary>
+		/// <param name="registration">The associated Registration</param>
 		/// <param name="type"></param>
 		/// <param name="instance"></param>
-        void Insert(Type type, object instance);
+		void Insert(Registration registration, Type type, object instance);
         
 		/// <summary>
 		/// Determines if there is an instance stored of the given type
@@ -38,7 +39,7 @@ namespace NanoIoC
 		/// <summary>
 		/// The underlying data structure.
 		/// </summary>
-		IDictionary<Type, IList<object>> Store { get; }
+		IDictionary<Type, IList<Tuple<Registration, object>>> Store { get; }
 
 		/// <summary>
 		/// Stores registrations for injected instances

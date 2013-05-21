@@ -2,7 +2,7 @@ using System;
 
 namespace NanoIoC
 {
-	public struct Registration
+	public class Registration
     {
 		public readonly Type AbstractType;
 		public readonly Type ConcreteType;

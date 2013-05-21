@@ -10,14 +10,14 @@ namespace NanoIoC
 	/// </summary>
     internal sealed class HttpContextOrThreadLocalInstanceStore : InstanceStore
 	{
-		readonly ThreadLocal<IDictionary<Type, IList<object>>> threadStore;
+		readonly ThreadLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> threadStore;
 		readonly ThreadLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
 		readonly Guid id;
 
 		public HttpContextOrThreadLocalInstanceStore()
 		{
 			this.id = Guid.NewGuid();
-			this.threadStore = new ThreadLocal<IDictionary<Type, IList<object>>>(() => new Dictionary<Type, IList<object>>());
+			this.threadStore = new ThreadLocal<IDictionary<Type, IList<Tuple<Registration, object>>>>(() => new Dictionary<Type, IList<Tuple<Registration, object>>>());
 			this.injectedRegistrations = new ThreadLocal<IDictionary<Type, IList<Registration>>>(() => new Dictionary<Type, IList<Registration>>());
 		}
 
@@ -37,12 +37,12 @@ namespace NanoIoC
 			}
 			else
 			{
-				this.threadStore.Value = new Dictionary<Type, IList<object>>(httpContextOrThreadLocalInstanceStore.threadStore.Value);
+				this.threadStore.Value = new Dictionary<Type, IList<Tuple<Registration, object>>>(httpContextOrThreadLocalInstanceStore.threadStore.Value);
 				this.injectedRegistrations.Value = new Dictionary<Type, IList<Registration>>(httpContextOrThreadLocalInstanceStore.injectedRegistrations.Value);
 			}
 		}
 
-		public override IDictionary<Type, IList<object>> Store
+		public override IDictionary<Type, IList<Tuple<Registration, object>>> Store
 		{
 			get
 			{
@@ -51,7 +51,7 @@ namespace NanoIoC
 					if (HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] == null)
 						HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<object>>();
 
-					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] as IDictionary<Type, IList<object>>;
+					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] as IDictionary<Type, IList<Tuple<Registration, object>>>;
 				}
 
 				return this.threadStore.Value;
