@@ -48,7 +48,18 @@ namespace NanoIoC
 			this.InjectedRegistrations.Clear();
 		}
 
-		public void Remove(Type type)
+		public void RemoveAllInstancesAndRegistrations(Type type)
+		{
+			// TODO: this should remove all instances from all stores in all httpcontexts :/
+
+			if (this.InjectedRegistrations.ContainsKey(type))
+				this.InjectedRegistrations.Remove(type);
+
+			if (this.Store.ContainsKey(type))
+				this.Store.Remove(type);
+		}
+
+		public void RemoveInstances(Type type)
 		{
 			if (this.InjectedRegistrations.ContainsKey(type))
 				this.InjectedRegistrations.Remove(type);

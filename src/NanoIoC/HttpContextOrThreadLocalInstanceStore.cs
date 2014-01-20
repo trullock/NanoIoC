@@ -8,7 +8,7 @@ namespace NanoIoC
 	/// <summary>
 	/// Stores instances in the current Httpcontext.Item or threadstatic variable
 	/// </summary>
-    internal sealed class HttpContextOrThreadLocalInstanceStore : InstanceStore
+    sealed class HttpContextOrThreadLocalInstanceStore : InstanceStore
 	{
 		readonly ThreadLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> threadStore;
 		readonly ThreadLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;

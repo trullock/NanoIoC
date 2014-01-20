@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
+    <Compile Include="RemovingInstances.cs" />
     <Compile Include="With.cs" />
     <Compile Include="MultiThreadingWithClearing.cs" />
     <Compile Include="MultiThreading.cs" />

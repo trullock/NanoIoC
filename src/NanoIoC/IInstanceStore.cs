@@ -49,9 +49,15 @@ namespace NanoIoC
 		void Inject(Type type, object instance);
 
 		/// <summary>
-		/// Removes all instances ang registrations of the given type
+		/// Removes all instances and registrations of the given type
 		/// </summary>
 		/// <param name="type"></param>
-		void Remove(Type type);
+		void RemoveAllInstancesAndRegistrations(Type type);
+
+		/// <summary>
+		/// Removes instances of the given type from the store in the context of the current user
+		/// </summary>
+		/// <param name="type"></param>
+		void RemoveInstances(Type type);
     }
 }

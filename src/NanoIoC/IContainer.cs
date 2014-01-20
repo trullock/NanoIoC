@@ -57,5 +57,7 @@ namespace NanoIoC
 
 		// Empty the container of everything! (apart from itself)
     	void Reset();
+
+	    void RemoveInstancesOf(Type type, Lifecycle lifecycle);
     }
 }

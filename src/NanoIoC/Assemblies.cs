@@ -14,9 +14,10 @@ namespace NanoIoC
 
 			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-			assemblies.AddRange(AllFromPath(baseDirectory, filter));
+			if (Directory.Exists(baseDirectory))
+				assemblies.AddRange(AllFromPath(baseDirectory, filter));
+
 			var binPath = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
-			
 			if (Directory.Exists(binPath))
 				assemblies.AddRange(AllFromPath(binPath, filter));
 
@@ -27,7 +28,8 @@ namespace NanoIoC
 		{
 			var assemblyPaths = Directory.GetFiles(path).Where(file =>
 					   Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)
-					   || Path.GetExtension(file).Equals(".dll", StringComparison.OrdinalIgnoreCase));
+					   || Path.GetExtension(file).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+					   .ToArray();
 
 			foreach (var assemblyPath in assemblyPaths)
 			{
@@ -37,8 +39,13 @@ namespace NanoIoC
 				{
 					assembly = Assembly.LoadFrom(assemblyPath);
 				}
-				catch
+				catch(Exception e)
 				{
+					Console.WriteLine("==============================");
+					Console.WriteLine(e.Message);
+					Console.WriteLine("==============================");
+					
+					throw e;
 				}
 
 				if (assembly != null && filter(assembly))

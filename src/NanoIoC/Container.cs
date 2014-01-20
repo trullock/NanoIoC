@@ -371,8 +371,8 @@ namespace NanoIoC
 				if (this.registeredTypes.ContainsKey(type))
 					this.registeredTypes.Remove(type);
 
-				this.singletonInstanceStore.Remove(type);
-				this.httpContextOrThreadLocalStore.Remove(type);
+				this.singletonInstanceStore.RemoveAllInstancesAndRegistrations(type);
+				this.httpContextOrThreadLocalStore.RemoveAllInstancesAndRegistrations(type);
 			}
 		}
 
@@ -433,6 +433,25 @@ namespace NanoIoC
 			}
 		}
 
-		
+
+		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
+		{
+			lock (this.mutex)
+			{
+				switch (lifecycle)
+				{
+					case Lifecycle.HttpContextOrThreadLocal:
+						this.httpContextOrThreadLocalStore.RemoveInstances(type);
+						return;
+
+					case Lifecycle.Singleton:
+						this.singletonInstanceStore.RemoveInstances(type);
+						return;
+
+					case Lifecycle.Transient:
+						throw new ArgumentException();
+				}
+			}
+		}
     }
 }

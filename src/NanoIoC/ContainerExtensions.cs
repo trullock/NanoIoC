@@ -60,6 +60,32 @@ namespace NanoIoC
 		}
 
 		/// <summary>
+		/// Replaces an injected instance with the new instance
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="container"></param>
+		/// <param name="instance">The type of the instance to resolve against</param>
+		/// <param name="lifecycle">The lifecycle must match the original injected instance's lifecycle</param>
+		public static void ReplaceInjected<T>(this IContainer container, T instance, Lifecycle lifecycle = Lifecycle.Singleton)
+		{
+			container.ReplaceInjected(instance, typeof(T), lifecycle);
+		}
+
+		/// <summary>
+		/// Replaces an injected instance with the new instance
+		/// </summary>
+		/// <param name="container"></param>
+		/// <param name="instance">The instance type</param>
+		/// <param name="type">The type of the instance to resolve against</param>
+		/// <param name="lifecycle">The lifecycle must match the original injected instance's lifecycle</param>
+		public static void ReplaceInjected(this IContainer container, object instance, Type type, Lifecycle lifecycle = Lifecycle.Singleton)
+		{
+			container.RemoveInstancesOf(type, lifecycle);
+			container.Inject(instance, type, lifecycle);
+		}
+
+
+		/// <summary>
 		/// Resolves all registered instances of T
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -73,6 +99,11 @@ namespace NanoIoC
 		public static void RemoveAllRegistrationsAndInstancesOf<T>(this IContainer container)
 		{
 			container.RemoveAllRegistrationsAndInstancesOf(typeof(T));
+		}
+
+		public static void RemoveInstancesOf<T>(this IContainer container, Lifecycle lifecycle)
+		{
+			container.RemoveInstancesOf(typeof(T), lifecycle);
 		}
 
 		public static bool HasRegistrationFor<T>(this IContainer container)
