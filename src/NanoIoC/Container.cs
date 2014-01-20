@@ -48,10 +48,10 @@ namespace NanoIoC
 
 				foreach (var type in types)
 				{
-					if (typeof (IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+					if (typeof(IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
 						registries.Add(Activator.CreateInstance(type) as IContainerRegistry);
 
-					if (typeof (ITypeProcessor).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+					if (typeof (ITypeProcessor).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
 						typeProcessors.Add(Activator.CreateInstance(type) as ITypeProcessor);
 				}
 			}
