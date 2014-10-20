@@ -7,7 +7,7 @@ namespace NanoIoC
 	/// <summary>
 	/// Stores instances for the life of the application
 	/// </summary>
-    internal abstract class InstanceStore : IInstanceStore
+	public abstract class InstanceStore : IInstanceStore
     {
 		public abstract IDictionary<Type, IList<Tuple<Registration, object>>> Store { get; }
 		public abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }

@@ -59,5 +59,6 @@ namespace NanoIoC
     	void Reset();
 
 	    void RemoveInstancesOf(Type type, Lifecycle lifecycle);
+	    object Resolve(Type type, params object[] dependencies);
     }
 }

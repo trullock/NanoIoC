@@ -6,7 +6,7 @@ namespace NanoIoC
 	/// <summary>
 	/// Stores instances for the life of the application
 	/// </summary>
-    internal sealed class SingletonInstanceStore : InstanceStore
+    internal class SingletonInstanceStore : InstanceStore
     {
 		readonly IDictionary<Type, IList<Tuple<Registration, object>>> instanceStore;
 		readonly IDictionary<Type, IList<Registration>> injectedRegistrations;

@@ -159,5 +159,10 @@ namespace NanoIoC
 
 			return newContainer;
 		}
+
+		public static object Resolve<T>(this IContainer container, params object[] dependencies)
+		{
+			return container.Resolve(typeof (T), dependencies);
+		}
 	}
 }
