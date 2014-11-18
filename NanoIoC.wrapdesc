@@ -1,7 +1,0 @@
-﻿name: NanoIoC
-depends: openwrap anchored content
-depends: nunit
-
-use-symlinks: false
-
-build: msbuild;project=src\NanoIoC\NanoIoC.csproj;profile=net40

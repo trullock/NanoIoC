@@ -1,11 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{16F31FC6-E1BB-4399-9A25-9E4215A41B72}"
 	ProjectSection(SolutionItems) = preProject
-		..\NanoIoC.wrapdesc = ..\NanoIoC.wrapdesc
 		..\readme.md = ..\readme.md
-		..\version = ..\version
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}"

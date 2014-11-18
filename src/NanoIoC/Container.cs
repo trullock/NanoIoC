@@ -215,7 +215,7 @@ namespace NanoIoC
     		{
     			if(!instances.Any(i => i != null && i.Item1 == registration))
     			{
-					var newinstance = this.GetInstance(registration, tempInstanceStore, buildStack);
+					var newinstance = this.GetInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
 
 					instanceStore.Insert(registration, requestType, newinstance);
 

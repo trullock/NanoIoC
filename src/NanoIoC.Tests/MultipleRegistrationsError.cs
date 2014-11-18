@@ -17,9 +17,10 @@ namespace NanoIoC.Tests
 
         	var all = container.ResolveAll<InterfaceA>().ToArray();
 
-			Assert.AreEqual(2, all.Length);
+			Assert.AreEqual(3, all.Length);
 			Assert.IsInstanceOf<ClassA1>(all[0]);
 			Assert.IsInstanceOf<ClassA2>(all[1]);
+			Assert.IsInstanceOf<ClassA1>(all[2]);
         }
 
 		public interface InterfaceA

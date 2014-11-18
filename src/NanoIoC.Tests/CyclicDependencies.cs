@@ -30,7 +30,6 @@ namespace NanoIoC.Tests
 			container.Register<InterfaceC, ClassC>();
 			container.Register<InterfaceD, ClassD>();
 
-
 			try
 			{
 				container.Resolve<InterfaceC>();
