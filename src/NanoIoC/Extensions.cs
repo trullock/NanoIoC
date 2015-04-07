@@ -66,7 +66,7 @@ namespace NanoIoC
 			}
 
 			// generic base classes
-			var baseType = self.BaseType;
+			var baseType = self;
 			while (baseType != null && baseType != typeof(object))
 			{
 				if (baseType.IsGenericType)
