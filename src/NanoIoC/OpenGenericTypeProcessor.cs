@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NanoIoC
 {
@@ -16,11 +18,22 @@ namespace NanoIoC
 			if (type.IsInterface || type.IsAbstract)
 				return;
 
-			var typeArguments = type.GetGenericArgumentsClosing(this.OpenGenericTypeToClose);
+			foreach (var itype in OpenGenericTypeInterfacesFor(type))
+			{
+				var typeArguments = itype.GetGenericArguments();
 
-			var closedType = this.OpenGenericTypeToClose.MakeGenericType(typeArguments);
+				var closedType = this.OpenGenericTypeToClose.MakeGenericType(typeArguments);
 
-			container.Register(closedType, type, this.Lifecycle);
+				container.Register(closedType, type, this.Lifecycle);
+			}
+
+		}
+
+		private IEnumerable<Type> OpenGenericTypeInterfacesFor(Type type)
+		{
+			return type.GetInterfaces()
+			           .Where(t => t.IsGenericType &&
+			                       t.GetGenericTypeDefinition() == this.OpenGenericTypeToClose);
 		}
 	}
 }
