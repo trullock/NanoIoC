@@ -82,8 +82,10 @@ namespace NanoIoC
 			return false;
 		}
 
-		public static Type[] GetGenericArgumentsClosing(this Type self, Type other)
+		public static IEnumerable<Type[]> GetGenericArgumentsClosing(this Type self, Type other)
 		{
+			var arguments = new List<Type[]>();
+
 			if(other.IsInterface)
 			{
 				if(!other.IsGenericType)
@@ -97,13 +99,14 @@ namespace NanoIoC
 				foreach(var @interface in interfaces)
 				{
 					if (@interface.IsGenericType && @interface.GetGenericTypeDefinition() == other)
-						return @interface.GetGenericArguments();
+						arguments.Add(@interface.GetGenericArguments());
 				}
-
-				throw new ArgumentException("Current type does not close other type", "other");
 			}
 
-			return null;
+			if(arguments.Count == 0)
+				throw new ArgumentException("Current type does not close other type", "other");
+
+			return arguments;
 		}
 	}
 }

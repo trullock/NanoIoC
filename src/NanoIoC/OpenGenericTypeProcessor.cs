@@ -16,11 +16,13 @@ namespace NanoIoC
 			if (type.IsInterface || type.IsAbstract)
 				return;
 
-			var typeArguments = type.GetGenericArgumentsClosing(this.OpenGenericTypeToClose);
+			var typeArgumentsForInterfaces = type.GetGenericArgumentsClosing(this.OpenGenericTypeToClose);
 
-			var closedType = this.OpenGenericTypeToClose.MakeGenericType(typeArguments);
-
-			container.Register(closedType, type, this.Lifecycle);
+			foreach (var typeArguments in typeArgumentsForInterfaces)
+			{
+				var closedType = this.OpenGenericTypeToClose.MakeGenericType(typeArguments);
+				container.Register(closedType, type, this.Lifecycle);	
+			}
 		}
 	}
 }
