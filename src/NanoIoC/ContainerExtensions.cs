@@ -125,6 +125,15 @@ namespace NanoIoC
 			}
 		}
 
+		public static void RunTypeProcessors(this IContainer container, IEnumerable<ITypeProcessor> typeProcessors, IEnumerable<Type> types)
+		{
+			foreach (var type in types)
+			{
+				foreach(var typeProcessor in typeProcessors)
+					typeProcessor.Process(type, container);
+			}
+		}
+
 		public static void RunTypeProcessor(this IContainer container, ITypeProcessor typeProcessor)
 		{
 			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
@@ -141,6 +150,12 @@ namespace NanoIoC
 		public static void RunAllRegistries(this IContainer container)
 		{
 			foreach(var registry in Container.Registries)
+				registry.Register(container);
+		}
+
+		public static void RunRegistries(this IContainer container, IEnumerable<IContainerRegistry> registries)
+		{
+			foreach(var registry in registries)
 				registry.Register(container);
 		}
 
