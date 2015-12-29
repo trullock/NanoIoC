@@ -8,13 +8,15 @@ namespace NanoIoC
 		public readonly Type ConcreteType;
 		public readonly Func<IContainer, object> Ctor;
 		public readonly Lifecycle Lifecycle;
+		public readonly InjectionBehaviour InjectionBehaviour;
 
-    	internal Registration(Type abstractType, Type concreteType, Func<IContainer, object> ctor, Lifecycle lifecycle)
+		internal Registration(Type abstractType, Type concreteType, Func<IContainer, object> ctor, Lifecycle lifecycle, InjectionBehaviour injectionBehaviour)
         {
     		this.AbstractType = abstractType;
     		this.ConcreteType = concreteType;
     		this.Ctor = ctor;
     		this.Lifecycle = lifecycle;
+			this.InjectionBehaviour = injectionBehaviour;
         }
     }
 }

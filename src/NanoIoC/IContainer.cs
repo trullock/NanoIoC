@@ -37,13 +37,14 @@ namespace NanoIoC
 
 		void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle);
 
-    	/// <summary>
-    	/// Injects the given instance as the given type with the given lifecycle
-    	/// </summary>
-    	/// <param name="instance"></param>
-    	/// <param name="type"></param>
-    	/// <param name="lifecycle">Must not be Transient</param>
-    	void Inject(object instance, Type type, Lifecycle lifecycle);
+	    /// <summary>
+	    /// Injects the given instance as the given type with the given lifecycle
+	    /// </summary>
+	    /// <param name="instance"></param>
+	    /// <param name="type"></param>
+	    /// <param name="lifecycle">Must not be Transient</param>
+	    /// <param name="injectionBehaviour"></param>
+	    void Inject(object instance, Type type, Lifecycle lifecycle, InjectionBehaviour injectionBehaviour);
 
     	IEnumerable ResolveAll(Type abstractType);
 

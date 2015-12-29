@@ -18,15 +18,18 @@ namespace NanoIoC
 			if(!this.Store.ContainsKey(type))
 				this.Store.Add(type, new List<Tuple<Registration, object>>());
 
+			if(registration.InjectionBehaviour == InjectionBehaviour.Override)
+				this.Store[type].Clear();
+
             this.Store[type].Add(new Tuple<Registration, object>(registration, instance));
         }
 
-		public void Inject(Type type, object instance)
+		public void Inject(Type type, object instance, InjectionBehaviour injectionBehaviour)
 		{
 			if (!this.InjectedRegistrations.ContainsKey(type))
 				this.InjectedRegistrations.Add(type, new List<Registration>());
 
-			var registration = new Registration(type, instance != null ? instance.GetType() : type, null, this.Lifecycle);
+			var registration = new Registration(type, instance?.GetType() ?? type, null, this.Lifecycle, injectionBehaviour);
 			this.InjectedRegistrations[type].Add(registration);
 
 			this.Insert(registration, type, instance);

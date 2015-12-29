@@ -10,7 +10,7 @@ namespace NanoIoC.Tests
 		public void ShouldWorkForNullInstances()
         {
             var container = new Container();
-            container.Inject(new TestClass());
+            ContainerExtensions.Inject(container, new TestClass());
             container.Inject<TestClass2>(null);
 
             var instance = container.Resolve<TestClass3>();
@@ -21,7 +21,7 @@ namespace NanoIoC.Tests
         {
             var container = new Container();
             var testClass = new TestClass();
-            container.Inject(testClass);
+            ContainerExtensions.Inject(container, testClass);
 
             var instance = container.Resolve<TestClass>();
             Assert.AreSame(testClass, instance);
@@ -73,7 +73,35 @@ namespace NanoIoC.Tests
 			Assert.AreNotSame(instances[0], instances[1]);
 		}
 
+		[Test]
+		public void ShouldResolveInjectedOverRegistered()
+		{
+			var container = new Container();
 
+			container.Register<TestInterface, TestClass>();
+
+			var injector = new TestClass2();
+			container.Inject<TestInterface>(injector, injectionBehaviour: InjectionBehaviour.Override);
+
+			Assert.AreSame(injector, container.Resolve<TestInterface>());
+		}
+		
+
+		[Test]
+		public void ShouldResolveInjectedOverInjected()
+		{
+			var container = new Container();
+
+			container.Register<TestInterface, TestClass>();
+
+			var injector1 = new TestClass2();
+			var injector2 = new TestClass2();
+			container.Inject<TestInterface>(injector1);
+			container.Inject<TestInterface>(injector2, injectionBehaviour: InjectionBehaviour.Override);
+
+			Assert.AreSame(injector2, container.Resolve<TestInterface>());
+		}
+		
 		public class TestClass : TestInterface
         {
             

@@ -252,17 +252,41 @@ namespace NanoIoC
 			{
 				var registrations = new List<Registration>();
 
+				// use temp instance store first
 				if (tempInstanceStore != null && tempInstanceStore.InjectedRegistrations.ContainsKey(type))
 					registrations.AddRange(tempInstanceStore.InjectedRegistrations[type]);
 
-				if(this.registeredTypes.ContainsKey(type))
-					registrations.AddRange(this.registeredTypes[type]);
-
+				// only add registrations if there are no override injections
+				if ((!this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
+				    this.singletonInstanceStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
+					(!this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type) ||
+					this.httpContextOrThreadLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)))
+				{
+					if (this.registeredTypes.ContainsKey(type))
+						registrations.AddRange(this.registeredTypes[type]);
+				}
+				
+				// add singleton injections
 				if (this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type))
-					registrations.AddRange(this.singletonInstanceStore.InjectedRegistrations[type]);
-
+				{
+					// if there are any overrides, return only them
+					var overrideInjections = this.singletonInstanceStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
+					if(overrideInjections.Any())
+						registrations.AddRange(overrideInjections);
+					else
+						registrations.AddRange(this.singletonInstanceStore.InjectedRegistrations[type]);
+				}
+				
+				// add httpcontextthreadlocal injections
 				if (this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type))
-					registrations.AddRange(this.httpContextOrThreadLocalStore.InjectedRegistrations[type]);
+				{
+					// if there are any overrides, return only them
+					var overrideInjections = this.httpContextOrThreadLocalStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
+					if (overrideInjections.Any())
+						registrations.AddRange(overrideInjections);
+					else
+						registrations.AddRange(this.httpContextOrThreadLocalStore.InjectedRegistrations[type]);
+				}
 
 				return registrations;
 			}
@@ -281,7 +305,7 @@ namespace NanoIoC
 				if (!this.registeredTypes.ContainsKey(abstractType))
 					this.registeredTypes.Add(abstractType, new List<Registration>());
 
-				this.registeredTypes[abstractType].Add(new Registration(abstractType, concreteType, null, lifecycle));
+				this.registeredTypes[abstractType].Add(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
 			}
         }
 
@@ -292,11 +316,11 @@ namespace NanoIoC
 				if (!this.registeredTypes.ContainsKey(abstractType))
 					this.registeredTypes.Add(abstractType, new List<Registration>());
 
-				this.registeredTypes[abstractType].Add(new Registration(abstractType, null, ctor, lifecycle));
+				this.registeredTypes[abstractType].Add(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
 			}
 		}
 
-		public void Inject(object instance, Type type, Lifecycle lifeCycle)
+		public void Inject(object instance, Type type, Lifecycle lifeCycle, InjectionBehaviour injectionBehaviour)
     	{
 			if (lifeCycle == Lifecycle.Transient)
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
@@ -306,10 +330,10 @@ namespace NanoIoC
 				switch (lifeCycle)
 				{
 					case Lifecycle.Singleton:
-						this.singletonInstanceStore.Inject(type, instance);
+						this.singletonInstanceStore.Inject(type, instance, injectionBehaviour);
 						break;
 					case Lifecycle.HttpContextOrThreadLocal:
-						this.httpContextOrThreadLocalStore.Inject(type, instance);
+						this.httpContextOrThreadLocalStore.Inject(type, instance, injectionBehaviour);
 						break;
 					default:
 						throw new NotSupportedException();
@@ -333,12 +357,12 @@ namespace NanoIoC
 					var genericArguments = requestedType.GetGenericArguments();
 					registrations = this.GetRegistrationsFor(genericTypeDefinition);
 
-					return registrations.Select(r => new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.Lifecycle));
+					return registrations.Select(r => new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.Lifecycle, InjectionBehaviour.Default));
 				}
 			}
 
 			if (!requestedType.IsAbstract && !requestedType.IsInterface)
-				return new [] { new Registration(requestedType, requestedType, null, Lifecycle.Transient)};
+				return new [] { new Registration(requestedType, requestedType, null, Lifecycle.Transient, InjectionBehaviour.Default) };
 
 			throw new ContainerException("Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.", buildStack);
 		}
