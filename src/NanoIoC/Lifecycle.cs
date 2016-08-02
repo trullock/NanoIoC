@@ -4,6 +4,7 @@ namespace NanoIoC
     {
 		Transient = 1,
 		HttpContextOrThreadLocal = 2,
-        Singleton = 3
+        Singleton = 3,
+		ExecutionContextLocal = 4,
     }
 }
