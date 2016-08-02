@@ -3,23 +3,23 @@ using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
-    public class ExecutionContextScopeAcrossThreads
+	[TestFixture]
+	public class ExecutionContextScopeAcrossThreads
 	{
-        [Test]
-        public void ShouldConstruct()
-        {
-            var container = new Container();
+		[Test]
+		public void ShouldConstruct()
+		{
+			var container = new Container();
 			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 
-	        TestInterface instance = null;
+			TestInterface instance = null;
 
-	        Task.Run(() => instance = container.Resolve<TestInterface>()).Wait();
+			Task.Run(() => instance = container.Resolve<TestInterface>()).Wait();
 
 			Assert.IsNotNull(instance);
 			Assert.IsInstanceOf<TestClass>(instance);
-        }
+		}
 
 		[Test]
 		public void ShouldAlwaysBeTheSameInstance()
@@ -40,14 +40,12 @@ namespace NanoIoC.Tests
 			Assert.AreSame(instance, instance2);
 		}
 
-    	public class TestClass : TestInterface
-        {
-            
-        }
+		public class TestClass : TestInterface
+		{
+		}
 
 		public interface TestInterface
 		{
-			
 		}
-    }
+	}
 }

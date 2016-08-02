@@ -30,15 +30,15 @@ namespace NanoIoC.Tests
 			bool thread2HasRegistration = true;
 
 			var thread2 = new Thread(() =>
-				                         {
-					                         container.Inject<TestInterface>(instance2, Lifecycle.HttpContextOrThreadLocal);
+			{
+				container.Inject<TestInterface>(instance2, Lifecycle.HttpContextOrThreadLocal);
 
-					                         thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
+				thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
 
-					                         container.RemoveInstancesOf<TestInterface>(Lifecycle.HttpContextOrThreadLocal);
+				container.RemoveInstancesOf<TestInterface>(Lifecycle.HttpContextOrThreadLocal);
 
-					                         thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
-				                         });
+				thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
+			});
 
 			thread2.Start();
 			thread2.Join(1000);
@@ -62,15 +62,15 @@ namespace NanoIoC.Tests
 			bool thread2HasRegistration = true;
 			ExecutionContext.SuppressFlow();
 			var thread2 = new Thread(() =>
-				                         {
-					                         container.Inject<TestInterface>(instance2, Lifecycle.ExecutionContextLocal);
+			{
+				container.Inject<TestInterface>(instance2, Lifecycle.ExecutionContextLocal);
 
-					                         thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
+				thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
 
-					                         container.RemoveInstancesOf<TestInterface>(Lifecycle.ExecutionContextLocal);
+				container.RemoveInstancesOf<TestInterface>(Lifecycle.ExecutionContextLocal);
 
-					                         thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
-				                         });
+				thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
+			});
 
 			thread2.Start();
 			thread2.Join(1000);

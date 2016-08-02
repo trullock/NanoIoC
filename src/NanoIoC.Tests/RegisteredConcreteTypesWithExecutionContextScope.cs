@@ -2,18 +2,18 @@
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
-    public class RegisteredConcreteTypesWithExecutionContextScope
-    {
-        [Test]
-        public void ShouldConstruct()
-        {
-            var container = new Container();
+	[TestFixture]
+	public class RegisteredConcreteTypesWithExecutionContextScope
+	{
+		[Test]
+		public void ShouldConstruct()
+		{
+			var container = new Container();
 			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 			var instance = container.Resolve<TestInterface>();
-            Assert.IsInstanceOf<TestClass>(instance);
-        }
+			Assert.IsInstanceOf<TestClass>(instance);
+		}
 
 		[Test]
 		public void ShouldAlwaysBeTheSameInstance()
@@ -26,14 +26,12 @@ namespace NanoIoC.Tests
 			Assert.AreSame(instance, instance2);
 		}
 
-    	public class TestClass : TestInterface
-        {
-            
-        }
+		public class TestClass : TestInterface
+		{
+		}
 
 		public interface TestInterface
 		{
-			
 		}
-    }
+	}
 }
