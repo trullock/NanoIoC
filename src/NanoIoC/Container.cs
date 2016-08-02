@@ -11,6 +11,7 @@ namespace NanoIoC
         readonly IDictionary<Type, IList<Registration>> registeredTypes;
         readonly IInstanceStore singletonInstanceStore;
         readonly IInstanceStore httpContextOrThreadLocalStore;
+        readonly IInstanceStore executionContextLocalStore;
 		readonly object mutex;
 
 		internal static IEnumerable<IContainerRegistry> Registries;
@@ -65,6 +66,7 @@ namespace NanoIoC
             this.registeredTypes = new Dictionary<Type, IList<Registration>>();
             this.singletonInstanceStore = new SingletonInstanceStore();
             this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
+            this.executionContextLocalStore = new ExecutionContextInstanceStore();
 
         	this.mutex = new object();
 
@@ -77,6 +79,7 @@ namespace NanoIoC
 			this.registeredTypes = new Dictionary<Type, IList<Registration>>(container.registeredTypes);
 			this.singletonInstanceStore = new SingletonInstanceStore(container.singletonInstanceStore);
 			this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore(container.httpContextOrThreadLocalStore);
+			this.executionContextLocalStore = new ExecutionContextInstanceStore(container.executionContextLocalStore);
 
 			this.mutex = new object();
 
@@ -185,6 +188,9 @@ namespace NanoIoC
 				
 				case Lifecycle.HttpContextOrThreadLocal:
 					return this.GetOrCreateInstances(type, this.httpContextOrThreadLocalStore, tempInstanceStore, buildStack);
+
+				case Lifecycle.ExecutionContextLocal:
+					return this.GetOrCreateInstances(type, this.executionContextLocalStore, tempInstanceStore, buildStack);
     			
 				default:
 					var typesToCreate = GetTypesToCreate(type, buildStack);
@@ -260,7 +266,9 @@ namespace NanoIoC
 				if ((!this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
 				    this.singletonInstanceStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
 					(!this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type) ||
-					this.httpContextOrThreadLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)))
+					this.httpContextOrThreadLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
+					(!this.executionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
+					this.executionContextLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)))
 				{
 					if (this.registeredTypes.ContainsKey(type))
 						registrations.AddRange(this.registeredTypes[type]);
@@ -286,6 +294,17 @@ namespace NanoIoC
 						registrations.AddRange(overrideInjections);
 					else
 						registrations.AddRange(this.httpContextOrThreadLocalStore.InjectedRegistrations[type]);
+				}
+
+				// add httpcontextthreadlocal injections
+				if (this.executionContextLocalStore.InjectedRegistrations.ContainsKey(type))
+				{
+					// if there are any overrides, return only them
+					var overrideInjections = this.executionContextLocalStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
+					if (overrideInjections.Any())
+						registrations.AddRange(overrideInjections);
+					else
+						registrations.AddRange(this.executionContextLocalStore.InjectedRegistrations[type]);
 				}
 
 				return registrations;
@@ -334,6 +353,9 @@ namespace NanoIoC
 						break;
 					case Lifecycle.HttpContextOrThreadLocal:
 						this.httpContextOrThreadLocalStore.Inject(type, instance, injectionBehaviour);
+						break;
+					case Lifecycle.ExecutionContextLocal:
+						this.executionContextLocalStore.Inject(type, instance, injectionBehaviour);
 						break;
 					default:
 						throw new NotSupportedException();
@@ -428,6 +450,9 @@ namespace NanoIoC
 				case Lifecycle.HttpContextOrThreadLocal:
 					this.httpContextOrThreadLocalStore.Clear();
 					break;
+				case Lifecycle.ExecutionContextLocal:
+					this.executionContextLocalStore.Clear();
+					break;
 				case Lifecycle.Singleton:
 					this.singletonInstanceStore.Clear();
 					this.Inject<IContainer>(this);
@@ -467,6 +492,9 @@ namespace NanoIoC
 						case Lifecycle.HttpContextOrThreadLocal:
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrThreadLocalStore, null, buildStack).Cast<object>());
 							break;
+						case Lifecycle.ExecutionContextLocal:
+							instances.AddRange(this.GetOrCreateInstances(abstractType, this.executionContextLocalStore, null, buildStack).Cast<object>());
+							break;
 						default:
 							var typesToCreate = GetTypesToCreate(abstractType, buildStack);
 							instances.AddRange(typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, null, buildStack)));
@@ -487,6 +515,10 @@ namespace NanoIoC
 				{
 					case Lifecycle.HttpContextOrThreadLocal:
 						this.httpContextOrThreadLocalStore.RemoveInstances(type);
+						return;
+
+					case Lifecycle.ExecutionContextLocal:
+						this.executionContextLocalStore.RemoveInstances(type);
 						return;
 
 					case Lifecycle.Singleton:

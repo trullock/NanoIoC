@@ -49,6 +49,38 @@ namespace NanoIoC.Tests
 			Assert.AreEqual(instance1, container.Resolve<TestInterface>());
 		}
 
+		[Test]
+		public void ShouldRemoveExecutionContextInstanceOnly()
+		{
+			var instance1 = new TestClass();
+			var instance2 = new TestClass();
+
+			var container = new Container();
+			container.Inject<TestInterface>(instance1, Lifecycle.ExecutionContextLocal);
+
+			TestInterface[] thread2ResolvedTestClasses = null;
+			bool thread2HasRegistration = true;
+			ExecutionContext.SuppressFlow();
+			var thread2 = new Thread(() =>
+				                         {
+					                         container.Inject<TestInterface>(instance2, Lifecycle.ExecutionContextLocal);
+
+					                         thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
+
+					                         container.RemoveInstancesOf<TestInterface>(Lifecycle.ExecutionContextLocal);
+
+					                         thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
+				                         });
+
+			thread2.Start();
+			thread2.Join(1000);
+			ExecutionContext.RestoreFlow();
+			Assert.IsFalse(thread2HasRegistration);
+			Assert.AreEqual(1, thread2ResolvedTestClasses.Length);
+
+			Assert.AreEqual(instance1, container.Resolve<TestInterface>());
+		}
+
 
 		public class TestClass : TestInterface
 		{
