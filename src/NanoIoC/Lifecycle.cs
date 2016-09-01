@@ -5,6 +5,6 @@ namespace NanoIoC
 		Transient = 1,
 		HttpContextOrThreadLocal = 2,
         Singleton = 3,
-		ExecutionContextLocal = 4,
+		HttpContextOrExecutionContextLocal = 4,
     }
 }
