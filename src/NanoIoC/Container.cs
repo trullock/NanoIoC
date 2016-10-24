@@ -439,6 +439,7 @@ namespace NanoIoC
 					this.registeredTypes.Remove(type);
 
 				this.singletonInstanceStore.RemoveAllInstancesAndRegistrations(type);
+				this.httpContextOrExecutionContextLocalStore.RemoveAllInstancesAndRegistrations(type);
 				this.httpContextOrThreadLocalStore.RemoveAllInstancesAndRegistrations(type);
 			}
 		}
