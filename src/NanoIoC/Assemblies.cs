@@ -39,12 +39,16 @@ namespace NanoIoC
 				{
 					assembly = Assembly.LoadFrom(assemblyPath);
 				}
-				catch(Exception e)
+				catch (BadImageFormatException)
+				{
+					
+				}
+				catch (Exception e)
 				{
 					Console.WriteLine("==============================");
 					Console.WriteLine(e.Message);
 					Console.WriteLine("==============================");
-					
+
 					throw e;
 				}
 
