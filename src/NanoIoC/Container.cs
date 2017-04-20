@@ -7,11 +7,11 @@ using System.Reflection;
 namespace NanoIoC
 {
 	public sealed class Container : MarshalByRefObject, IContainer
-    {
-        readonly IDictionary<Type, IList<Registration>> registeredTypes;
-        readonly IInstanceStore singletonInstanceStore;
-        readonly IInstanceStore httpContextOrThreadLocalStore;
-        readonly IInstanceStore httpContextOrExecutionContextLocalStore;
+	{
+		readonly IDictionary<Type, IList<Registration>> registeredTypes;
+		readonly IInstanceStore singletonInstanceStore;
+		readonly IInstanceStore httpContextOrThreadLocalStore;
+		readonly IInstanceStore httpContextOrExecutionContextLocalStore;
 		readonly object mutex;
 
 		internal static IEnumerable<IContainerRegistry> Registries;
@@ -20,7 +20,7 @@ namespace NanoIoC
 		/// <summary>
 		/// Global container instance
 		/// </summary>
-    	public static readonly IContainer Global;
+		public static readonly IContainer Global;
 
 		static Container()
 		{
@@ -61,17 +61,17 @@ namespace NanoIoC
 			Registries = registries;
 		}
 
-        public Container()
-        {
-            this.registeredTypes = new Dictionary<Type, IList<Registration>>();
-            this.singletonInstanceStore = new SingletonInstanceStore();
-            this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
-            this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
+		public Container()
+		{
+			this.registeredTypes = new Dictionary<Type, IList<Registration>>();
+			this.singletonInstanceStore = new SingletonInstanceStore();
+			this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
+			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
 
-        	this.mutex = new object();
+			this.mutex = new object();
 
 			this.Inject<IContainer>(this);
-        }
+		}
 
 		internal Container(Container container)
 		{
@@ -91,14 +91,14 @@ namespace NanoIoC
 		}
 
 		public object Resolve(Type type)
-        {
-        	return Resolve(type, null, new Stack<Type>());
-        }
+		{
+			return Resolve(type, null, new Stack<Type>());
+		}
 
 		public object Resolve(Type type, params object[] dependencies)
-        {
-        	return Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
-        }
+		{
+			return Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
+		}
 
 		object Resolve(Type type, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
@@ -129,31 +129,31 @@ namespace NanoIoC
 			buildStack.Push(registration.ConcreteType);
 
 			var constructor = registration.Ctor ??
-			                   (container =>
-			                    	{
-			                    		var constructors = registration.ConcreteType.GetConstructors();
-			                    		var ctorsWithParams = constructors.Select(c => new {ctor = c, parameters = c.GetParameters()});
-			                    		var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
-			                    		foreach (var ctor in orderedEnumerable)
-			                    		{
-			                    			var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
+							   (container =>
+									{
+										var constructors = registration.ConcreteType.GetConstructors();
+										var ctorsWithParams = constructors.Select(c => new {ctor = c, parameters = c.GetParameters()});
+										var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
+										foreach (var ctor in orderedEnumerable)
+										{
+											var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
 											this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle, tempInstanceStore, buildStack);
 
-			                    			var parameters = new object[ctor.parameters.Length];
-			                    			for (var i = 0; i < ctor.parameters.Length; i++)
-			                    			{
+											var parameters = new object[ctor.parameters.Length];
+											for (var i = 0; i < ctor.parameters.Length; i++)
+											{
 												var newBuildStack = new Stack<Type>(buildStack.Reverse());
-			                    				if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
-			                    				{
-			                    					var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
+												if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+												{
+													var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
 													parameters[i] = this.ResolveAll(genericArgument, newBuildStack);
-			                    				}
-			                    				else
-			                    				{
+												}
+												else
+												{
 													parameters[i] = this.Resolve(ctor.parameters[i].ParameterType, tempInstanceStore, newBuildStack);
-			                    				}
-			                    			}
+												}
+											}
 
 											try
 											{
@@ -163,10 +163,10 @@ namespace NanoIoC
 											{
 												throw new ContainerException("Cannot create type `" + ctor.ctor.DeclaringType.FullName + "`", buildStack, e);
 											}
-			                    		}
+										}
 
-			                    		throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
-			                    	});
+										throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+									});
 
 			return constructor(this);
 		}
@@ -180,10 +180,10 @@ namespace NanoIoC
 		/// <param name="buildStack"></param>
 		/// <returns></returns>
 		IEnumerable GetOrCreateInstances(Type type, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
-    	{
-    		switch (lifecycle)
-    		{
-    			case Lifecycle.Singleton:
+		{
+			switch (lifecycle)
+			{
+				case Lifecycle.Singleton:
 					return this.GetOrCreateInstances(type, this.singletonInstanceStore, tempInstanceStore, buildStack);
 				
 				case Lifecycle.HttpContextOrThreadLocal:
@@ -191,12 +191,12 @@ namespace NanoIoC
 
 				case Lifecycle.HttpContextOrExecutionContextLocal:
 					return this.GetOrCreateInstances(type, this.httpContextOrExecutionContextLocalStore, tempInstanceStore, buildStack);
-    			
+				
 				default:
 					var typesToCreate = GetTypesToCreate(type, buildStack);
 					return typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, tempInstanceStore, buildStack)).ToArray();
-    		}
-    	}
+			}
+		}
 
 		/// <summary>
 		/// Trys to get an instance from the instance store, creating it if it doesnt exist
@@ -207,7 +207,7 @@ namespace NanoIoC
 		/// <param name="buildStack"></param>
 		/// <returns></returns>
 		IEnumerable GetOrCreateInstances(Type requestType, IInstanceStore instanceStore, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
-        {
+		{
 			var typesToCreate = GetTypesToCreate(requestType, buildStack);
 
 			var instances = new List<Tuple<Registration, object>>();
@@ -217,20 +217,20 @@ namespace NanoIoC
 			else if (instanceStore.ContainsInstancesFor(requestType))
 				instances.AddRange(instanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
 
-    		foreach (var registration in typesToCreate)
-    		{
-    			if(!instances.Any(i => i != null && i.Item1 == registration))
-    			{
+			foreach (var registration in typesToCreate)
+			{
+				if(!instances.Any(i => i != null && i.Item1 == registration))
+				{
 					var newinstance = this.GetInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
 
 					instanceStore.Insert(registration, requestType, newinstance);
 
 					instances.Add(new Tuple<Registration, object>(registration, newinstance));
-    			}
-    		}
-    		
-            return instances.Select(i => i.Item2).ToArray();
-        }
+				}
+			}
+			
+			return instances.Select(i => i.Item2).ToArray();
+		}
 
 		/// <summary>
 		/// Determines if there is a registration for the requested type
@@ -238,14 +238,15 @@ namespace NanoIoC
 		/// <param name="type"></param>
 		/// <returns></returns>
 		public bool HasRegistrationsFor(Type type)
-        {
+		{
 			lock (this.mutex)
 			{
 				return this.registeredTypes.ContainsKey(type) ||
-				       this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
-				       this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type);
+					   this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
+					   this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
+					   this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type);
 			}
-        }
+		}
 
 		public IEnumerable<Registration> GetRegistrationsFor(Type type)
 		{
@@ -253,7 +254,7 @@ namespace NanoIoC
 		}
 
 		IEnumerable<Registration> GetRegistrationsFor(Type type, IInstanceStore tempInstanceStore)
-        {
+		{
 			lock (this.mutex)
 			{
 				var registrations = new List<Registration>();
@@ -264,7 +265,7 @@ namespace NanoIoC
 
 				// only add registrations if there are no override injections
 				if ((!this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
-				    this.singletonInstanceStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
+					this.singletonInstanceStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
 					(!this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type) ||
 					this.httpContextOrThreadLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
 					(!this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
@@ -309,10 +310,10 @@ namespace NanoIoC
 
 				return registrations;
 			}
-        }
+		}
 
 		public void Register(Type abstractType, Type concreteType, Lifecycle lifecycle = Lifecycle.Singleton)
-        {
+		{
 			if (!concreteType.IsOrDerivesFrom(abstractType))
 				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
 
@@ -326,7 +327,7 @@ namespace NanoIoC
 
 				this.registeredTypes[abstractType].Add(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
 			}
-        }
+		}
 
 		public void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle)
 		{
@@ -340,7 +341,7 @@ namespace NanoIoC
 		}
 
 		public void Inject(object instance, Type type, Lifecycle lifeCycle, InjectionBehaviour injectionBehaviour)
-    	{
+		{
 			if (lifeCycle == Lifecycle.Transient)
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 			
@@ -361,7 +362,7 @@ namespace NanoIoC
 						throw new NotSupportedException();
 				}
 			}
-    	}
+		}
 
 		IEnumerable<Registration> GetTypesToCreate(Type requestedType, Stack<Type> buildStack)
 		{
@@ -392,33 +393,33 @@ namespace NanoIoC
 		void CheckDependencies(Type dependeeType, IEnumerable<Type> parameters, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			parameters.All(p =>
-			                      	{
+									{
 										if (CanCreateDependency(dependeeType, p, lifecycle, tempInstanceStore, false, buildStack))
 											return true;
 
-			                      		if (p.IsGenericType && p.GetGenericTypeDefinition() == typeof (IEnumerable<>))
-			                      			return true;
+										if (p.IsGenericType && p.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+											return true;
 
-			                      		if (!p.IsAbstract && !p.IsInterface)
+										if (!p.IsAbstract && !p.IsInterface)
 											return true;
 
 										throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "` of dependee `" + dependeeType.AssemblyQualifiedName + "`", buildStack);
-			                      	});
+									});
 		}
 
-    	bool CanCreateDependency(Type dependeeType, Type requestedType, Lifecycle lifecycle, IInstanceStore tempInstanceStore, bool allowMultiple, Stack<Type> buildStack)
-    	{
-    		var registrations = this.GetRegistrationsFor(requestedType, tempInstanceStore).ToList();
-    		if (registrations.Any())
-    		{			
-    			if (!allowMultiple && registrations.Count > 1)
+		bool CanCreateDependency(Type dependeeType, Type requestedType, Lifecycle lifecycle, IInstanceStore tempInstanceStore, bool allowMultiple, Stack<Type> buildStack)
+		{
+			var registrations = this.GetRegistrationsFor(requestedType, tempInstanceStore).ToList();
+			if (registrations.Any())
+			{			
+				if (!allowMultiple && registrations.Count > 1)
 					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`, there are multiple concrete types registered for it.", buildStack);
 
-    			if (registrations[0].Lifecycle < lifecycle)
+				if (registrations[0].Lifecycle < lifecycle)
 					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.AssemblyQualifiedName + "` (" + lifecycle + ")", buildStack);
 
-    			return true;
-    		}
+				return true;
+			}
 
 			if (requestedType.IsGenericType)
 			{
@@ -426,11 +427,11 @@ namespace NanoIoC
 				return this.HasRegistrationsFor(genericTypeDefinition);
 			}
 
-    		return false;
-    	}
+			return false;
+		}
 
 
-    	
+		
 		public void RemoveAllRegistrationsAndInstancesOf(Type type)
 		{
 			lock (this.mutex)
@@ -531,5 +532,5 @@ namespace NanoIoC
 				}
 			}
 		}
-    }
+	}
 }
