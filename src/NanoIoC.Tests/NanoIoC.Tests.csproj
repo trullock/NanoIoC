@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
     <Compile Include="DependencyStore.cs" />
+    <Compile Include="HasRegistrationsFor.cs" />
     <Compile Include="MultipleGenericInterfacesImpelemtedOnSameClass.cs" />
     <Compile Include="MultipleRegistrationsError.cs" />
     <Compile Include="ExecutionContextScopeAcrossThreads.cs" />
