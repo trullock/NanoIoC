@@ -243,6 +243,7 @@ namespace NanoIoC
 			{
 				return this.registeredTypes.ContainsKey(type) ||
 					   this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
+					   this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
 					   this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type);
 			}
 		}
