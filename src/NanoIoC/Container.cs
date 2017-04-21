@@ -8,10 +8,11 @@ namespace NanoIoC
 {
 	public sealed class Container : MarshalByRefObject, IContainer
 	{
-		readonly IDictionary<Type, IList<Registration>> registeredTypes;
 		readonly IInstanceStore singletonInstanceStore;
 		readonly IInstanceStore httpContextOrThreadLocalStore;
 		readonly IInstanceStore httpContextOrExecutionContextLocalStore;
+		readonly IInstanceStore transientInstanceStore;
+
 		readonly object mutex;
 
 		internal static IEnumerable<IContainerRegistry> Registries;
@@ -63,10 +64,10 @@ namespace NanoIoC
 
 		public Container()
 		{
-			this.registeredTypes = new Dictionary<Type, IList<Registration>>();
 			this.singletonInstanceStore = new SingletonInstanceStore();
 			this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
 			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
+			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.mutex = new object();
 
@@ -75,11 +76,10 @@ namespace NanoIoC
 
 		internal Container(Container container)
 		{
-			//todo: replace lists also
-			this.registeredTypes = new Dictionary<Type, IList<Registration>>(container.registeredTypes);
-			this.singletonInstanceStore = new SingletonInstanceStore(container.singletonInstanceStore);
-			this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore(container.httpContextOrThreadLocalStore);
-			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore(container.httpContextOrExecutionContextLocalStore);
+			this.singletonInstanceStore = container.singletonInstanceStore.Clone();
+			this.httpContextOrThreadLocalStore = container.httpContextOrThreadLocalStore.Clone();
+			this.httpContextOrExecutionContextLocalStore = container.httpContextOrExecutionContextLocalStore.Clone();
+			this.transientInstanceStore = container.transientInstanceStore.Clone();
 
 			this.mutex = new object();
 
@@ -108,9 +108,11 @@ namespace NanoIoC
 			lock (this.mutex)
 			{
 				var registrations = this.GetRegistrationsFor(type, null).ToList();
-
-				if(registrations.Count > 1)
-					throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.", buildStack);
+			
+				if (registrations.Count > 1)
+					throw new ContainerException(
+						"Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.",
+						buildStack);
 
 				if (registrations.Count == 1)
 					return this.GetOrCreateInstances(type, registrations[0].Lifecycle, tempInstanceStore, buildStack).First();
@@ -207,28 +209,31 @@ namespace NanoIoC
 		/// <returns></returns>
 		IEnumerable GetOrCreateInstances(Type requestType, IInstanceStore instanceStore, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
-			var typesToCreate = GetTypesToCreate(requestType, buildStack);
+			//lock (instanceStore.Mutex)
+			//{
+				var typesToCreate = GetTypesToCreate(requestType, buildStack);
 
-			var instances = new List<Tuple<Registration, object>>();
+				var instances = new List<Tuple<Registration, object>>();
 
-			if (tempInstanceStore != null && tempInstanceStore.ContainsInstancesFor(requestType))
-				instances.AddRange(tempInstanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
-			else if (instanceStore.ContainsInstancesFor(requestType))
-				instances.AddRange(instanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
+				if (tempInstanceStore != null && tempInstanceStore.ContainsInstancesFor(requestType))
+					instances.AddRange(tempInstanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
+				else if (instanceStore.ContainsInstancesFor(requestType))
+					instances.AddRange(instanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
 
-			foreach (var registration in typesToCreate)
-			{
-				if(!instances.Any(i => i != null && i.Item1 == registration))
+				foreach (var registration in typesToCreate)
 				{
-					var newinstance = this.GetInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
+					if (!instances.Any(i => i != null && i.Item1 == registration))
+					{
+						var newinstance = this.GetInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
 
-					instanceStore.Insert(registration, requestType, newinstance);
+						instanceStore.Insert(registration, requestType, newinstance);
 
-					instances.Add(new Tuple<Registration, object>(registration, newinstance));
+						instances.Add(new Tuple<Registration, object>(registration, newinstance));
+					}
 				}
-			}
-			
-			return instances.Select(i => i.Item2).ToArray();
+
+				return instances.Select(i => i.Item2).ToArray();
+			//}
 		}
 
 		/// <summary>
@@ -240,10 +245,10 @@ namespace NanoIoC
 		{
 			lock (this.mutex)
 			{
-				return this.registeredTypes.ContainsKey(type) ||
-					   this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
-					   this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
-					   this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type);
+				return this.transientInstanceStore.ContainsRegistrationsFor(type) ||
+					   this.singletonInstanceStore.ContainsRegistrationsFor(type) ||
+					   this.httpContextOrExecutionContextLocalStore.ContainsRegistrationsFor(type) ||
+					   this.httpContextOrThreadLocalStore.ContainsRegistrationsFor(type);
 			}
 		}
 
@@ -259,53 +264,14 @@ namespace NanoIoC
 				var registrations = new List<Registration>();
 
 				// use temp instance store first
-				if (tempInstanceStore != null && tempInstanceStore.InjectedRegistrations.ContainsKey(type))
-					registrations.AddRange(tempInstanceStore.InjectedRegistrations[type]);
-
-				// only add registrations if there are no override injections
-				if ((!this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type) ||
-					this.singletonInstanceStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
-					(!this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type) ||
-					this.httpContextOrThreadLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)) &&
-					(!this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type) ||
-					this.httpContextOrExecutionContextLocalStore.InjectedRegistrations[type].All(r => r.InjectionBehaviour != InjectionBehaviour.Override)))
-				{
-					if (this.registeredTypes.ContainsKey(type))
-						registrations.AddRange(this.registeredTypes[type]);
-				}
+				if (tempInstanceStore != null && tempInstanceStore.ContainsRegistrationsFor(type))
+					registrations.AddRange(tempInstanceStore.GetRegistrationsFor(type));
 				
-				// add singleton injections
-				if (this.singletonInstanceStore.InjectedRegistrations.ContainsKey(type))
-				{
-					// if there are any overrides, return only them
-					var overrideInjections = this.singletonInstanceStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
-					if(overrideInjections.Any())
-						registrations.AddRange(overrideInjections);
-					else
-						registrations.AddRange(this.singletonInstanceStore.InjectedRegistrations[type]);
-				}
-				
-				// add httpcontextthreadlocal injections
-				if (this.httpContextOrThreadLocalStore.InjectedRegistrations.ContainsKey(type))
-				{
-					// if there are any overrides, return only them
-					var overrideInjections = this.httpContextOrThreadLocalStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
-					if (overrideInjections.Any())
-						registrations.AddRange(overrideInjections);
-					else
-						registrations.AddRange(this.httpContextOrThreadLocalStore.InjectedRegistrations[type]);
-				}
-
-				// add httpcontextthreadlocal injections
-				if (this.httpContextOrExecutionContextLocalStore.InjectedRegistrations.ContainsKey(type))
-				{
-					// if there are any overrides, return only them
-					var overrideInjections = this.httpContextOrExecutionContextLocalStore.InjectedRegistrations[type].Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
-					if (overrideInjections.Any())
-						registrations.AddRange(overrideInjections);
-					else
-						registrations.AddRange(this.httpContextOrExecutionContextLocalStore.InjectedRegistrations[type]);
-				}
+				// TODO: send to bottom?
+				registrations.AddRange(this.transientInstanceStore.GetRegistrationsFor(type));
+				registrations.AddRange(this.singletonInstanceStore.GetRegistrationsFor(type));
+				registrations.AddRange(this.httpContextOrThreadLocalStore.GetRegistrationsFor(type));
+				registrations.AddRange(this.httpContextOrExecutionContextLocalStore.GetRegistrationsFor(type));
 
 				return registrations;
 			}
@@ -321,10 +287,8 @@ namespace NanoIoC
 
 			lock (this.mutex)
 			{
-				if (!this.registeredTypes.ContainsKey(abstractType))
-					this.registeredTypes.Add(abstractType, new List<Registration>());
-
-				this.registeredTypes[abstractType].Add(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
+				var store = GetStore(lifecycle);
+				store.AddRegistration(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
 			}
 		}
 
@@ -332,10 +296,8 @@ namespace NanoIoC
 		{
 			lock (this.mutex)
 			{
-				if (!this.registeredTypes.ContainsKey(abstractType))
-					this.registeredTypes.Add(abstractType, new List<Registration>());
-
-				this.registeredTypes[abstractType].Add(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
+				var store = GetStore(lifecycle);
+				store.AddRegistration(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
 			}
 		}
 
@@ -435,12 +397,10 @@ namespace NanoIoC
 		{
 			lock (this.mutex)
 			{
-				if (this.registeredTypes.ContainsKey(type))
-					this.registeredTypes.Remove(type);
-
 				this.singletonInstanceStore.RemoveAllInstancesAndRegistrations(type);
 				this.httpContextOrExecutionContextLocalStore.RemoveAllInstancesAndRegistrations(type);
 				this.httpContextOrThreadLocalStore.RemoveAllInstancesAndRegistrations(type);
+				this.transientInstanceStore.RemoveAllInstancesAndRegistrations(type);
 			}
 		}
 
@@ -465,10 +425,15 @@ namespace NanoIoC
 
 		public void Reset()
 		{
-			this.registeredTypes.Clear();
-			this.httpContextOrThreadLocalStore.Clear();
-			this.singletonInstanceStore.Clear();
-			this.Inject<IContainer>(this);
+			// TODO: validate where UNiDAYS call this from, will adding a lock make things go bang?
+			//lock (this.mutex)
+			//{
+				this.httpContextOrExecutionContextLocalStore.Clear();
+				this.httpContextOrThreadLocalStore.Clear();
+				this.singletonInstanceStore.Clear();
+				this.transientInstanceStore.Clear();
+				this.Inject<IContainer>(this);
+			//}
 		}
 
 		public IEnumerable ResolveAll(Type abstractType)
@@ -510,25 +475,38 @@ namespace NanoIoC
 
 		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
 		{
+			if (lifecycle == Lifecycle.Transient)
+				throw new ArgumentException("You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
+
 			lock (this.mutex)
 			{
-				switch (lifecycle)
-				{
-					case Lifecycle.HttpContextOrThreadLocal:
-						this.httpContextOrThreadLocalStore.RemoveInstances(type);
-						return;
+				var store = GetStore(lifecycle);
 
-					case Lifecycle.HttpContextOrExecutionContextLocal:
-						this.httpContextOrExecutionContextLocalStore.RemoveInstances(type);
-						return;
+				if(store == null)
+					throw new ArgumentException();
 
-					case Lifecycle.Singleton:
-						this.singletonInstanceStore.RemoveInstances(type);
-						return;
+				store.RemoveInstances(type);
+			}
+		}
 
-					case Lifecycle.Transient:
-						throw new ArgumentException();
-				}
+		IInstanceStore GetStore(Lifecycle lifecycle)
+		{
+			switch (lifecycle)
+			{
+				case Lifecycle.HttpContextOrThreadLocal:
+					return this.httpContextOrThreadLocalStore;
+
+				case Lifecycle.HttpContextOrExecutionContextLocal:
+					return this.httpContextOrExecutionContextLocalStore;
+
+				case Lifecycle.Singleton:
+					return this.singletonInstanceStore;
+
+				case Lifecycle.Transient:
+					return this.transientInstanceStore;
+
+				default:
+					return null;
 			}
 		}
 	}

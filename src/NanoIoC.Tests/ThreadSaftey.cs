@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace NanoIoC.Tests
 {
     [TestFixture]
-    public class SlowCtor
+    public class ThreadSaftey
     {
         [Test]
         public void ShouldntBlockEachOther()

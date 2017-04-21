@@ -12,7 +12,18 @@ namespace NanoIoC
 	{
 		readonly AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> registrationStore;
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
+		readonly AsyncLocal<object> mutex;
 		readonly Guid id = new Guid();
+		protected override Lifecycle Lifecycle => Lifecycle.HttpContextOrExecutionContextLocal;
+		public override object Mutex
+		{
+			get
+			{
+				if (HttpContext.Current != null)
+					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id];
+				return this.mutex;
+			}
+		}
 
 		public HttpContextOrExecutionContextLocalInstanceStore()
 		{
@@ -24,29 +35,13 @@ namespace NanoIoC
 			{
 				Value = new Dictionary<Type, IList<Registration>>()
 			};
+			this.mutex = new AsyncLocal<object>
+			{
+				Value = new object()
+			};
 		}
 
-		public HttpContextOrExecutionContextLocalInstanceStore(IInstanceStore instanceStore) : this()
-		{
-			if (!(instanceStore is HttpContextOrExecutionContextLocalInstanceStore))
-				throw new ArgumentException("executionContextInstanceStore is not a `" + typeof(HttpContextOrExecutionContextLocalInstanceStore).FullName + "`");
-
-			var executionContextInstanceStore = (HttpContextOrExecutionContextLocalInstanceStore)instanceStore;
-
-			if (HttpContext.Current != null)
-			{
-				// todo: replace ILists with new lists
-				HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>(executionContextInstanceStore.Store);
-				HttpContext.Current.Items["__NanoIoC_InjectedRegistrations_" + this.id] = new Dictionary<Type, IList<Registration>>(executionContextInstanceStore.InjectedRegistrations);
-			}
-			else
-			{
-				this.registrationStore.Value = new Dictionary<Type, IList<Tuple<Registration, object>>>(executionContextInstanceStore.Store);
-				this.injectedRegistrations.Value = new Dictionary<Type, IList<Registration>>(executionContextInstanceStore.InjectedRegistrations);
-			}
-		}
-
-		public override IDictionary<Type, IList<Tuple<Registration, object>>> Store
+		protected override IDictionary<Type, IList<Tuple<Registration, object>>> Store
 		{
 			get
 			{
@@ -65,7 +60,7 @@ namespace NanoIoC
 			}
 		}
 
-		public override IDictionary<Type, IList<Registration>> InjectedRegistrations
+		protected override IDictionary<Type, IList<Registration>> InjectedRegistrations
 		{
 			get
 			{
@@ -84,6 +79,24 @@ namespace NanoIoC
 			}
 		}
 
-		protected override Lifecycle Lifecycle => Lifecycle.HttpContextOrExecutionContextLocal;
+		public override IInstanceStore Clone()
+		{
+			var instanceStore = new HttpContextOrExecutionContextLocalInstanceStore();
+
+			if (HttpContext.Current != null)
+			{
+				// todo: replace ILists with new lists, and registrations with new registrations
+				HttpContext.Current.Items["__NanoIoC_InstanceStore_" + instanceStore.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);
+				HttpContext.Current.Items["__NanoIoC_InjectedRegistrations_" + instanceStore.id] = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
+			}
+			else
+			{
+				// todo: replace ILists with new lists, and registrations with new registrations
+				instanceStore.registrationStore.Value = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);
+				instanceStore.injectedRegistrations.Value = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
+			}
+
+			return instanceStore;
+		}
 	}
 }

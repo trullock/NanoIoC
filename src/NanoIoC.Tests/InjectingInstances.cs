@@ -88,6 +88,34 @@ namespace NanoIoC.Tests
 		
 
 		[Test]
+		public void ShouldResolveInjectedOverRegisteredWithThreadLifecycles()
+		{
+			var container = new Container();
+
+			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrThreadLocal);
+
+			var injector = new TestClass2();
+			container.Inject<TestInterface>(injector, Lifecycle.HttpContextOrThreadLocal, InjectionBehaviour.Override);
+
+			Assert.AreSame(injector, container.Resolve<TestInterface>());
+		}
+		
+
+		[Test]
+		public void ShouldResolveInjectedOverRegisteredWithDifferentLifecycles()
+		{
+			var container = new Container();
+
+			container.Register<TestInterface, TestClass>();
+
+			var injector = new TestClass2();
+			container.Inject<TestInterface>(injector, Lifecycle.HttpContextOrThreadLocal, InjectionBehaviour.Override);
+
+			Assert.AreSame(injector, container.Resolve<TestInterface>());
+		}
+		
+
+		[Test]
 		public void ShouldResolveInjectedOverInjected()
 		{
 			var container = new Container();

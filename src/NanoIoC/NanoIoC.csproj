@@ -59,6 +59,7 @@
     <Compile Include="Registration.cs" />
     <Compile Include="SingletonInstanceStore.cs" />
     <Compile Include="TempInstanceStore.cs" />
+    <Compile Include="TransientInstanceStore.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

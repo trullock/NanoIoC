@@ -43,13 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
+    <Compile Include="ThreadSaftey.cs" />
+    <Compile Include="SlowCtor.cs" />
     <Compile Include="DependencyStore.cs" />
     <Compile Include="HasRegistrationsFor.cs" />
     <Compile Include="MultipleGenericInterfacesImpelemtedOnSameClass.cs" />
     <Compile Include="MultipleRegistrationsError.cs" />
     <Compile Include="ExecutionContextScopeAcrossThreads.cs" />
     <Compile Include="RegisteredConcreteTypesWithExecutionContextScope.cs" />
-    <Compile Include="SlowCtor.cs" />
     <Compile Include="RemovingInstances.cs" />
     <Compile Include="With.cs" />
     <Compile Include="MultiThreadingWithClearing.cs" />

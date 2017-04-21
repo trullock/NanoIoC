@@ -7,36 +7,32 @@ namespace NanoIoC
 	/// Stores instances for the life of the application
 	/// </summary>
     internal class SingletonInstanceStore : InstanceStore
-    {
-		readonly IDictionary<Type, IList<Tuple<Registration, object>>> instanceStore;
-		readonly IDictionary<Type, IList<Registration>> injectedRegistrations;
+	{
+		IDictionary<Type, IList<Tuple<Registration, object>>> store { get; set; }
+		IDictionary<Type, IList<Registration>> injectedRegistrations { get; set; }
+
+		protected override IDictionary<Type, IList<Tuple<Registration, object>>> Store => this.store;
+		protected override IDictionary<Type, IList<Registration>> InjectedRegistrations => this.injectedRegistrations;
+
+		protected override Lifecycle Lifecycle => Lifecycle.Singleton;
+		public override object Mutex { get; }
 
 		public SingletonInstanceStore()
-        {
-			this.instanceStore = new Dictionary<Type, IList<Tuple<Registration, object>>>();
+		{
+			this.store = new Dictionary<Type, IList<Tuple<Registration, object>>>();
 			this.injectedRegistrations = new Dictionary<Type, IList<Registration>>();
-        }
-
-		public SingletonInstanceStore(IInstanceStore store)
+			this.Mutex = new object();
+		}
+		
+		public override IInstanceStore Clone()
 		{
+			var singletonInstanceStore = new SingletonInstanceStore();
+
 			// todo: replace ILists with new lists
-			this.instanceStore = new Dictionary<Type, IList<Tuple<Registration, object>>>(store.Store);
-			this.injectedRegistrations = new Dictionary<Type, IList<Registration>>(store.InjectedRegistrations);
-		}
+			singletonInstanceStore.store = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);
+			singletonInstanceStore.injectedRegistrations = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
 
-		public override IDictionary<Type, IList<Tuple<Registration, object>>> Store
-		{
-			get { return this.instanceStore; }
+			return singletonInstanceStore;
 		}
-
-		public override IDictionary<Type, IList<Registration>> InjectedRegistrations
-		{
-			get { return this.injectedRegistrations; }
-		}
-
-		protected override Lifecycle Lifecycle
-		{
-			get { return Lifecycle.Singleton; }
-		}
-    }
+	}
 }
