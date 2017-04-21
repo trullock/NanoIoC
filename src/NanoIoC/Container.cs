@@ -107,8 +107,7 @@ namespace NanoIoC
 
 			lock (this.mutex)
 			{
-				// dont pass tempinstancestore in here, the If above handles it
-				var registrations = this.GetRegistrationsFor(type, tempInstanceStore).ToList();
+				var registrations = this.GetRegistrationsFor(type, null).ToList();
 
 				if(registrations.Count > 1)
 					throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.", buildStack);

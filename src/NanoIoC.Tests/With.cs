@@ -39,6 +39,17 @@ namespace NanoIoC.Tests
 
 			Assert.IsInstanceOf<ClassA2>(x);
 		}
+		[Test]
+		public void ShouldResolveDependantReplacement()
+		{
+			var container = new Container();
+			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrThreadLocal);
+			container.Register<InterfaceB, ClassB>(Lifecycle.HttpContextOrThreadLocal);
+
+			var b = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceB>();
+
+			Assert.IsInstanceOf<ClassA2>(b.A);
+		}
 
 		[Test]
 		public void OriginalContainerShouldBeUnaffected()
@@ -71,6 +82,11 @@ namespace NanoIoC.Tests
 			
 		}
 
+		public interface InterfaceB
+		{
+			InterfaceA A { get; set; }
+		}
+
         public class ClassA1 : InterfaceA
         {
         }
@@ -79,9 +95,9 @@ namespace NanoIoC.Tests
 		{
 		}
 
-		public class ClassB
+		public class ClassB : InterfaceB
 		{
-			public readonly InterfaceA A;
+			public InterfaceA A { get; set; }
 
 			public ClassB(InterfaceA a)
 			{
