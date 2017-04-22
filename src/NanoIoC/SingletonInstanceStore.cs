@@ -26,13 +26,15 @@ namespace NanoIoC
 		
 		public override IInstanceStore Clone()
 		{
-			var singletonInstanceStore = new SingletonInstanceStore();
+			var instanceStore = new SingletonInstanceStore();
 
 			// todo: replace ILists with new lists
-			singletonInstanceStore.store = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);
-			singletonInstanceStore.injectedRegistrations = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
+			instanceStore.store = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);
+			instanceStore.injectedRegistrations = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
+			
+			instanceStore.Registrations = new Dictionary<Type, IList<Registration>>(this.Registrations);
 
-			return singletonInstanceStore;
+			return instanceStore;
 		}
 	}
 }

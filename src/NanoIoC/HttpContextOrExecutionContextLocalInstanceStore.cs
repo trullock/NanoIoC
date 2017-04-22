@@ -96,6 +96,8 @@ namespace NanoIoC
 				instanceStore.injectedRegistrations.Value = new Dictionary<Type, IList<Registration>>(this.InjectedRegistrations);
 			}
 
+			instanceStore.Registrations = new Dictionary<Type, IList<Registration>>(this.Registrations);
+
 			return instanceStore;
 		}
 	}

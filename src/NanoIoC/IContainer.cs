@@ -1,18 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace NanoIoC
 {
-    public interface IContainer
+    public interface IContainer : IResolverContainer
     {
-		/// <summary>
-		/// Resolve an instance of the requested type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-        object Resolve(Type type);
-
 		/// <summary>
 		/// Determines if there is a registration for the given type
 		/// </summary>
@@ -35,7 +27,7 @@ namespace NanoIoC
 		/// <param name="lifecycle"></param>
         void Register(Type abstractType, Type concreteType, Lifecycle lifecycle);
 
-		void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle);
+		void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle);
 
 	    /// <summary>
 	    /// Injects the given instance as the given type with the given lifecycle
@@ -46,9 +38,7 @@ namespace NanoIoC
 	    /// <param name="injectionBehaviour"></param>
 	    void Inject(object instance, Type type, Lifecycle lifecycle, InjectionBehaviour injectionBehaviour);
 
-    	IEnumerable ResolveAll(Type abstractType);
-
-    	void RemoveAllRegistrationsAndInstancesOf(Type type);
+		void RemoveAllRegistrationsAndInstancesOf(Type type);
 
 		/// <summary>
 		/// Removes all instances with the given lifecycle
@@ -60,6 +50,5 @@ namespace NanoIoC
     	void Reset();
 
 	    void RemoveInstancesOf(Type type, Lifecycle lifecycle);
-	    object Resolve(Type type, params object[] dependencies);
     }
 }

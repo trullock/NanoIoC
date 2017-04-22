@@ -9,7 +9,6 @@ namespace NanoIoC
 	public sealed class Container : MarshalByRefObject, IContainer
 	{
 		readonly IInstanceStore singletonInstanceStore;
-		readonly IInstanceStore httpContextOrThreadLocalStore;
 		readonly IInstanceStore httpContextOrExecutionContextLocalStore;
 		readonly IInstanceStore transientInstanceStore;
 
@@ -65,7 +64,6 @@ namespace NanoIoC
 		public Container()
 		{
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.httpContextOrThreadLocalStore = new HttpContextOrThreadLocalInstanceStore();
 			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
 
@@ -77,7 +75,6 @@ namespace NanoIoC
 		internal Container(Container container)
 		{
 			this.singletonInstanceStore = container.singletonInstanceStore.Clone();
-			this.httpContextOrThreadLocalStore = container.httpContextOrThreadLocalStore.Clone();
 			this.httpContextOrExecutionContextLocalStore = container.httpContextOrExecutionContextLocalStore.Clone();
 			this.transientInstanceStore = container.transientInstanceStore.Clone();
 
@@ -187,9 +184,6 @@ namespace NanoIoC
 				case Lifecycle.Singleton:
 					return this.GetOrCreateInstances(type, this.singletonInstanceStore, tempInstanceStore, buildStack);
 				
-				case Lifecycle.HttpContextOrThreadLocal:
-					return this.GetOrCreateInstances(type, this.httpContextOrThreadLocalStore, tempInstanceStore, buildStack);
-
 				case Lifecycle.HttpContextOrExecutionContextLocal:
 					return this.GetOrCreateInstances(type, this.httpContextOrExecutionContextLocalStore, tempInstanceStore, buildStack);
 				
@@ -247,8 +241,7 @@ namespace NanoIoC
 			{
 				return this.transientInstanceStore.ContainsRegistrationsFor(type) ||
 					   this.singletonInstanceStore.ContainsRegistrationsFor(type) ||
-					   this.httpContextOrExecutionContextLocalStore.ContainsRegistrationsFor(type) ||
-					   this.httpContextOrThreadLocalStore.ContainsRegistrationsFor(type);
+					   this.httpContextOrExecutionContextLocalStore.ContainsRegistrationsFor(type);
 			}
 		}
 
@@ -270,8 +263,10 @@ namespace NanoIoC
 				// TODO: send to bottom?
 				registrations.AddRange(this.transientInstanceStore.GetRegistrationsFor(type));
 				registrations.AddRange(this.singletonInstanceStore.GetRegistrationsFor(type));
-				registrations.AddRange(this.httpContextOrThreadLocalStore.GetRegistrationsFor(type));
 				registrations.AddRange(this.httpContextOrExecutionContextLocalStore.GetRegistrationsFor(type));
+
+				if (registrations.Any(r => r.InjectionBehaviour == InjectionBehaviour.Override))
+					return registrations.Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
 
 				return registrations;
 			}
@@ -292,7 +287,7 @@ namespace NanoIoC
 			}
 		}
 
-		public void Register(Type abstractType, Func<IContainer, object> ctor, Lifecycle lifecycle)
+		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle)
 		{
 			lock (this.mutex)
 			{
@@ -312,9 +307,6 @@ namespace NanoIoC
 				{
 					case Lifecycle.Singleton:
 						this.singletonInstanceStore.Inject(type, instance, injectionBehaviour);
-						break;
-					case Lifecycle.HttpContextOrThreadLocal:
-						this.httpContextOrThreadLocalStore.Inject(type, instance, injectionBehaviour);
 						break;
 					case Lifecycle.HttpContextOrExecutionContextLocal:
 						this.httpContextOrExecutionContextLocalStore.Inject(type, instance, injectionBehaviour);
@@ -399,7 +391,6 @@ namespace NanoIoC
 			{
 				this.singletonInstanceStore.RemoveAllInstancesAndRegistrations(type);
 				this.httpContextOrExecutionContextLocalStore.RemoveAllInstancesAndRegistrations(type);
-				this.httpContextOrThreadLocalStore.RemoveAllInstancesAndRegistrations(type);
 				this.transientInstanceStore.RemoveAllInstancesAndRegistrations(type);
 			}
 		}
@@ -408,9 +399,6 @@ namespace NanoIoC
 		{
 			switch (lifecycle)
 			{
-				case Lifecycle.HttpContextOrThreadLocal:
-					this.httpContextOrThreadLocalStore.Clear();
-					break;
 				case Lifecycle.HttpContextOrExecutionContextLocal:
 					this.httpContextOrExecutionContextLocalStore.Clear();
 					break;
@@ -429,7 +417,6 @@ namespace NanoIoC
 			//lock (this.mutex)
 			//{
 				this.httpContextOrExecutionContextLocalStore.Clear();
-				this.httpContextOrThreadLocalStore.Clear();
 				this.singletonInstanceStore.Clear();
 				this.transientInstanceStore.Clear();
 				this.Inject<IContainer>(this);
@@ -454,9 +441,6 @@ namespace NanoIoC
 					{
 						case Lifecycle.Singleton:
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
-							break;
-						case Lifecycle.HttpContextOrThreadLocal:
-							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrThreadLocalStore, null, buildStack).Cast<object>());
 							break;
 						case Lifecycle.HttpContextOrExecutionContextLocal:
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrExecutionContextLocalStore, null, buildStack).Cast<object>());
@@ -493,9 +477,6 @@ namespace NanoIoC
 		{
 			switch (lifecycle)
 			{
-				case Lifecycle.HttpContextOrThreadLocal:
-					return this.httpContextOrThreadLocalStore;
-
 				case Lifecycle.HttpContextOrExecutionContextLocal:
 					return this.httpContextOrExecutionContextLocalStore;
 

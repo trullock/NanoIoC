@@ -46,9 +46,9 @@
     <Compile Include="ContainerExtensions.cs" />
     <Compile Include="HttpContextOrExecutionContextLocalInstanceStore.cs" />
     <Compile Include="InjectionBehaviour.cs" />
+    <Compile Include="IResolverContainer.cs" />
     <Compile Include="OpenGenericTypeProcessor.cs" />
     <Compile Include="InstanceStore.cs" />
-    <Compile Include="HttpContextOrThreadLocalInstanceStore.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IInstanceStore.cs" />

@@ -11,15 +11,18 @@ namespace NanoIoC
 	public abstract class InstanceStore : IInstanceStore
     {
 		protected abstract IDictionary<Type, IList<Tuple<Registration, object>>> Store { get; }
-		IDictionary<Type, IList<Registration>> Registrations { get; set; }
+		protected IDictionary<Type, IList<Registration>> Registrations { get; set; }
 		protected abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
 		protected abstract Lifecycle Lifecycle { get; }
 		public abstract object Mutex { get; }
 
+		protected InstanceStore()
+		{
+			this.Registrations = new Dictionary<Type, IList<Registration>>();
+		}
+
 		public void Insert(Registration registration, Type type, object instance)
         {
-			this.Registrations = new Dictionary<Type, IList<Registration>>();
-
 			if (!this.Store.ContainsKey(type))
 				this.Store.Add(type, new List<Tuple<Registration, object>>());
 

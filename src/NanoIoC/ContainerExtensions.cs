@@ -31,7 +31,7 @@ namespace NanoIoC
 			container.Register(typeof(TAbstract), typeof(TConcrete), lifecycle);
 		}
 
-		public static void Register<TAbstract>(this IContainer container, Func<IContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton)
+		public static void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton)
 		{
 			container.Register(typeof(TAbstract), c => ctor(c), lifecycle);
 		}
@@ -42,7 +42,7 @@ namespace NanoIoC
 		/// <typeparam name="T"></typeparam>
 		/// <param name="container"></param>
 		/// <returns></returns>
-		public static T Resolve<T>(this IContainer container)
+		public static T Resolve<T>(this IResolverContainer container)
 		{
 			return (T) container.Resolve(typeof (T));
 		}
@@ -66,7 +66,7 @@ namespace NanoIoC
 		/// <typeparam name="T"></typeparam>
 		/// <param name="container"></param>
 		/// <returns></returns>
-		public static IEnumerable<T> ResolveAll<T>(this IContainer container)
+		public static IEnumerable<T> ResolveAll<T>(this IResolverContainer container)
 		{
 			return container.ResolveAll(typeof (T)).Cast<T>();
 		}
@@ -150,7 +150,7 @@ namespace NanoIoC
 			return newContainer;
 		}
 
-		public static object Resolve<T>(this IContainer container, params object[] dependencies)
+		public static object Resolve<T>(this IResolverContainer container, params object[] dependencies)
 		{
 			return container.Resolve(typeof (T), dependencies);
 		}
