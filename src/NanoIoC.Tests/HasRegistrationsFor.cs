@@ -21,7 +21,7 @@ namespace NanoIoC.Tests
 		[Test]
 		public void RegisteredThreadLocal()
 		{
-			RegisteredLifecycle(Lifecycle.HttpContextOrThreadLocal);
+			RegisteredLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
 		}
 
 		[Test]
@@ -39,7 +39,7 @@ namespace NanoIoC.Tests
 		[Test]
 		public void InjectedThreadLocal()
 		{
-			InjectedLifecycle(Lifecycle.HttpContextOrThreadLocal);
+			InjectedLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
 		}
 
 		[Test]

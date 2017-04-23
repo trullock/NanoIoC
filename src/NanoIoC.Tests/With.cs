@@ -33,7 +33,7 @@ namespace NanoIoC.Tests
 		public void ShouldResolveHybridReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrThreadLocal);
+			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrExecutionContextLocal);
 
 			var x = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceA>();
 
@@ -43,8 +43,8 @@ namespace NanoIoC.Tests
 		public void ShouldResolveDependantReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrThreadLocal);
-			container.Register<InterfaceB, ClassB>(Lifecycle.HttpContextOrThreadLocal);
+			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<InterfaceB, ClassB>(Lifecycle.HttpContextOrExecutionContextLocal);
 
 			var b = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceB>();
 

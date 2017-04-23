@@ -52,23 +52,7 @@ namespace NanoIoC.Tests
 
 			Assert.IsNotNull(classE);
 		}
-
-		[Test]
-		public void ShouldNotStackOverflowWhenResolvingWithCycles()
-		{
-			var container = new Container();
-
-			container.Register<ClassF>(c => c.Resolve<ClassF>());
-			try
-			{
-				var classF = container.Resolve<ClassF>();
-			}
-			catch (ContainerException e)
-			{
-				Assert.IsNotNull(e);
-			}
-		}
-
+		
 		public class ClassA
 		{
 			public ClassA(ClassB b)

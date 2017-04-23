@@ -16,39 +16,7 @@ namespace NanoIoC.Tests
 
 			Assert.IsFalse(container.HasRegistrationFor<TestInterface>());
 		}
-
-		[Test]
-		public void ShouldRemoveCurrentHttpContextOrThreadInstanceOnly()
-		{
-			var instance1 = new TestClass();
-			var instance2 = new TestClass();
-
-			var container = new Container();
-			container.Inject<TestInterface>(instance1, Lifecycle.HttpContextOrThreadLocal);
-
-			TestInterface[] thread2ResolvedTestClasses = null;
-			bool thread2HasRegistration = true;
-
-			var thread2 = new Thread(() =>
-			{
-				container.Inject<TestInterface>(instance2, Lifecycle.HttpContextOrThreadLocal);
-
-				thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
-
-				container.RemoveInstancesOf<TestInterface>(Lifecycle.HttpContextOrThreadLocal);
-
-				thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
-			});
-
-			thread2.Start();
-			thread2.Join(1000);
-
-			Assert.IsFalse(thread2HasRegistration);
-			Assert.AreEqual(1, thread2ResolvedTestClasses.Length);
-
-			Assert.AreEqual(instance1, container.Resolve<TestInterface>());
-		}
-
+		
 		[Test]
 		public void ShouldRemoveExecutionContextInstanceOnly()
 		{
