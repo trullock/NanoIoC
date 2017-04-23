@@ -7,7 +7,7 @@ namespace NanoIoC
 {
 	sealed class TransientInstanceStore : IInstanceStore
 	{
-		IDictionary<Type, IList<Registration>> registrations { get; set; }
+		IDictionary<Type, IList<Registration>> registrations;
 		public object Mutex { get; }
 
 		public TransientInstanceStore()

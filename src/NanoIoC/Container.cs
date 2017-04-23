@@ -42,18 +42,15 @@ namespace NanoIoC
 				}
 				catch (ReflectionTypeLoadException e)
 				{
-					throw new ContainerException(
-						"Unable to load one or more types: " + string.Join(", ", e.LoaderExceptions.Select(x => x.Message).ToArray()), e);
+					throw new ContainerException("Unable to load one or more types: " + string.Join(", ", e.LoaderExceptions.Select(x => x.Message).ToArray()), e);
 				}
 
 				foreach (var type in types)
 				{
-					if (typeof (IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract &&
-					    !type.ContainsGenericParameters)
+					if (typeof (IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
 						registries.Add(Activator.CreateInstance(type) as IContainerRegistry);
 
-					if (typeof (ITypeProcessor).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract &&
-					    !type.ContainsGenericParameters)
+					if (typeof (ITypeProcessor).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
 						typeProcessors.Add(Activator.CreateInstance(type) as ITypeProcessor);
 				}
 			}
@@ -86,12 +83,12 @@ namespace NanoIoC
 
 		public object Resolve(Type type)
 		{
-			return Resolve(type, null, new Stack<Type>());
+			return this.Resolve(type, null, new Stack<Type>());
 		}
 
 		public object Resolve(Type type, params object[] dependencies)
 		{
-			return Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
+			return this.Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
 		}
 
 		object Resolve(Type type, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
@@ -102,23 +99,19 @@ namespace NanoIoC
 			var registrations = this.GetRegistrationsFor(type, null).ToList();
 
 			if (registrations.Count > 1)
-				throw new ContainerException(
-					"Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.",
-					buildStack);
+				throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.", buildStack);
 
 			if (registrations.Count == 1)
 				return this.GetOrCreateInstances(type, registrations[0].Lifecycle, tempInstanceStore, buildStack).First();
 
-			var typesToCreate = GetTypesToCreate(type, buildStack);
+			var typesToCreate = this.GetTypesToCreate(type, buildStack);
 			return this.GetInstance(typesToCreate.First(), tempInstanceStore, buildStack);
 		}
 
 		object GetInstance(Registration registration, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			if (buildStack.Contains(registration.ConcreteType))
-				throw new ContainerException(
-					"Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`",
-					buildStack);
+				throw new ContainerException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
 
 			buildStack.Push(registration.ConcreteType);
 
@@ -132,15 +125,13 @@ namespace NanoIoC
 				                  {
 					                  var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
-					                  this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle,
-						                  tempInstanceStore, buildStack);
+					                  this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle, tempInstanceStore, buildStack);
 
 					                  var parameters = new object[ctor.parameters.Length];
 					                  for (var i = 0; i < ctor.parameters.Length; i++)
 					                  {
 						                  var newBuildStack = new Stack<Type>(buildStack.Reverse());
-						                  if (ctor.parameters[i].ParameterType.IsGenericType &&
-						                      ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+						                  if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
 						                  {
 							                  var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
 							                  parameters[i] = this.ResolveAll(genericArgument, newBuildStack);
@@ -157,13 +148,11 @@ namespace NanoIoC
 					                  }
 					                  catch (Exception e)
 					                  {
-						                  throw new ContainerException("Cannot create type `" + ctor.ctor.DeclaringType.FullName + "`",
-							                  buildStack, e);
+						                  throw new ContainerException("Cannot create type `" + ctor.ctor.DeclaringType.FullName + "`", buildStack, e);
 					                  }
 				                  }
 
-				                  throw new ContainerException(
-					                  "Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+				                  throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
 			                  });
 
 			return constructor(this);
@@ -177,8 +166,7 @@ namespace NanoIoC
 		/// <param name="tempInstanceStore"></param>
 		/// <param name="buildStack"></param>
 		/// <returns></returns>
-		IEnumerable GetOrCreateInstances(Type type, Lifecycle lifecycle, IInstanceStore tempInstanceStore,
-			Stack<Type> buildStack)
+		IEnumerable GetOrCreateInstances(Type type, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			switch (lifecycle)
 			{
@@ -191,9 +179,8 @@ namespace NanoIoC
 						return this.GetOrCreateInstances(type, this.httpContextOrExecutionContextLocalStore, tempInstanceStore, buildStack);
 
 				default:
-					var typesToCreate = GetTypesToCreate(type, buildStack);
-					return
-						typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, tempInstanceStore, buildStack)).ToArray();
+					var typesToCreate = this.GetTypesToCreate(type, buildStack);
+					return typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, tempInstanceStore, buildStack)).ToArray();
 			}
 		}
 
@@ -205,10 +192,9 @@ namespace NanoIoC
 		/// <param name="tempInstanceStore"></param>
 		/// <param name="buildStack"></param>
 		/// <returns></returns>
-		IEnumerable GetOrCreateInstances(Type requestType, IInstanceStore instanceStore, IInstanceStore tempInstanceStore,
-			Stack<Type> buildStack)
+		IEnumerable GetOrCreateInstances(Type requestType, IInstanceStore instanceStore, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
-			var typesToCreate = GetTypesToCreate(requestType, buildStack);
+			var typesToCreate = this.GetTypesToCreate(requestType, buildStack);
 
 			var instances = new List<Tuple<Registration, object>>();
 
@@ -295,13 +281,12 @@ namespace NanoIoC
 		public void Register(Type abstractType, Type concreteType, Lifecycle lifecycle = Lifecycle.Singleton)
 		{
 			if (!concreteType.IsOrDerivesFrom(abstractType))
-				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName +
-				                             "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
+				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
 
 			if (concreteType.IsInterface || concreteType.IsAbstract)
 				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not a concrete type");
 
-			var store = GetStore(lifecycle);
+			var store = this.GetStore(lifecycle);
 
 			lock (store.Mutex)
 				store.AddRegistration(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
@@ -309,7 +294,7 @@ namespace NanoIoC
 
 		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle)
 		{
-			var store = GetStore(lifecycle);
+			var store = this.GetStore(lifecycle);
 			lock (store.Mutex)
 				store.AddRegistration(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
 		}
@@ -317,10 +302,9 @@ namespace NanoIoC
 		public void Inject(object instance, Type type, Lifecycle lifeCycle, InjectionBehaviour injectionBehaviour)
 		{
 			if (lifeCycle == Lifecycle.Transient)
-				throw new ArgumentException(
-					"You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
+				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 
-			var store = GetStore(lifeCycle);
+			var store = this.GetStore(lifeCycle);
 			lock (store.Mutex)
 				store.Inject(type, instance, injectionBehaviour);
 		}
@@ -341,27 +325,21 @@ namespace NanoIoC
 					var genericArguments = requestedType.GetGenericArguments();
 					registrations = this.GetRegistrationsFor(genericTypeDefinition);
 
-					return
-						registrations.Select(
-							r =>
-								new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.Lifecycle,
-									InjectionBehaviour.Default));
+					return registrations.Select(r => new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.Lifecycle, InjectionBehaviour.Default));
 				}
 			}
 
 			if (!requestedType.IsAbstract && !requestedType.IsInterface)
 				return new[] {new Registration(requestedType, requestedType, null, Lifecycle.Transient, InjectionBehaviour.Default)};
 
-			throw new ContainerException(
-				"Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.", buildStack);
+			throw new ContainerException("Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.", buildStack);
 		}
 
-		void CheckDependencies(Type dependeeType, IEnumerable<Type> parameters, Lifecycle lifecycle,
-			IInstanceStore tempInstanceStore, Stack<Type> buildStack)
+		void CheckDependencies(Type dependeeType, IEnumerable<Type> parameters, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			parameters.All(p =>
 			{
-				if (CanCreateDependency(dependeeType, p, lifecycle, tempInstanceStore, false, buildStack))
+				if (this.CanCreateDependency(dependeeType, p, lifecycle, tempInstanceStore, false, buildStack))
 					return true;
 
 				if (p.IsGenericType && p.GetGenericTypeDefinition() == typeof (IEnumerable<>))
@@ -370,28 +348,20 @@ namespace NanoIoC
 				if (!p.IsAbstract && !p.IsInterface)
 					return true;
 
-				throw new ContainerException(
-					"Cannot create dependency `" + p.AssemblyQualifiedName + "` of dependee `" + dependeeType.AssemblyQualifiedName +
-					"`", buildStack);
+				throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "` of dependee `" + dependeeType.AssemblyQualifiedName + "`", buildStack);
 			});
 		}
 
-		bool CanCreateDependency(Type dependeeType, Type requestedType, Lifecycle lifecycle, IInstanceStore tempInstanceStore,
-			bool allowMultiple, Stack<Type> buildStack)
+		bool CanCreateDependency(Type dependeeType, Type requestedType, Lifecycle lifecycle, IInstanceStore tempInstanceStore, bool allowMultiple, Stack<Type> buildStack)
 		{
 			var registrations = this.GetRegistrationsFor(requestedType, tempInstanceStore).ToList();
 			if (registrations.Any())
 			{
 				if (!allowMultiple && registrations.Count > 1)
-					throw new ContainerException(
-						"Cannot create dependency `" + requestedType.AssemblyQualifiedName +
-						"`, there are multiple concrete types registered for it.", buildStack);
+					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`, there are multiple concrete types registered for it.", buildStack);
 
 				if (registrations[0].Lifecycle < lifecycle)
-					throw new ContainerException(
-						"Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`. It's lifecycle (" +
-						registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.AssemblyQualifiedName + "` (" +
-						lifecycle + ")", buildStack);
+					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.AssemblyQualifiedName + "` (" + lifecycle + ")", buildStack);
 
 				return true;
 			}
@@ -447,7 +417,7 @@ namespace NanoIoC
 
 		public IEnumerable ResolveAll(Type abstractType)
 		{
-			return ResolveAll(abstractType, new Stack<Type>());
+			return this.ResolveAll(abstractType, new Stack<Type>());
 		}
 
 		IEnumerable ResolveAll(Type abstractType, Stack<Type> buildStack)
@@ -461,17 +431,14 @@ namespace NanoIoC
 				{
 					case Lifecycle.Singleton:
 						lock (this.singletonInstanceStore.Mutex)
-							instances.AddRange(
-								this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
+							instances.AddRange(this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
 						break;
 					case Lifecycle.HttpContextOrExecutionContextLocal:
 						lock (this.httpContextOrExecutionContextLocalStore.Mutex)
-							instances.AddRange(
-								this.GetOrCreateInstances(abstractType, this.httpContextOrExecutionContextLocalStore, null, buildStack)
-									.Cast<object>());
+							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrExecutionContextLocalStore, null, buildStack).Cast<object>());
 						break;
 					default:
-						var typesToCreate = GetTypesToCreate(abstractType, buildStack);
+						var typesToCreate = this.GetTypesToCreate(abstractType, buildStack);
 						instances.AddRange(typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, null, buildStack)));
 						break;
 				}
@@ -480,14 +447,12 @@ namespace NanoIoC
 			return instances.Cast(abstractType);
 		}
 
-
 		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
 		{
 			if (lifecycle == Lifecycle.Transient)
-				throw new ArgumentException(
-					"You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
+				throw new ArgumentException("You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
 
-			var store = GetStore(lifecycle);
+			var store = this.GetStore(lifecycle);
 			lock (store.Mutex)
 				store.RemoveInstances(type);
 		}

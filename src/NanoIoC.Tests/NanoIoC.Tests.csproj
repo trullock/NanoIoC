@@ -43,7 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
-    <Compile Include="ThreadSaftey.cs" />
     <Compile Include="SlowCtor.cs" />
     <Compile Include="DependencyStore.cs" />
     <Compile Include="HasRegistrationsFor.cs" />
