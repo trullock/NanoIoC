@@ -5,13 +5,13 @@ using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
-    public class SlowCtor
-    {
-        [Test]
-        public void ShouldntBlockEachOther()
-        {
-            var container = new Container();
+	[TestFixture]
+	public class SlowCtor
+	{
+		[Test]
+		public void ShouldntBlockEachOther()
+		{
+			var container = new Container();
 
 			container.Register<TestInterface>(c =>
 			{
@@ -19,10 +19,10 @@ namespace NanoIoC.Tests
 				return new TestClass();
 			}, Lifecycle.Transient);
 
-	        var stopwatch = new Stopwatch();
+			var stopwatch = new Stopwatch();
 			stopwatch.Start();
 
-	        Enumerable.Range(0, 10).Select(i =>
+			Enumerable.Range(0, 10).Select(i =>
 			{
 				var thread = new Thread(Construct);
 				thread.Start(container);
@@ -33,21 +33,21 @@ namespace NanoIoC.Tests
 
 			// if this takes 10s then they ran serially
 			Assert.Less(stopwatch.Elapsed.TotalSeconds, 1.5);
-        }
+		}
 
-	    static void Construct(object o)
-	    {
+		static void Construct(object o)
+		{
 			var resolved = (o as IContainer).Resolve<TestInterface>();
 		}
 
 		public class TestClass : TestInterface
-        {
-            
-        }
-		
+		{
+
+		}
+
 		public interface TestInterface
 		{
-			
+
 		}
-    }
+	}
 }

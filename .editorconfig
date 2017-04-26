@@ -1,0 +1,8 @@
+﻿charset = utf-8
+[*.cs]
+indent_style = tab
+trim_trailing_whitespace = true
+dotnet_style_qualification_for_field = true:suggestion
+dotnet_style_qualification_for_property = true:suggestion
+dotnet_style_qualification_for_method = true:suggestion
+dotnet_style_qualification_for_event = true:suggestion

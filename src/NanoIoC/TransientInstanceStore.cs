@@ -53,7 +53,6 @@ namespace NanoIoC
 				this.registrations.Remove(type);
 		}
 
-
 		public void Insert(Registration registration, Type type, object instance)
 		{
 			throw new InvalidOperationException();
@@ -61,7 +60,7 @@ namespace NanoIoC
 
 		public bool ContainsInstancesFor(Type type)
 		{
-			throw new NotImplementedException();
+			throw new InvalidOperationException();
 		}
 
 		public IEnumerable GetInstances(Type type)
@@ -71,7 +70,7 @@ namespace NanoIoC
 
 		public void Clear()
 		{
-			throw new NotImplementedException();
+			throw new InvalidOperationException();
 		}
 
 		public void Inject(Type type, object instance, InjectionBehaviour injectionBehaviour)
@@ -83,6 +82,5 @@ namespace NanoIoC
 		{
 			throw new InvalidOperationException();
 		}
-
 	}
 }
