@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
+    <Compile Include="LifecycleDependencyRules.cs" />
+    <Compile Include="MixedLifecycleHierarchy.cs" />
     <Compile Include="SlowCtor.cs" />
     <Compile Include="DependencyStore.cs" />
     <Compile Include="HasRegistrationsFor.cs" />
