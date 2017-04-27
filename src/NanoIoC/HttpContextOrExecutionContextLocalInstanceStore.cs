@@ -15,15 +15,10 @@ namespace NanoIoC
 		readonly AsyncLocal<object> mutex;
 		readonly Guid id = new Guid();
 		protected override Lifecycle Lifecycle => Lifecycle.HttpContextOrExecutionContextLocal;
-		public override object Mutex
-		{
-			get
-			{
-				if (HttpContext.Current != null)
-					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id];
-				return this.mutex;
-			}
-		}
+
+		public override object Mutex => HttpContext.Current == null
+			? this.mutex
+			: this.GetCurrentContextInstanceStore();
 
 		public HttpContextOrExecutionContextLocalInstanceStore()
 		{
@@ -46,18 +41,19 @@ namespace NanoIoC
 			get
 			{
 				if (HttpContext.Current != null)
-				{
-					if (HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] == null)
-						HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>();
-
-					return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] as IDictionary<Type, IList<Tuple<Registration, object>>>;
-				}
+					return this.GetCurrentContextInstanceStore() as IDictionary<Type, IList<Tuple<Registration, object>>>;
 
 				if (this.registrationStore.Value == null)
 					this.registrationStore.Value = new Dictionary<Type, IList<Tuple<Registration, object>>>();
 
 				return this.registrationStore.Value;
 			}
+		}
+
+		private object GetCurrentContextInstanceStore()
+		{
+			return HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] ??
+				   (HttpContext.Current.Items["__NanoIoC_InstanceStore_" + this.id] = new Dictionary<Type, IList<Tuple<Registration, object>>>());
 		}
 
 		protected override IDictionary<Type, IList<Registration>> InjectedRegistrations

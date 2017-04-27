@@ -37,9 +37,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
+    <Compile Include="HttpContextInstanceStoreMutexInitialisation.cs" />
     <Compile Include="LifecycleDependencyRules.cs" />
     <Compile Include="MixedLifecycleHierarchy.cs" />
     <Compile Include="SlowCtor.cs" />
