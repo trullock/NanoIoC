@@ -85,6 +85,7 @@ namespace NanoIoC
 		public void Clear()
 		{
 			this.Store.Clear();
+			this.Registrations.Clear();
 			this.InjectedRegistrations.Clear();
 		}
 

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
@@ -17,10 +18,16 @@ namespace NanoIoC.Tests
 
 			container.Register<TestInterface, TestClass1>(Lifecycle.Singleton);
 			container.Inject<TestInterface>(new TestClass1(), Lifecycle.Singleton);
-
-			container.Reset();
-
-			Assert.IsFalse(container.HasRegistrationFor<TestInterface>());
+			try
+			{
+				container.Reset();
+			}
+			catch (Exception e)
+			{
+				Assert.Fail();
+			}
+			var hasRegistrationFor = container.HasRegistrationFor<TestInterface>();
+			Assert.IsFalse(hasRegistrationFor);
 		}
 
 
