@@ -70,7 +70,7 @@ namespace NanoIoC
 
 		public void Clear()
 		{
-			throw new InvalidOperationException();
+			this.registrations.Clear();
 		}
 
 		public void Inject(Type type, object instance, InjectionBehaviour injectionBehaviour)

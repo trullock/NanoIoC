@@ -405,14 +405,16 @@ namespace NanoIoC
 
 		public void Reset()
 		{
-			// TODO: validate where UNiDAYS call this from, will adding a lock make things go bang?
-			//lock (this.mutex)
-			//{
-			this.httpContextOrExecutionContextLocalStore.Clear();
-			this.singletonInstanceStore.Clear();
-			this.transientInstanceStore.Clear();
+			lock(this.httpContextOrExecutionContextLocalStore.Mutex)
+				this.httpContextOrExecutionContextLocalStore.Clear();
+
+			lock(this.singletonInstanceStore.Mutex)
+				this.singletonInstanceStore.Clear();
+
+			lock(this.transientInstanceStore.Mutex)
+				this.transientInstanceStore.Clear();
+
 			this.Inject<IContainer>(this);
-			//}
 		}
 
 		public IEnumerable ResolveAll(Type abstractType)
