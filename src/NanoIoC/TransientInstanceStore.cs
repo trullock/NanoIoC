@@ -47,10 +47,20 @@ namespace NanoIoC
 			this.registrations[registration.AbstractType].Add(registration);
 		}
 
-		public void RemoveAllInstancesAndRegistrations(Type type)
+		public void RemoveAllRegistrationsAndInstances(Type type)
 		{
 			if (this.registrations.ContainsKey(type))
 				this.registrations.Remove(type);
+		}
+
+		public void RemoveAllRegistrationsAndInstances()
+		{
+			this.registrations.Clear();
+		}
+
+		public void RemoveAllInstances()
+		{
+			throw new InvalidOperationException();
 		}
 
 		public void Insert(Registration registration, Type type, object instance)
@@ -66,11 +76,6 @@ namespace NanoIoC
 		public IEnumerable GetInstances(Type type)
 		{
 			throw new InvalidOperationException();
-		}
-
-		public void Clear()
-		{
-			this.registrations.Clear();
 		}
 
 		public void Inject(Type type, object instance, InjectionBehaviour injectionBehaviour)

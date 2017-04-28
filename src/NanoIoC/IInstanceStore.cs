@@ -32,11 +32,6 @@ namespace NanoIoC
 		IEnumerable GetInstances(Type type);
 
 		/// <summary>
-		/// Removes all stored instances
-		/// </summary>
-		void Clear();
-		
-		/// <summary>
 		/// Injects an instance into the store
 		/// </summary>
 		/// <param name="type"></param>
@@ -45,10 +40,20 @@ namespace NanoIoC
 		void Inject(Type type, object instance, InjectionBehaviour injectionBehaviour);
 
 		/// <summary>
+		/// Removes all instances and registrations for all types
+		/// </summary>
+		void RemoveAllRegistrationsAndInstances();
+
+		/// <summary>
 		/// Removes all instances and registrations of the given type
 		/// </summary>
 		/// <param name="type"></param>
-		void RemoveAllInstancesAndRegistrations(Type type);
+		void RemoveAllRegistrationsAndInstances(Type type);
+
+		/// <summary>
+		/// Removes all constructed or injected instances, leaving the registrations in place
+		/// </summary>
+		void RemoveAllInstances();
 
 		/// <summary>
 		/// Removes instances of the given type from the store in the context of the current user
@@ -69,7 +74,9 @@ namespace NanoIoC
 		IInstanceStore Clone();
 
 		bool ContainsRegistrationsFor(Type type);
+
 		IEnumerable<Registration> GetRegistrationsFor(Type type);
+
 		void AddRegistration(Registration registration);
     }
 }

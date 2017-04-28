@@ -378,13 +378,13 @@ namespace NanoIoC
 		public void RemoveAllRegistrationsAndInstancesOf(Type type)
 		{
 			lock (this.singletonInstanceStore.Mutex)
-				this.singletonInstanceStore.RemoveAllInstancesAndRegistrations(type);
+				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances(type);
 
 			lock (this.httpContextOrExecutionContextLocalStore.Mutex)
-				this.httpContextOrExecutionContextLocalStore.RemoveAllInstancesAndRegistrations(type);
+				this.httpContextOrExecutionContextLocalStore.RemoveAllRegistrationsAndInstances(type);
 
 			lock (this.transientInstanceStore.Mutex)
-				this.transientInstanceStore.RemoveAllInstancesAndRegistrations(type);
+				this.transientInstanceStore.RemoveAllRegistrationsAndInstances(type);
 		}
 
 		public void RemoveAllInstancesWithLifecycle(Lifecycle lifecycle)
@@ -392,10 +392,10 @@ namespace NanoIoC
 			switch (lifecycle)
 			{
 				case Lifecycle.HttpContextOrExecutionContextLocal:
-					this.httpContextOrExecutionContextLocalStore.Clear();
+					this.httpContextOrExecutionContextLocalStore.RemoveAllInstances();
 					break;
 				case Lifecycle.Singleton:
-					this.singletonInstanceStore.Clear();
+					this.singletonInstanceStore.RemoveAllInstances();
 					this.Inject<IContainer>(this);
 					break;
 				case Lifecycle.Transient:
@@ -403,16 +403,26 @@ namespace NanoIoC
 			}
 		}
 
+		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
+		{
+			if (lifecycle == Lifecycle.Transient)
+				throw new ArgumentException("You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
+
+			var store = this.GetStore(lifecycle);
+			lock (store.Mutex)
+				store.RemoveInstances(type);
+		}
+
 		public void Reset()
 		{
 			lock(this.httpContextOrExecutionContextLocalStore.Mutex)
-				this.httpContextOrExecutionContextLocalStore.Clear();
+				this.httpContextOrExecutionContextLocalStore.RemoveAllRegistrationsAndInstances();
 
 			lock(this.singletonInstanceStore.Mutex)
-				this.singletonInstanceStore.Clear();
+				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances();
 
 			lock(this.transientInstanceStore.Mutex)
-				this.transientInstanceStore.Clear();
+				this.transientInstanceStore.RemoveAllRegistrationsAndInstances();
 
 			this.Inject<IContainer>(this);
 		}
@@ -449,15 +459,6 @@ namespace NanoIoC
 			return instances.Cast(abstractType);
 		}
 
-		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
-		{
-			if (lifecycle == Lifecycle.Transient)
-				throw new ArgumentException("You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
-
-			var store = this.GetStore(lifecycle);
-			lock (store.Mutex)
-				store.RemoveInstances(type);
-		}
 
 		IInstanceStore GetStore(Lifecycle lifecycle)
 		{
