@@ -1,18 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{16F31FC6-E1BB-4399-9A25-9E4215A41B72}"
-	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
-		..\paket.dependencies = ..\paket.dependencies
-		..\readme.md = ..\readme.md
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{2DFA2D28-96F1-4ECC-886C-D1525792295C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{421F01D9-2D1C-4D75-AAAF-EE13131B455C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{5AACAC91-E05B-45F8-8091-2804829A4425}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,16 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DFA2D28-96F1-4ECC-886C-D1525792295C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DFA2D28-96F1-4ECC-886C-D1525792295C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DFA2D28-96F1-4ECC-886C-D1525792295C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DFA2D28-96F1-4ECC-886C-D1525792295C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AACAC91-E05B-45F8-8091-2804829A4425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AACAC91-E05B-45F8-8091-2804829A4425}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AACAC91-E05B-45F8-8091-2804829A4425}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AACAC91-E05B-45F8-8091-2804829A4425}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5262574-BE90-46D2-91C4-79F29EA4A985}
 	EndGlobalSection
 EndGlobal
