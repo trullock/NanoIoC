@@ -15,7 +15,6 @@ namespace NanoIoC
 		protected override IDictionary<Type, IList<Registration>> InjectedRegistrations => this.injectedRegistrations;
 
 		protected override Lifecycle Lifecycle => Lifecycle.Singleton;
-		public override object Mutex { get; }
 
 		public SingletonInstanceStore()
 		{

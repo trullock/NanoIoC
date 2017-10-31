@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NanoIoC
 {
@@ -88,7 +89,7 @@ namespace NanoIoC
 
 		public static void RunAllTypeProcessors(this IContainer container)
 		{
-			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetCustomAttribute<IncludeInNanoIoCAssemblyScanningAttribute>() != null);
 			foreach (var assembly in assemblies)
 			{
 				var types = assembly.GetTypes();
@@ -111,7 +112,7 @@ namespace NanoIoC
 
 		public static void RunTypeProcessor(this IContainer container, ITypeProcessor typeProcessor)
 		{
-			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetCustomAttribute<IncludeInNanoIoCAssemblyScanningAttribute>() != null);
 			foreach (var assembly in assemblies)
 			{
 				var types = assembly.GetTypes();

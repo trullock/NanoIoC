@@ -31,7 +31,7 @@ namespace NanoIoC
 			var registries = new List<IContainerRegistry>();
 			var typeProcessors = new List<ITypeProcessor>();
 
-			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetCustomAttribute<IncludeInNanoIoCAssemblyScanningAttribute>() != null);
 			foreach (var assembly in assemblies)
 			{
 				Type[] types;

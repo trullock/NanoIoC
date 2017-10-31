@@ -14,7 +14,7 @@ namespace NanoIoC
 		protected IDictionary<Type, IList<Registration>> Registrations { get; set; }
 		protected abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
 		protected abstract Lifecycle Lifecycle { get; }
-		public abstract object Mutex { get; }
+		public object Mutex { get; protected set; }
 
 		protected InstanceStore()
 		{

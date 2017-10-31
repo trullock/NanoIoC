@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{2DFA2D28-96F1-4ECC-886C-D1525792295C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{2DFA2D28-96F1-4ECC-886C-D1525792295C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{5AACAC91-E05B-45F8-8091-2804829A4425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{5AACAC91-E05B-45F8-8091-2804829A4425}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B474D97C-32CE-43EA-8312-3318ED357F5B}"
+	ProjectSection(SolutionItems) = preProject
+		..\paket.dependencies = ..\paket.dependencies
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
