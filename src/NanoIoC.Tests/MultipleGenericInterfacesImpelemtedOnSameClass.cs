@@ -45,8 +45,7 @@ namespace NanoIoC.Tests
 			Assert.NotNull(bahHandler);
 		}
 
-		[Fact]
-		[Ignore("Deliberately added a test I know will fail, to resolve at some time in the future as it would be a more significant restructure.")]
+		[Fact(Skip = "Deliberately added a test I know will fail, to resolve at some time in the future as it would be a more significant restructure.")]
 		public void Singleton_instance_is_created_per_concrete_class_not_per_interface_implementation()
 		{
 			var container = new Container();

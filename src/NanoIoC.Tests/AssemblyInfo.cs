@@ -1,0 +1,3 @@
+﻿using NanoIoC;
+
+[assembly: IncludeInNanoIoCAssemblyScanning]

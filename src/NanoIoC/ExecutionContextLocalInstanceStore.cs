@@ -12,13 +12,20 @@ namespace NanoIoC
 		readonly AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> registrationStore;
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
 		readonly AsyncLocal<object> mutex;
-		readonly Guid id = new Guid();
 		protected override Lifecycle Lifecycle => Lifecycle.ExecutionContextLocal;
+		public override object Mutex
+		{
+			get
+			{
+				if(this.mutex.Value == null)
+					this.mutex.Value = new object();
+
+				return this.mutex.Value;
+			}
+		}
 
 		public ExecutionContextLocalInstanceStore()
 		{
-			this.Mutex = this.mutex;
-
 			this.registrationStore = new AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>>
 			{
 				Value = new Dictionary<Type, IList<Tuple<Registration, object>>>()
@@ -27,10 +34,7 @@ namespace NanoIoC
 			{
 				Value = new Dictionary<Type, IList<Registration>>()
 			};
-			this.mutex = new AsyncLocal<object>
-			{
-				Value = new object()
-			};
+			this.mutex = new AsyncLocal<object>();
 		}
 
 		protected override IDictionary<Type, IList<Tuple<Registration, object>>> Store

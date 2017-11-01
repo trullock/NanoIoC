@@ -4,49 +4,36 @@ namespace NanoIoC.Tests
 {
 	public class LifecycleDependencyRules
 	{
-		private static Lifecycle[][] InvalidCombinations()
-		{
-			return new[]
-			{
-				new[] {Lifecycle.Singleton, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Singleton, Lifecycle.Transient},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Transient}
-			};
-		}
-
-		[TestCaseSource(nameof(InvalidCombinations))]
+		[Theory]
+		[InlineData(Lifecycle.Singleton, Lifecycle.ExecutionContextLocal)]
+		[InlineData(Lifecycle.Singleton, Lifecycle.Transient)]
+		[InlineData(Lifecycle.ExecutionContextLocal, Lifecycle.Transient)]
 		public void CannotDependOnAnInstanceWithShorterLifecycle(Lifecycle dependant, Lifecycle dependency)
 		{
 			var container = new Container();
 			container.Register<Dependant>(dependant);
 			container.Register<Dependency>(dependency);
 
-			Assert.That(() => container.Resolve<Dependant>(),
-				Throws.InstanceOf<ContainerException>()
-					.With.Message.StringMatching("It's lifecycle \\(.*\\) is shorter than the dependee's"));
+			var ex = Assert.Throws<ContainerException>(() => container.Resolve<Dependant>());
+			Assert.Matches("It's lifecycle \\(.*\\) is shorter than the dependee's", ex.Message);
 		}
 
-		private static Lifecycle[][] ValidCombinations()
-		{
-			return new[]
-			{
-				new[] {Lifecycle.Singleton, Lifecycle.Singleton},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Singleton},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Transient, Lifecycle.Singleton},
-				new[] {Lifecycle.Transient, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Transient, Lifecycle.Transient}
-			};
-		}
-
-		[TestCaseSource(nameof(ValidCombinations))]
+		[Theory]
+		[InlineData(Lifecycle.Singleton, Lifecycle.Singleton)]
+		[InlineData(Lifecycle.ExecutionContextLocal, Lifecycle.Singleton)]
+		[InlineData(Lifecycle.ExecutionContextLocal, Lifecycle.ExecutionContextLocal)]
+		[InlineData(Lifecycle.Transient, Lifecycle.Singleton)]
+		[InlineData(Lifecycle.Transient, Lifecycle.ExecutionContextLocal)]
+		[InlineData(Lifecycle.Transient, Lifecycle.Transient)]
 		public void CanDependOnAnInstanceWithLongerOrSameLifecycle(Lifecycle dependant, Lifecycle dependency)
 		{
 			var container = new Container();
 			container.Register<Dependant>(dependant);
 			container.Register<Dependency>(dependency);
 
-			Assert.DoesNotThrow(() => container.Resolve<Dependant>());
+			container.Resolve<Dependant>();
+
+			Assert.True(true, "Did not throw exception");
 		}
 
 		private class Dependant { public Dependant(Dependency dependency) { } }

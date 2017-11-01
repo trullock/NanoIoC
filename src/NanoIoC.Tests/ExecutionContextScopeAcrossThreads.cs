@@ -17,7 +17,7 @@ namespace NanoIoC.Tests
 			Task.Run(() => instance = container.Resolve<TestInterface>()).Wait();
 
 			Assert.NotNull(instance);
-			Assert.InstanceOf<TestClass>(instance);
+			Assert.IsType<TestClass>(instance);
 		}
 
 		[Fact]

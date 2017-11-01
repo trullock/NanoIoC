@@ -70,7 +70,7 @@ namespace NanoIoC.Tests
 			var y = container.Resolve<IContainer>();
 			var z = container.Resolve<IContainer>();
 
-			Assert.IsType<IContainer>(y);
+			Assert.IsAssignableFrom<IContainer>(y);
 			Assert.Same(y, z);
 		}
 
