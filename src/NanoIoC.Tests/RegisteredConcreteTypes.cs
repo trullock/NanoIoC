@@ -1,21 +1,20 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class RegisteredConcreteTypes
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
             container.Register<object, TestClass>();
 
             var instance = container.Resolve<object>();
-            Assert.IsInstanceOf<TestClass>(instance);
+            Assert.IsType<TestClass>(instance);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldAlwaysBeTheSameInstance()
 		{
 			var container = new Container();
@@ -23,10 +22,10 @@ namespace NanoIoC.Tests
 
 			var instance = container.Resolve<object>();
 			var instance2 = container.Resolve<object>();
-			Assert.AreSame(instance, instance2);
+			Assert.Same(instance, instance2);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldThrowWhenConcreteDoesNotImplementAbstract()
 		{
 			var container = new Container();
@@ -37,7 +36,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Concrete type `NanoIoC.Tests.RegisteredConcreteTypes+TestClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` is not assignable to abstract type `NanoIoC.Tests.RegisteredConcreteTypes+TestInterface, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
+				Assert.Equal("Concrete type `NanoIoC.Tests.RegisteredConcreteTypes+TestClass, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` is not assignable to abstract type `NanoIoC.Tests.RegisteredConcreteTypes+TestInterface, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
 			}
 		}
 

@@ -1,18 +1,17 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class UnregisteredConcreteTypes
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
             var instance = container.Resolve<ClassA>();
 
-            Assert.IsInstanceOf<ClassA>(instance);
-			Assert.IsInstanceOf<ClassB>(instance.B);
+            Assert.IsType<ClassA>(instance);
+			Assert.IsType<ClassB>(instance.B);
         }
 
         public class ClassA

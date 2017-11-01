@@ -1,73 +1,71 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class HasRegistrationsFor
 	{
-		[Test]
+		[Fact]
 		public void RegisteredTransient()
 		{
 			RegisteredLifecycle(Lifecycle.Singleton);
 		}
 
-		[Test]
+		[Fact]
 		public void RegisteredSingleton()
 		{
 			RegisteredLifecycle(Lifecycle.Singleton);
 		}
 
-		[Test]
+		[Fact]
 		public void RegisteredThreadLocal()
 		{
-			RegisteredLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			RegisteredLifecycle(Lifecycle.ExecutionContextLocal);
 		}
 
-		[Test]
+		[Fact]
 		public void RegisteredExecutionContextLocal()
 		{
-			RegisteredLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			RegisteredLifecycle(Lifecycle.ExecutionContextLocal);
 		}
 
-		[Test]
+		[Fact]
 		public void InjectedSingleton()
 		{
 			InjectedLifecycle(Lifecycle.Singleton);
 		}
 
-		[Test]
+		[Fact]
 		public void InjectedThreadLocal()
 		{
-			InjectedLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			InjectedLifecycle(Lifecycle.ExecutionContextLocal);
 		}
 
-		[Test]
+		[Fact]
 		public void InjectedExecutionContextLocal()
 		{
-			InjectedLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			InjectedLifecycle(Lifecycle.ExecutionContextLocal);
 		}
 
 		static void InjectedLifecycle(Lifecycle lifecycle)
 		{
 			var container = new Container();
 
-			Assert.IsFalse(container.HasRegistrationsFor(typeof(TestClass)));
+			Assert.False(container.HasRegistrationsFor(typeof(TestClass)));
 
 			container.Inject(new TestClass(), lifecycle);
 
-			Assert.IsTrue(container.HasRegistrationsFor(typeof(TestClass)));
+			Assert.True(container.HasRegistrationsFor(typeof(TestClass)));
 		}
 
 		static void RegisteredLifecycle(Lifecycle lifecycle)
 		{
 			var container = new Container();
 
-			Assert.IsFalse(container.HasRegistrationsFor(typeof(ITestClass)));
+			Assert.False(container.HasRegistrationsFor(typeof(ITestClass)));
 
 			container.Register(typeof(ITestClass), typeof(TestClass), lifecycle);
 
-			Assert.IsTrue(container.HasRegistrationsFor(typeof(ITestClass)));
+			Assert.True(container.HasRegistrationsFor(typeof(ITestClass)));
 		}
 
 		public interface ITestClass

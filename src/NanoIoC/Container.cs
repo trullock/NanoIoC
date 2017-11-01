@@ -62,7 +62,7 @@ namespace NanoIoC
 		public Container()
 		{
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
+			this.httpContextOrExecutionContextLocalStore = new ExecutionContextLocalInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
@@ -174,7 +174,7 @@ namespace NanoIoC
 					lock (this.singletonInstanceStore.Mutex)
 						return this.GetOrCreateInstances(type, this.singletonInstanceStore, tempInstanceStore, buildStack);
 
-				case Lifecycle.HttpContextOrExecutionContextLocal:
+				case Lifecycle.ExecutionContextLocal:
 					lock (this.httpContextOrExecutionContextLocalStore.Mutex)
 						return this.GetOrCreateInstances(type, this.httpContextOrExecutionContextLocalStore, tempInstanceStore, buildStack);
 
@@ -391,7 +391,7 @@ namespace NanoIoC
 		{
 			switch (lifecycle)
 			{
-				case Lifecycle.HttpContextOrExecutionContextLocal:
+				case Lifecycle.ExecutionContextLocal:
 					this.httpContextOrExecutionContextLocalStore.RemoveAllInstances();
 					break;
 				case Lifecycle.Singleton:
@@ -445,7 +445,7 @@ namespace NanoIoC
 						lock (this.singletonInstanceStore.Mutex)
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
 						break;
-					case Lifecycle.HttpContextOrExecutionContextLocal:
+					case Lifecycle.ExecutionContextLocal:
 						lock (this.httpContextOrExecutionContextLocalStore.Mutex)
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrExecutionContextLocalStore, null, buildStack).Cast<object>());
 						break;
@@ -464,7 +464,7 @@ namespace NanoIoC
 		{
 			switch (lifecycle)
 			{
-				case Lifecycle.HttpContextOrExecutionContextLocal:
+				case Lifecycle.ExecutionContextLocal:
 					return this.httpContextOrExecutionContextLocalStore;
 
 				case Lifecycle.Singleton:

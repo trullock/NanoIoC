@@ -1,37 +1,36 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class RegisteringAbstractTypes
     {
-        [Test]
+        [Fact]
         public void ShouldThrowOnInterfaces()
         {
             var container = new Container();
 			try
 			{
 				container.Register<object, TestInterface>();
-				Assert.Fail("Did not throw");
+				Assert.True(false, "Did not throw");
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Concrete type `" + typeof(TestInterface).AssemblyQualifiedName + "` is not a concrete type", e.Message);
+				Assert.Equal("Concrete type `" + typeof(TestInterface).AssemblyQualifiedName + "` is not a concrete type", e.Message);
 			}
         }
 
-		[Test]
+		[Fact]
 		public void ShouldThrowOnAbstract()
 		{
 			var container = new Container();
 			try
 			{
 				container.Register<object, TestClass>();
-				Assert.Fail("Did not throw");
+				Assert.True(false, "Did not throw");
 			}
 			catch (ContainerException e)
 			{
-				Assert.AreEqual("Concrete type `" + typeof(TestClass).AssemblyQualifiedName + "` is not a concrete type", e.Message);
+				Assert.Equal("Concrete type `" + typeof(TestClass).AssemblyQualifiedName + "` is not a concrete type", e.Message);
 			}
 		}
 

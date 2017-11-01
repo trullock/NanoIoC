@@ -1,11 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class UnregisteredAbstractTypes
     {
-        [Test]
+        [Fact]
         public void ShouldThrow()
         {
             var container = new Container();
@@ -15,7 +14,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cannot resolve `NanoIoC.Tests.UnregisteredAbstractTypes+TestInterface`, it is not constructable and has no associated registration.", e.Message);	
+				Assert.Equal("Cannot resolve `NanoIoC.Tests.UnregisteredAbstractTypes+TestInterface`, it is not constructable and has no associated registration.", e.Message);	
 			}
         }
 

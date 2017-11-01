@@ -1,27 +1,26 @@
 ﻿using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class ExecutionContextScopeAcrossThreads
 	{
-		[Test]
+		[Fact]
 		public void ShouldConstruct()
 		{
 			var container = new Container();
-			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 
 			TestInterface instance = null;
 
 			Task.Run(() => instance = container.Resolve<TestInterface>()).Wait();
 
-			Assert.IsNotNull(instance);
-			Assert.IsInstanceOf<TestClass>(instance);
+			Assert.NotNull(instance);
+			Assert.InstanceOf<TestClass>(instance);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldAlwaysBeTheSameInstance()
 		{
 			var container = new Container();
@@ -36,8 +35,8 @@ namespace NanoIoC.Tests
 				instance2 = container.Resolve<TestInterface>();
 			}).Wait();
 
-			Assert.IsNotNull(instance);
-			Assert.AreSame(instance, instance2);
+			Assert.NotNull(instance);
+			Assert.Same(instance, instance2);
 		}
 
 		public class TestClass : TestInterface

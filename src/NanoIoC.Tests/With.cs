@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class With
     {
-        [Test]
+        [Fact]
         public void ShouldResolveSingletonReplacement()
         {
             var container = new Container();
@@ -15,10 +12,10 @@ namespace NanoIoC.Tests
 
         	var x = container.With<InterfaceA>(new ClassA2()).Resolve<ClassB>();
 
-			Assert.IsInstanceOf<ClassA2>(x.A);
+			Assert.IsType<ClassA2>(x.A);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldResolveInheritedSingletonReplacement()
 		{
 			var container = new Container();
@@ -26,32 +23,32 @@ namespace NanoIoC.Tests
 
 			var x = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceA>();
 
-			Assert.IsInstanceOf<ClassA2>(x);
+			Assert.IsType<ClassA2>(x);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldResolveHybridReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<InterfaceA, ClassA1>(Lifecycle.ExecutionContextLocal);
 
 			var x = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceA>();
 
-			Assert.IsInstanceOf<ClassA2>(x);
+			Assert.IsType<ClassA2>(x);
 		}
-		[Test]
+		[Fact]
 		public void ShouldResolveDependantReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.HttpContextOrExecutionContextLocal);
-			container.Register<InterfaceB, ClassB>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<InterfaceA, ClassA1>(Lifecycle.ExecutionContextLocal);
+			container.Register<InterfaceB, ClassB>(Lifecycle.ExecutionContextLocal);
 
 			var b = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceB>();
 
-			Assert.IsInstanceOf<ClassA2>(b.A);
+			Assert.IsType<ClassA2>(b.A);
 		}
 
-		[Test]
+		[Fact]
 		public void OriginalContainerShouldBeUnaffected()
 		{
 			var container = new Container();
@@ -60,10 +57,10 @@ namespace NanoIoC.Tests
 			var x = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceA>();
 			var y = container.Resolve<InterfaceA>();
 
-			Assert.IsInstanceOf<ClassA1>(y);
+			Assert.IsType<ClassA1>(y);
 		}
 
-		[Test]
+		[Fact]
 		public void ContainerShouldBeResolvable()
 		{
 			var container = new Container();
@@ -73,8 +70,8 @@ namespace NanoIoC.Tests
 			var y = container.Resolve<IContainer>();
 			var z = container.Resolve<IContainer>();
 
-			Assert.IsInstanceOf<IContainer>(y);
-			Assert.AreSame(y, z);
+			Assert.IsType<IContainer>(y);
+			Assert.Same(y, z);
 		}
 
 		public interface InterfaceA

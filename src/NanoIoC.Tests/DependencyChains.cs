@@ -1,11 +1,10 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class DependencyChains
 	{
-		[Test]
+		[Fact]
 		public void ShouldUseExistingInstancesForDependencies()
 		{
 			var container = new Container();
@@ -15,7 +14,7 @@ namespace NanoIoC.Tests
 			var singleton = container.Resolve<TestSingletonClass>();
 			var transient = container.Resolve<TestTransientClass>();
 			
-			Assert.AreSame(singleton, transient.Dependency);
+			Assert.Same(singleton, transient.Dependency);
 		}
 
 		public class TestSingletonClass

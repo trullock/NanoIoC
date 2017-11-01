@@ -1,29 +1,28 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class GettingTheContainer
     {
-        [Test]
+        [Fact]
         public void TheContainShouldBeInsideItself()
         {
             var container = new Container();
 
         	var resolved = container.Resolve<IContainer>();
 
-            Assert.AreSame(container, resolved);
+            Assert.Same(container, resolved);
         }
 
 
-		[Test]
+		[Fact]
 		public void TheContainShouldBeDependable()
 		{
 			var container = new Container();
 
 			var resolved = container.Resolve<TestClass>();
 
-			Assert.AreSame(container, resolved.Container);
+			Assert.Same(container, resolved.Container);
 		}
 
         public class TestClass

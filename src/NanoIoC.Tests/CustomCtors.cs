@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class CustomCtors
     {
-        [Test]
+        [Fact]
         public void ShouldResolve()
         {
             var container = new Container();
@@ -15,10 +14,10 @@ namespace NanoIoC.Tests
 
 			var resolved = container.Resolve<TestInterface>();
 
-            Assert.AreSame(typeof(TestClass), resolved.GetType());
+            Assert.Same(typeof(TestClass), resolved.GetType());
         }
 
-        [Test]
+        [Fact]
         public void ShouldResolveSameInstance()
         {
             var container = new Container();
@@ -29,12 +28,12 @@ namespace NanoIoC.Tests
 			var resolved2 = container.Resolve<TestInterface>();
 			
 			var resolvedAll = container.ResolveAll<TestInterface>().ToArray();
-			Assert.AreEqual(1, resolvedAll.Length);
+			Assert.Equal(1, resolvedAll.Length);
 
-            Assert.AreSame(resolved1, resolved2);
+            Assert.Same(resolved1, resolved2);
         }
 
-        [Test]
+        [Fact]
         public void ShouldResolveNullCtors()
         {
             var container = new Container();

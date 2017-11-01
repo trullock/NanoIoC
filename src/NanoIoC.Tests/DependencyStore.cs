@@ -1,11 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class DependencyStore
     {
-        [Test]
+        [Fact]
         public void ShouldResolveAll()
         {
             var container = new Container();

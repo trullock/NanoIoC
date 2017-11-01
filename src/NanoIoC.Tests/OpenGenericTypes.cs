@@ -1,28 +1,27 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class OpenGenericTypes
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
             container.Register(typeof (ITestInterface<>), typeof (TestClass<>));
 
             var instance = container.Resolve<ITestInterface<int>>();
-            Assert.IsInstanceOf<TestClass<int>>(instance);
+            Assert.IsType<TestClass<int>>(instance);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldConstructDependencies()
 		{
 			var container = new Container();
 			container.Register(typeof(ITestInterface<>), typeof(TestClass<>));
 
 			var instance = container.Resolve<TestClass>();
-			Assert.IsNotNull(instance);
+			Assert.NotNull(instance);
 		}
 
 		public class TestClass

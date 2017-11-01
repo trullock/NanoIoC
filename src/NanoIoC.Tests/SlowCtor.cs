@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class SlowCtor
 	{
-		[Test]
+		[Fact]
 		public void ShouldntBlockEachOther()
 		{
 			var container = new Container();
@@ -32,7 +31,7 @@ namespace NanoIoC.Tests
 			stopwatch.Stop();
 
 			// if this takes 10s then they ran serially
-			Assert.Less(stopwatch.Elapsed.TotalSeconds, 1.5);
+			Assert.True(stopwatch.Elapsed.TotalSeconds < 1.5);
 		}
 
 		static void Construct(object o)

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class GenericTypeProcessorSpecs
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
@@ -15,8 +14,8 @@ namespace NanoIoC.Tests
 
             var instances = container.ResolveAll<ITestInterface<string>>().ToArray();
 
-        	Assert.AreEqual(1, instances.Length);
-			Assert.AreEqual(typeof(TestClass), instances[0].GetType());
+        	Assert.Equal(1, instances.Length);
+			Assert.Equal(typeof(TestClass), instances[0].GetType());
         }
 
 		public class TISTypeProcessor : OpenGenericTypeProcessor

@@ -1,11 +1,10 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class DeepDependencyChains
 	{
-		[Test]
+		[Fact]
 		public void ShouldFailOnMissingDeepRegistration()
 		{
 			var container = new Container();
@@ -16,7 +15,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.DeepDependencyChains+InterfaceC, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` of dependee `NanoIoC.Tests.DeepDependencyChains+ClassB, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`\nBuild Stack:\nNanoIoC.Tests.DeepDependencyChains+ClassA\nNanoIoC.Tests.DeepDependencyChains+ClassB", e.Message);
+				Assert.Equal("Cannot create dependency `NanoIoC.Tests.DeepDependencyChains+InterfaceC, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null` of dependee `NanoIoC.Tests.DeepDependencyChains+ClassB, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`\nBuild Stack:\nNanoIoC.Tests.DeepDependencyChains+ClassA\nNanoIoC.Tests.DeepDependencyChains+ClassB", e.Message);
 			}
 		}
 

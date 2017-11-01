@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class RemovingRegistrations
     {
-        [Test]
+        [Fact]
         public void ShouldntHaveRegistrations()
         {
             var container = new Container();
@@ -17,10 +16,10 @@ namespace NanoIoC.Tests
 
 			container.RemoveAllRegistrationsAndInstancesOf<InterfaceA>();
 
-        	Assert.IsFalse(container.HasRegistrationFor<InterfaceA>());
+        	Assert.False(container.HasRegistrationFor<InterfaceA>());
         }
 
-		[Test]
+		[Fact]
 		public void ShouldRemoveInstances()
 		{
 			var container = new Container();
@@ -29,10 +28,10 @@ namespace NanoIoC.Tests
 
 			container.RemoveAllRegistrationsAndInstancesOf<InterfaceA>();
 
-			Assert.AreEqual(0, container.ResolveAll<InterfaceA>().Count());
+			Assert.Equal(0, container.ResolveAll<InterfaceA>().Count());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldRemoveInstances2()
 		{
 			var container = new Container();
@@ -46,41 +45,41 @@ namespace NanoIoC.Tests
 			ContainerExtensions.Inject(container, class2);
 
 			var classA1 = container.Resolve<ClassA1>();
-			Assert.AreSame(class2, classA1);
+			Assert.Same(class2, classA1);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldRemoveInstances3()
 		{
 			var container = new Container();
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class1, Lifecycle.ExecutionContextLocal);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
 
-			container.Inject(class2, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class2, Lifecycle.ExecutionContextLocal);
 
 			var classA1 = container.Resolve<ClassA1>();
-			Assert.AreSame(class2, classA1);
+			Assert.Same(class2, classA1);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldRemoveInstances4()
 		{
 			var container = new Container();
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class1, Lifecycle.ExecutionContextLocal);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
 
-			container.Inject(class2, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class2, Lifecycle.ExecutionContextLocal);
 
 			var classA1 = container.Resolve<ClassA1>();
-			Assert.AreSame(class2, classA1);
+			Assert.Same(class2, classA1);
 		}
 
 		public interface InterfaceA

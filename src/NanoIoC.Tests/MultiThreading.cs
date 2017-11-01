@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Threading;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
-    public class MultiThreading
-    {
-    	Container container;
-    	Exception ex;
+	public class MultiThreading
+	{
+		Container container;
+		Exception ex;
 
-    	[Test]
-        public void ShouldConstruct()
-        {
-            this.container = new Container();
+		[Fact]
+		public void ShouldConstruct()
+		{
+			this.container = new Container();
 			this.container.Register<TestInterface, TestClass>();
 
 			for (var i = 0; i < 10; i++)
@@ -21,8 +20,8 @@ namespace NanoIoC.Tests
 
 			Thread.Sleep(1000);
 
-           Assert.IsNull(ex);
-        }
+			Assert.Null(ex);
+		}
 
 		void Test(object state)
 		{
@@ -30,20 +29,18 @@ namespace NanoIoC.Tests
 			{
 				container.Resolve<TestInterface>();
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				ex = e;
 			}
 		}
 
 		public class TestClass : TestInterface
-        {
-            
-        }
+		{
+		}
 
 		public interface TestInterface
 		{
-			
 		}
-    }
+	}
 }

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class MultipleRegistrationsError
     {
-        [Test]
+        [Fact]
         public void ShouldResolveAll()
         {
             var container = new Container();
@@ -17,10 +16,10 @@ namespace NanoIoC.Tests
 
         	var all = container.ResolveAll<InterfaceA>().ToArray();
 
-			Assert.AreEqual(3, all.Length);
-			Assert.IsInstanceOf<ClassA1>(all[0]);
-			Assert.IsInstanceOf<ClassA2>(all[1]);
-			Assert.IsInstanceOf<ClassA1>(all[2]);
+			Assert.Equal(3, all.Length);
+			Assert.IsType<ClassA1>(all[0]);
+			Assert.IsType<ClassA2>(all[1]);
+			Assert.IsType<ClassA1>(all[2]);
         }
 
 		public interface InterfaceA

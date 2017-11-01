@@ -1,20 +1,19 @@
 ﻿using System;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class Reset
 	{
-		[Test]
+		[Fact]
 		public void ResettingShouldClearAllStores()
 		{
 			var container = new Container();
 
 			container.Register<TestInterface, TestClass1>(Lifecycle.Transient);
 
-			container.Register<TestInterface, TestClass1>(Lifecycle.HttpContextOrExecutionContextLocal);
-			container.Inject<TestInterface>(new TestClass1(), Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass1>(Lifecycle.ExecutionContextLocal);
+			container.Inject<TestInterface>(new TestClass1(), Lifecycle.ExecutionContextLocal);
 
 			container.Register<TestInterface, TestClass1>(Lifecycle.Singleton);
 			container.Inject<TestInterface>(new TestClass1(), Lifecycle.Singleton);
@@ -24,10 +23,10 @@ namespace NanoIoC.Tests
 			}
 			catch (Exception e)
 			{
-				Assert.Fail();
+				Assert.False(true);
 			}
 			var hasRegistrationFor = container.HasRegistrationFor<TestInterface>();
-			Assert.IsFalse(hasRegistrationFor);
+			Assert.False(hasRegistrationFor);
 		}
 
 

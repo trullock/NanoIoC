@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
+﻿
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class Registries
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
@@ -13,7 +13,7 @@ namespace NanoIoC.Tests
         	container.RunAllRegistries();
 
         	var instance = container.Resolve<TestInterface>();
-			Assert.AreEqual(typeof(TestClass1), instance.GetType());
+			Assert.Equal(typeof(TestClass1), instance.GetType());
         }
 
 

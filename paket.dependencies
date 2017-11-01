@@ -1,5 +1,5 @@
 source https://www.nuget.org/api/v2
 
 nuget NUnit
-nuget Microsoft.AspNetCore.Http
+nuget Microsoft.NET.Test.Sdk
 nuget Microsoft.Extensions.DependencyModel

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class MultipleRegistrations
     {
-		[Test]
+		[Fact]
 		public void ShouldThrowWhenNoRegistrations()
 		{
 			var container = new Container();
@@ -18,11 +17,11 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("No types registered for `NanoIoC.Tests.MultipleRegistrations+InterfaceA, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
+				Assert.Equal("No types registered for `NanoIoC.Tests.MultipleRegistrations+InterfaceA, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
 			}
 		}
 
-        [Test]
+        [Fact]
         public void ShouldResolveAll()
         {
             var container = new Container();
@@ -31,12 +30,12 @@ namespace NanoIoC.Tests
 
         	var all = container.ResolveAll<InterfaceA>().ToArray();
 
-			Assert.AreEqual(2, all.Length);
-			Assert.IsInstanceOf<ClassA1>(all[0]);
-			Assert.IsInstanceOf<ClassA2>(all[1]);
+			Assert.Equal(2, all.Length);
+			Assert.IsType<ClassA1>(all[0]);
+			Assert.IsType<ClassA2>(all[1]);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldNotBuildTwice()
 		{
 			var container = new Container();
@@ -46,14 +45,14 @@ namespace NanoIoC.Tests
 			var all = container.ResolveAll<InterfaceA>().ToArray();
 			var all2 = container.ResolveAll<InterfaceA>().ToArray();
 
-			Assert.AreEqual(2, all.Length);
-			Assert.AreEqual(2, all2.Length);
+			Assert.Equal(2, all.Length);
+			Assert.Equal(2, all2.Length);
 
-			Assert.AreSame(all[0], all2[0]);
-			Assert.AreSame(all[1], all2[1]);
+			Assert.Same(all[0], all2[0]);
+			Assert.Same(all[1], all2[1]);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldInjectAll()
 		{
 			var container = new Container();
@@ -62,29 +61,29 @@ namespace NanoIoC.Tests
 
 			var b = container.Resolve<ClassB>();
 
-			Assert.AreEqual(2, b.As.Length);
-			Assert.IsInstanceOf<ClassA1>(b.As[0]);
-			Assert.IsInstanceOf<ClassA2>(b.As[1]);
+			Assert.Equal(2, b.As.Length);
+			Assert.IsType<ClassA1>(b.As[0]);
+			Assert.IsType<ClassA2>(b.As[1]);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnEmptyEnumerable()
 		{
 			var container = new Container();
 
 			var xs = container.ResolveAll<InterfaceA>();
 
-			Assert.AreEqual(0, xs.Count());
+			Assert.Equal(0, xs.Count());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldReturnEmptyEnumerableForDependencies()
 		{
 			var container = new Container();
 
 			var x = container.Resolve<ClassB>();
 
-			Assert.AreEqual(0, x.As.Count());
+			Assert.Equal(0, x.As.Count());
 		}
 
 		public interface InterfaceA

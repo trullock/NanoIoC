@@ -1,21 +1,20 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class RegisteredConcreteTypesWithThreadLocalScope
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
-			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 			var instance = container.Resolve<TestInterface>();
-            Assert.IsInstanceOf<TestClass>(instance);
+            Assert.IsType<TestClass>(instance);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldAlwaysBeTheSameInstance()
 		{
 			var container = new Container();
@@ -23,7 +22,7 @@ namespace NanoIoC.Tests
 
 			var instance = container.Resolve<TestInterface>();
 			var instance2 = container.Resolve<TestInterface>();
-			Assert.AreSame(instance, instance2);
+			Assert.Same(instance, instance2);
 		}
 
     	public class TestClass : TestInterface

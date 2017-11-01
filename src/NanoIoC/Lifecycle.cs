@@ -5,9 +5,9 @@ namespace NanoIoC
     public enum Lifecycle
     {
         Transient = 1,
-        [Obsolete("Use HttpContextOrExecutionContextLocal instead", true)]
+        [Obsolete("Use ExecutionContextLocal instead", true)]
 		HttpContextOrThreadLocal = 2,
-        HttpContextOrExecutionContextLocal = 3,
+        ExecutionContextLocal = 3,
         Singleton = 4
     }
 }

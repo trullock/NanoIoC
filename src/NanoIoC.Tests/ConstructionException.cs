@@ -1,12 +1,11 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	[TestFixture]
 	public class ConstructionException
 	{
-		[Test]
+		[Fact]
 		public void ShouldUseExistingInstancesForDependencies()
 		{
 			var container = new Container();
@@ -20,10 +19,10 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual(typeof(ClassC), e.BuildStack[0]);
-				Assert.AreEqual(typeof(ClassB), e.BuildStack[1]);
-				Assert.AreEqual(typeof(ClassA), e.BuildStack[2]);
-				Assert.AreEqual(3, e.BuildStack.Length);
+				Assert.Equal(typeof(ClassC), e.BuildStack[0]);
+				Assert.Equal(typeof(ClassB), e.BuildStack[1]);
+				Assert.Equal(typeof(ClassA), e.BuildStack[2]);
+				Assert.Equal(3, e.BuildStack.Length);
 			}
 		}
 

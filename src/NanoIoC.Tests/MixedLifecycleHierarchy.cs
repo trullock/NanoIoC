@@ -3,18 +3,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
 	public class MixedLifecycleHierarchy
 	{
-		[Test]
+		[Fact]
 		public void ShouldNotBlock()
 		{
 			var container = new Container();
 			container.Register<IOuter, Outer>(Lifecycle.Transient);
-			container.Register<IInner, Inner>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<IInner, Inner>(Lifecycle.ExecutionContextLocal);
 			container.Register<IService, Service>();
 
 			var cde = new CountdownEvent(5);
@@ -29,7 +29,7 @@ namespace NanoIoC.Tests
 					}
 					catch (Exception e)
 					{
-						Assert.Fail(e.Message);
+						Assert.True(false, e.Message);
 					}
 				}))
 				.ToList();
@@ -38,8 +38,8 @@ namespace NanoIoC.Tests
 			var waitResult = Task.WaitAll(tasks.ToArray(), 500);
 			sw.Stop();
 
-			Assert.That(waitResult, Is.True, "Timed out waiting for tasks to finish");
-			Assert.That(sw.ElapsedMilliseconds, Is.LessThan(300), "Took too long to construct hierarchy ({0})", sw.Elapsed);
+			Assert.True(waitResult, "Timed out waiting for tasks to finish");
+			Assert.True(sw.ElapsedMilliseconds < 300, $"Took too long to construct hierarchy ({sw.Elapsed})");
 		}
 
 		private class Service : IService

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class TypeProcessors
     {
-        [Test]
+        [Fact]
         public void ShouldConstruct()
         {
             var container = new Container();
@@ -16,9 +15,9 @@ namespace NanoIoC.Tests
 
         	var instances = container.ResolveAll<TestInterface>().ToArray();
 
-			Assert.AreEqual(typeof(TestClass1), instances[0].GetType());
-			Assert.AreEqual(typeof(TestClass2), instances[1].GetType());
-			Assert.AreEqual(typeof(TestClass3), instances[2].GetType());
+			Assert.Equal(typeof(TestClass1), instances[0].GetType());
+			Assert.Equal(typeof(TestClass2), instances[1].GetType());
+			Assert.Equal(typeof(TestClass3), instances[2].GetType());
         }
 
 

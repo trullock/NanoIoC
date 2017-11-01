@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-    [TestFixture]
     public class InjectingInstances
     {
-        [Test]
+        [Fact]
 		public void ShouldWorkForNullInstances()
         {
             var container = new Container();
@@ -16,7 +15,7 @@ namespace NanoIoC.Tests
             var instance = container.Resolve<TestClass3>();
         }
 
-        [Test]
+        [Fact]
 		public void ShouldWorkForTheDefaultType()
         {
             var container = new Container();
@@ -24,10 +23,10 @@ namespace NanoIoC.Tests
             ContainerExtensions.Inject(container, testClass);
 
             var instance = container.Resolve<TestClass>();
-            Assert.AreSame(testClass, instance);
+            Assert.Same(testClass, instance);
         }
 
-        [Test]
+        [Fact]
         public void ShouldWorkForAnExplicitType()
         {
             var container = new Container();
@@ -35,10 +34,10 @@ namespace NanoIoC.Tests
             container.Inject<object>(testClass);
 
             var instance = container.Resolve<object>();
-            Assert.AreSame(testClass, instance);
+            Assert.Same(testClass, instance);
         }
 
-		[Test]
+		[Fact]
 		public void ShouldResolveRegisteredAndInjected()
 		{
 			var container = new Container();
@@ -50,12 +49,12 @@ namespace NanoIoC.Tests
 
 			var instances = container.ResolveAll<TestInterface>().ToArray();
 
-			Assert.AreEqual(2, instances.Length);
+			Assert.Equal(2, instances.Length);
 
-			Assert.AreNotSame(instances[0], instances[1]);
+			Assert.NotSame(instances[0], instances[1]);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldResolveRegisteredResolvedAndInjected()
 		{
 			var container = new Container();
@@ -68,12 +67,12 @@ namespace NanoIoC.Tests
 
 			var instances = container.ResolveAll<TestInterface>().ToArray();
 
-			Assert.AreEqual(2, instances.Length);
+			Assert.Equal(2, instances.Length);
 
-			Assert.AreNotSame(instances[0], instances[1]);
+			Assert.NotSame(instances[0], instances[1]);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldResolveInjectedOverRegistered()
 		{
 			var container = new Container();
@@ -83,25 +82,25 @@ namespace NanoIoC.Tests
 			var injector = new TestClass2();
 			container.Inject<TestInterface>(injector, injectionBehaviour: InjectionBehaviour.Override);
 
-			Assert.AreSame(injector, container.Resolve<TestInterface>());
+			Assert.Same(injector, container.Resolve<TestInterface>());
 		}
 		
 
-		[Test]
+		[Fact]
 		public void ShouldResolveInjectedOverRegisteredWithThreadLifecycles()
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 			var injector = new TestClass2();
-			container.Inject<TestInterface>(injector, Lifecycle.HttpContextOrExecutionContextLocal, InjectionBehaviour.Override);
+			container.Inject<TestInterface>(injector, Lifecycle.ExecutionContextLocal, InjectionBehaviour.Override);
 
-			Assert.AreSame(injector, container.Resolve<TestInterface>());
+			Assert.Same(injector, container.Resolve<TestInterface>());
 		}
 		
 
-		[Test]
+		[Fact]
 		public void ShouldResolveInjectedOverRegisteredWithShorterLifecycles()
 		{
 			var container = new Container();
@@ -109,26 +108,26 @@ namespace NanoIoC.Tests
 			container.Register<TestInterface, TestClass>(Lifecycle.Singleton);
 
 			var injector = new TestClass2();
-			container.Inject<TestInterface>(injector, Lifecycle.HttpContextOrExecutionContextLocal, InjectionBehaviour.Override);
+			container.Inject<TestInterface>(injector, Lifecycle.ExecutionContextLocal, InjectionBehaviour.Override);
 
-			Assert.AreSame(injector, container.Resolve<TestInterface>());
+			Assert.Same(injector, container.Resolve<TestInterface>());
 		}
 		
-		[Test]
+		[Fact]
 		public void ShouldResolveInjectedOverRegisteredWithLongerLifecycles()
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 			var injector = new TestClass2();
 			container.Inject<TestInterface>(injector, Lifecycle.Singleton, InjectionBehaviour.Override);
 
-			Assert.AreSame(injector, container.Resolve<TestInterface>());
+			Assert.Same(injector, container.Resolve<TestInterface>());
 		}
 		
 
-		[Test]
+		[Fact]
 		public void ShouldResolveInjectedOverInjected()
 		{
 			var container = new Container();
@@ -140,7 +139,7 @@ namespace NanoIoC.Tests
 			container.Inject<TestInterface>(injector1);
 			container.Inject<TestInterface>(injector2, injectionBehaviour: InjectionBehaviour.Override);
 
-			Assert.AreSame(injector2, container.Resolve<TestInterface>());
+			Assert.Same(injector2, container.Resolve<TestInterface>());
 		}
 		
 		public class TestClass : TestInterface
