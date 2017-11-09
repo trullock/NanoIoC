@@ -9,7 +9,7 @@ namespace NanoIoC
 	{
 		/// <summary>
 		/// Registers a concrete type with a lifecycle.
-		/// You should only be using this for Singleton or HttpContextOrThreadLocal lifecycles.
+		/// You should only be using this for Singleton or ExecutionContextOrThreadLocal lifecycles.
 		/// Registering a concrete type as Transient is pointless, as you get this behaviour by default.
 		/// </summary>
 		/// <typeparam name="TConcrete">The concrete type to register</typeparam>

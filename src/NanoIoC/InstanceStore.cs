@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,7 +91,7 @@ namespace NanoIoC
 
 		public void RemoveAllRegistrationsAndInstances(Type type)
 		{
-			// TODO: this should remove all instances from all stores in all httpcontexts :/
+			// TODO: this should remove all instances from all stores in all executioncontexts :/
 
 			if (this.Registrations.ContainsKey(type))
 				this.Registrations.Remove(type);
