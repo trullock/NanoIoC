@@ -21,7 +21,7 @@ namespace NanoIoC.Tests
 			{
 				container.Reset();
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				Assert.False(true);
 			}

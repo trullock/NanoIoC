@@ -1,11 +1,11 @@
-﻿using Xunit;
+using Xunit;
 
 namespace NanoIoC.Tests
 {
-	public class HttpContextInstanceStoreMutexInitialisation
+	public class ExecutionContextInstanceStoreMutexInitialisation
 	{
 		[Fact]
-		public void MutexIsInitialisedWhenCurrentHttpContextIsNonNull()
+		public void MutexIsInitialised()
 		{
 			var instanceStore = new ExecutionContextLocalInstanceStore();
 

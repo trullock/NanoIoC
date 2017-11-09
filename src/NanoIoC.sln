@@ -5,12 +5,7 @@ VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{2DFA2D28-96F1-4ECC-886C-D1525792295C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B474D97C-32CE-43EA-8312-3318ED357F5B}"
-	ProjectSection(SolutionItems) = preProject
-		..\paket.dependencies = ..\paket.dependencies
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{836505A0-6A73-4FA4-93E3-20BA805CF1D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{836505A0-6A73-4FA4-93E3-20BA805CF1D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -13,16 +13,7 @@ namespace NanoIoC
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
 		readonly AsyncLocal<object> mutex;
 		protected override Lifecycle Lifecycle => Lifecycle.ExecutionContextLocal;
-		public override object Mutex
-		{
-			get
-			{
-				if(this.mutex.Value == null)
-					this.mutex.Value = new object();
-
-				return this.mutex.Value;
-			}
-		}
+		public override object Mutex => this.mutex.Value ?? (this.mutex.Value = new object());
 
 		public ExecutionContextLocalInstanceStore()
 		{
