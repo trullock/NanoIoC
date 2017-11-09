@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
     <Version>3.0.0.0</Version>
     <Description>A tiny IoC container, does exactly what you want, and only that.</Description>
     <Copyright>Copyright © Trullock 2011-2017</Copyright>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <FileVersion>3.0.0.0</FileVersion>
+    <Authors>Andrew Bullock</Authors>
+    <Company>Trullock</Company>
+    <PackageProjectUrl>https://github.com/trullock/NanoIoC</PackageProjectUrl>
+    <PackageTags>IoC DI</PackageTags>
   </PropertyGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,5 +1,0 @@
-source https://www.nuget.org/api/v2
-
-nuget NUnit
-nuget Microsoft.NET.Test.Sdk
-nuget Microsoft.Extensions.DependencyModel

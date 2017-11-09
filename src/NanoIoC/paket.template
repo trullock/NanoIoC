@@ -1,7 +1,0 @@
-﻿type project
-authors Andrew Bullock
-projectUrl https://github.com/trullock/NanoIoC
-frameworkAssemblies
-  System.Web
-include-pdbs true
-tags IoC DI
