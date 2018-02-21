@@ -225,6 +225,9 @@ namespace NanoIoC
 		/// <returns></returns>
 		public bool HasRegistrationsFor(Type type)
 		{
+			if(type == null)
+				throw new ArgumentNullException(nameof(type), "Type cannot be null");
+
 			lock (this.transientInstanceStore.Mutex)
 			{
 				if (this.transientInstanceStore.ContainsRegistrationsFor(type))
@@ -245,11 +248,15 @@ namespace NanoIoC
 
 		public IEnumerable<Registration> GetRegistrationsFor(Type type)
 		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type), "Type cannot be null");
+
 			return this.GetRegistrationsFor(type, null);
 		}
 
 		IEnumerable<Registration> GetRegistrationsFor(Type type, IInstanceStore tempInstanceStore)
 		{
+
 			var registrations = new List<Registration>();
 
 			// use temp instance store first
@@ -280,6 +287,11 @@ namespace NanoIoC
 
 		public void Register(Type abstractType, Type concreteType, Lifecycle lifecycle = Lifecycle.Singleton)
 		{
+			if (abstractType == null)
+				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
+			if (concreteType == null)
+				throw new ArgumentNullException(nameof(concreteType), "ConcreteType cannot be null");
+
 			if (!concreteType.IsOrDerivesFrom(abstractType))
 				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
 
@@ -294,6 +306,9 @@ namespace NanoIoC
 
 		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle)
 		{
+			if (abstractType == null)
+				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
+
 			var store = this.GetStore(lifecycle);
 			lock (store.Mutex)
 				store.AddRegistration(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
@@ -377,6 +392,9 @@ namespace NanoIoC
 
 		public void RemoveAllRegistrationsAndInstancesOf(Type type)
 		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type), "Type cannot be null");
+
 			lock (this.singletonInstanceStore.Mutex)
 				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances(type);
 
@@ -406,7 +424,7 @@ namespace NanoIoC
 		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
 		{
 			if (lifecycle == Lifecycle.Transient)
-				throw new ArgumentException("You cannot remove an instance is Transient. That doesn't make sense, does it? Think about it...");
+				throw new ArgumentException("You cannot remove a Transient instance. That doesn't make sense, does it? Think about it...");
 
 			var store = this.GetStore(lifecycle);
 			lock (store.Mutex)
@@ -429,6 +447,9 @@ namespace NanoIoC
 
 		public IEnumerable ResolveAll(Type abstractType)
 		{
+			if (abstractType == null)
+				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
+
 			return this.ResolveAll(abstractType, new Stack<Type>());
 		}
 

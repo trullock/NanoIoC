@@ -77,9 +77,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NanoIoc\NanoIoc.csproj">
+    <ProjectReference Include="..\NanoIoC\NanoIoC.csproj">
       <Project>{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}</Project>
-      <Name>NanoIoc</Name>
+      <Name>NanoIoC</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
