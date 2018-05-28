@@ -6,13 +6,6 @@ namespace NanoIoC
     public interface IContainer : IResolverContainer
     {
 		/// <summary>
-		/// Determines if there is a registration for the given type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-        bool HasRegistrationsFor(Type type);
-
-		/// <summary>
 		/// Gets the registered concrete types for the requested type
 		/// </summary>
 		/// <param name="type"></param>
