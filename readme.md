@@ -10,10 +10,10 @@ A tiny IoC container, does exactly what you want, and only that.
 
 Use either of these methods:
 
-<pre>
+```
 void IContainer.Register&lt;TAbstract, TConcrete&gt;(Lifecycle lifecycle = Lifecycle.Singleton);
 void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle = Lifecycle.Singleton);
-</pre>
+```
 
 You will typically want to put your registrations inside an `IContainerRegistry`.
 
@@ -21,9 +21,9 @@ NanoIoC will find all `IContainerRegistrys` in all assemblies in the application
 
 To run all the registries, use:
 
-<pre>
+```
 void IContainer.RunAllRegistries();
-</pre>
+```
 
 ### Auto Registering Dependencies
 
@@ -33,12 +33,12 @@ NanoIoC will find all `TypeProcesors` in all assemblies in the application's bas
 
 For example:
 
-<pre>
+```
 void IContainer.RunAllTypeProcessors();
-</pre>
+```
 
 Where one of your `TypeProcessor`s might look like:
-<pre>
+```
 public class ExampleTypeProcessor : ITypeProcessor
 {
 	public void Process(Type type, IContainer container)
@@ -47,31 +47,31 @@ public class ExampleTypeProcessor : ITypeProcessor
 			container.Register(typeof(MyInterface), type, Lifecycle.Singleton);
 	}
 }
-</pre>
+```
 
 
 ### Resolving Dependencies:
 
 Use either of these methods:
 
-<pre>
+```
 T IContainer.Resolve&lt;T&gt;();
 object IContainer.Resolve(Type type);
-</pre>
+```
 
 You can resolve concrete types that aren't registered, as long as all their dependencies are registered or directly constructable.
 
 You can get all registered types:
-<pre>
+```
 IEnumerable<T> IContainer.ResolveAll<T>()
 IEnumerable IContainer.ResolveAll(Type type);
-</pre>
+```
 
 ### Injecting instances:
 
 You can inject existing instances:
 
-<pre>
+```
 void IContainer.Inject<T>(T instance, Lifecycle lifeCycle = Lifecycle.Singleton);
 void IContainer.Inject(object instance, Type type, Lifecycle lifecycle);
-</pre>
+```
