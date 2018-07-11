@@ -21,8 +21,7 @@ namespace NanoIoC
 
 			throw new ArgumentException("Enumerable contains no elements");
 		}
-
-
+		
 		public static T First<T>(this IEnumerable<T> self)
 		{
 			var enumerator = self.GetEnumerator();

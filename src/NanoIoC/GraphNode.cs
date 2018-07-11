@@ -5,8 +5,8 @@ namespace NanoIoC
 {
 	public sealed class GraphNode
 	{
-		public Registration Registration { get; internal set; }
-		public IList<GraphNode> Dependencies { get;}
+		public Registration Registration { get; }
+		public IList<GraphNode> Dependencies { get; }
 		
 		public GraphNode(Registration registration)
 		{
@@ -18,6 +18,7 @@ namespace NanoIoC
 		{
 			return this.ToString(0);
 		}
+
 		public string ToString(int depth)
 		{
 			var builder = new StringBuilder();

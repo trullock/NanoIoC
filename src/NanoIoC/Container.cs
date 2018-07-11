@@ -98,10 +98,10 @@ namespace NanoIoC
 		/// <returns></returns>
 		public GraphNode DependencyGraph(Type type)
 		{
-			return this.DependencyGraph(type, new Stack<Type>());
+			return this.DependencyGraph_Visit(type, new Stack<Type>());
 		}
 
-		GraphNode DependencyGraph(Type type, Stack<Type> buildStack)
+		GraphNode DependencyGraph_Visit(Type type, Stack<Type> buildStack)
 		{
 			var registrations = this.GetRegistrationsForTypesToCreate(type, buildStack);
 
@@ -113,7 +113,7 @@ namespace NanoIoC
 				{
 					var regNode = new GraphNode(reg);
 					enumerableNode.Dependencies.Add(regNode);
-					this.DependencyGraph(reg, regNode, new Stack<Type>(buildStack.Reverse()));
+					this.DependencyGraph_VisitCtor(reg, regNode, new Stack<Type>(buildStack.Reverse()));
 				}
 
 				return enumerableNode;
@@ -122,12 +122,12 @@ namespace NanoIoC
 			var registration = registrations.First();
 
 			var node = new GraphNode(registration);
-			this.DependencyGraph(registration, node, buildStack);
+			this.DependencyGraph_VisitCtor(registration, node, buildStack);
 			
 			return node;
 		}
 
-		void DependencyGraph(Registration registration, GraphNode node, Stack<Type> buildStack)
+		void DependencyGraph_VisitCtor(Registration registration, GraphNode node, Stack<Type> buildStack)
 		{
 			if (registration.Ctor != null)
 			{
@@ -150,11 +150,11 @@ namespace NanoIoC
 						if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 						{
 							var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
-							node.Dependencies.Add(this.DependencyGraph(genericArgument, newBuildStack));
+							node.Dependencies.Add(this.DependencyGraph_Visit(genericArgument, newBuildStack));
 						}
 						else
 						{
-							node.Dependencies.Add(this.DependencyGraph(ctor.parameters[i].ParameterType, newBuildStack));
+							node.Dependencies.Add(this.DependencyGraph_Visit(ctor.parameters[i].ParameterType, newBuildStack));
 						}
 					}
 
