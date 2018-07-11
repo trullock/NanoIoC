@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructionException.cs" />
+    <Compile Include="DependencyGraph.cs" />
     <Compile Include="HttpContextInstanceStoreMutexInitialisation.cs" />
     <Compile Include="LifecycleDependencyRules.cs" />
     <Compile Include="MixedLifecycleHierarchy.cs" />

@@ -15,6 +15,13 @@ namespace NanoIoC
 		object Resolve(Type type, params object[] dependencies);
 
 		/// <summary>
+		/// Returns a graph of the dependencies for the requested type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		GraphNode DependencyGraph(Type type);
+
+		/// <summary>
 		/// Determines if there is a registration for the given type
 		/// </summary>
 		/// <param name="type"></param>

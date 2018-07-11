@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NanoIoC
 {
@@ -107,6 +108,29 @@ namespace NanoIoC
 				throw new ArgumentException("Current type does not close other type", "other");
 
 			return arguments;
+		}
+
+		public static StringBuilder Indent(this StringBuilder builder, int indent)
+		{
+			for (var i = 0; i < indent; i++)
+				builder.Append("     ");
+
+			return builder;
+		}
+
+		public static string GetFriendlyName(this Type type)
+		{
+			var friendlyName = type.Name;
+			if (!type.IsGenericType)
+				return friendlyName;
+
+			var iBacktick = friendlyName.IndexOf('`');
+			if (iBacktick > 0)
+				friendlyName = friendlyName.Remove(iBacktick);
+
+			friendlyName += $"<{string.Join(",", type.GetGenericArguments().Select(p => p.GetFriendlyName()))}>";
+
+			return friendlyName;
 		}
 	}
 }

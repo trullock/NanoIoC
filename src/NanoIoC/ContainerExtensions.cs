@@ -47,6 +47,17 @@ namespace NanoIoC
 			return (T) container.Resolve(typeof (T));
 		}
 
+		public static object Resolve<T>(this IResolverContainer container, params object[] dependencies)
+		{
+			return container.Resolve(typeof(T), dependencies);
+		}
+
+
+		public static GraphNode DependencyGraph<T>(this IResolverContainer container)
+		{
+			return container.DependencyGraph(typeof(T));
+		}
+
 		/// <summary>
 		/// Injects an instance 
 		/// </summary>
@@ -150,9 +161,5 @@ namespace NanoIoC
 			return newContainer;
 		}
 
-		public static object Resolve<T>(this IResolverContainer container, params object[] dependencies)
-		{
-			return container.Resolve(typeof (T), dependencies);
-		}
 	}
 }

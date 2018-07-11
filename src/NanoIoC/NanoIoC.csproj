@@ -44,6 +44,7 @@
     <Compile Include="Container.cs" />
     <Compile Include="ContainerException.cs" />
     <Compile Include="ContainerExtensions.cs" />
+    <Compile Include="GraphNode.cs" />
     <Compile Include="HttpContextOrExecutionContextLocalInstanceStore.cs" />
     <Compile Include="InjectionBehaviour.cs" />
     <Compile Include="IResolverContainer.cs" />

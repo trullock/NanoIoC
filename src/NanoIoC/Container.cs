@@ -91,6 +91,75 @@ namespace NanoIoC
 			return this.Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
 		}
 
+		public GraphNode DependencyGraph(Type type)
+		{
+			return this.DependencyGraph(type, new Stack<Type>());
+		}
+
+		GraphNode DependencyGraph(Type type, Stack<Type> buildStack)
+		{
+			var registrations = this.GetRegistrationsForTypesToCreate(type, buildStack);
+
+			if (registrations.Count() > 1)
+			{
+				var enumerableNode = new GraphNode(new Registration(typeof(IEnumerable<>).MakeGenericType(type), null, null, Lifecycle.Transient, InjectionBehaviour.Default));
+
+				foreach (var reg in registrations)
+				{
+					var regNode = new GraphNode(reg);
+					enumerableNode.Dependencies.Add(regNode);
+					this.DependencyGraph(reg, regNode, new Stack<Type>(buildStack.Reverse()));
+				}
+
+				return enumerableNode;
+			}
+
+			var registration = registrations.First();
+
+			var node = new GraphNode(registration);
+			this.DependencyGraph(registration, node, buildStack);
+			
+			return node;
+		}
+
+		void DependencyGraph(Registration registration, GraphNode node, Stack<Type> buildStack)
+		{
+			if (registration.Ctor != null)
+			{
+				// cant handle this
+			}
+			else
+			{
+				var constructors = registration.ConcreteType.GetConstructors();
+				var ctorsWithParams = constructors.Select(c => new { ctor = c, parameters = c.GetParameters() });
+				var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
+				foreach (var ctor in orderedEnumerable)
+				{
+					var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
+
+					this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle, null, buildStack);
+
+					for (var i = 0; i < ctor.parameters.Length; i++)
+					{
+						var newBuildStack = new Stack<Type>(buildStack.Reverse());
+						if (ctor.parameters[i].ParameterType.IsGenericType && ctor.parameters[i].ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+						{
+							var genericArgument = ctor.parameters[i].ParameterType.GetGenericArguments()[0];
+							node.Dependencies.Add(this.DependencyGraph(genericArgument, newBuildStack));
+						}
+						else
+						{
+							node.Dependencies.Add(this.DependencyGraph(ctor.parameters[i].ParameterType, newBuildStack));
+						}
+					}
+
+					break;
+				}
+
+				//throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+			}
+		}
+
 		object Resolve(Type type, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			if (tempInstanceStore != null && tempInstanceStore.ContainsInstancesFor(type))
@@ -104,11 +173,11 @@ namespace NanoIoC
 			if (registrations.Count == 1)
 				return this.GetOrCreateInstances(type, registrations[0].Lifecycle, tempInstanceStore, buildStack).First();
 
-			var typesToCreate = this.GetTypesToCreate(type, buildStack);
-			return this.GetInstance(typesToCreate.First(), tempInstanceStore, buildStack);
+			var typesToCreate = this.GetRegistrationsForTypesToCreate(type, buildStack);
+			return this.CreateInstance(typesToCreate.First(), tempInstanceStore, buildStack);
 		}
 
-		object GetInstance(Registration registration, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
+		object CreateInstance(Registration registration, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			if (buildStack.Contains(registration.ConcreteType))
 				throw new ContainerException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
@@ -179,8 +248,8 @@ namespace NanoIoC
 						return this.GetOrCreateInstances(type, this.httpContextOrExecutionContextLocalStore, tempInstanceStore, buildStack);
 
 				default:
-					var typesToCreate = this.GetTypesToCreate(type, buildStack);
-					return typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, tempInstanceStore, buildStack)).ToArray();
+					var typesToCreate = this.GetRegistrationsForTypesToCreate(type, buildStack);
+					return typesToCreate.Select(typeToCreate => this.CreateInstance(typeToCreate, tempInstanceStore, buildStack)).ToArray();
 			}
 		}
 
@@ -194,7 +263,7 @@ namespace NanoIoC
 		/// <returns></returns>
 		IEnumerable GetOrCreateInstances(Type requestType, IInstanceStore instanceStore, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
-			var typesToCreate = this.GetTypesToCreate(requestType, buildStack);
+			var registrations = this.GetRegistrationsForTypesToCreate(requestType, buildStack);
 
 			var instances = new List<Tuple<Registration, object>>();
 
@@ -203,16 +272,17 @@ namespace NanoIoC
 			else if (instanceStore.ContainsInstancesFor(requestType))
 				instances.AddRange(instanceStore.GetInstances(requestType).Cast<Tuple<Registration, object>>());
 
-			foreach (var registration in typesToCreate)
+			foreach (var registration in registrations)
 			{
-				if (!instances.Any(i => i != null && i.Item1 == registration))
-				{
-					var newinstance = this.GetInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
+				// if we already have an instance from the store for this registration
+				if (instances.Any(i => i != null && i.Item1 == registration))
+					continue;
 
-					instanceStore.Insert(registration, requestType, newinstance);
+				var newinstance = this.CreateInstance(registration, tempInstanceStore, new Stack<Type>(buildStack.Reverse()));
 
-					instances.Add(new Tuple<Registration, object>(registration, newinstance));
-				}
+				instanceStore.Insert(registration, requestType, newinstance);
+
+				instances.Add(new Tuple<Registration, object>(registration, newinstance));
 			}
 
 			return instances.Select(i => i.Item2).ToArray();
@@ -256,7 +326,6 @@ namespace NanoIoC
 
 		IEnumerable<Registration> GetRegistrationsFor(Type type, IInstanceStore tempInstanceStore)
 		{
-
 			var registrations = new List<Registration>();
 
 			// use temp instance store first
@@ -324,7 +393,7 @@ namespace NanoIoC
 				store.Inject(type, instance, injectionBehaviour);
 		}
 
-		IEnumerable<Registration> GetTypesToCreate(Type requestedType, Stack<Type> buildStack)
+		IEnumerable<Registration> GetRegistrationsForTypesToCreate(Type requestedType, Stack<Type> buildStack)
 		{
 			var registrations = this.GetRegistrationsFor(requestedType);
 			if (registrations.Any())
@@ -471,8 +540,8 @@ namespace NanoIoC
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.httpContextOrExecutionContextLocalStore, null, buildStack).Cast<object>());
 						break;
 					default:
-						var typesToCreate = this.GetTypesToCreate(abstractType, buildStack);
-						instances.AddRange(typesToCreate.Select(typeToCreate => this.GetInstance(typeToCreate, null, buildStack)));
+						var typesToCreate = this.GetRegistrationsForTypesToCreate(abstractType, buildStack);
+						instances.AddRange(typesToCreate.Select(typeToCreate => this.CreateInstance(typeToCreate, null, buildStack)));
 						break;
 				}
 			}

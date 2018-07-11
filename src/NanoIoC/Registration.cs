@@ -2,7 +2,7 @@ using System;
 
 namespace NanoIoC
 {
-	public class Registration
+	public sealed class Registration
     {
 		public readonly Type AbstractType;
 		public readonly Type ConcreteType;
@@ -18,5 +18,10 @@ namespace NanoIoC
     		this.Lifecycle = lifecycle;
 			this.InjectionBehaviour = injectionBehaviour;
         }
+
+	    public override string ToString()
+	    {
+		    return "Abstract: " + this.AbstractType?.GetFriendlyName() + ", Concrete: " + this.ConcreteType?.GetFriendlyName() + ", Lifecycle: " + this.Lifecycle;
+	    }
     }
 }
