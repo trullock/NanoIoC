@@ -52,7 +52,12 @@ namespace NanoIoC
 			return container.Resolve(typeof(T), dependencies);
 		}
 
-
+		/// <summary>
+		/// Returns the dependency graph for the given type
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="container"></param>
+		/// <returns></returns>
 		public static GraphNode DependencyGraph<T>(this IResolverContainer container)
 		{
 			return container.DependencyGraph(typeof(T));

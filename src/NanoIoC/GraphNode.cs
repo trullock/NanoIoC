@@ -7,12 +7,7 @@ namespace NanoIoC
 	{
 		public Registration Registration { get; internal set; }
 		public IList<GraphNode> Dependencies { get;}
-
-		public GraphNode()
-		{
-			this.Dependencies = new List<GraphNode>();
-		}
-
+		
 		public GraphNode(Registration registration)
 		{
 			this.Registration = registration;

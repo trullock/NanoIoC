@@ -91,6 +91,11 @@ namespace NanoIoC
 			return this.Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
 		}
 
+		/// <summary>
+		/// Returns the dependency graph for the given type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
 		public GraphNode DependencyGraph(Type type)
 		{
 			return this.DependencyGraph(type, new Stack<Type>());
