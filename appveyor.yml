@@ -1,0 +1,32 @@
+image: Visual Studio 2017
+version: 2.0.{build}
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.cs'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+configuration: Release
+before_build:
+- .paket\paket.exe restore
+for:
+  - branches:
+      only:
+        - master
+    after_test:
+      - .paket\paket pack . --version %APPVEYOR_BUILD_VERSION%
+  - branches:
+      except:
+        - master
+    after_test:
+      - .paket\paket pack . --version %APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_BRANCH%
+artifacts:
+  - path: '*.nupkg'
+deploy:
+  provider: NuGet
+  api_key:
+    secure: YDpZ0RO4y/+Bw6uGblG151STJHDZ80TIKxjGGpMsNUxzoOxKkZwTfw1g7XCH1nmz
+  on:
+    branch:
+      - master
+
