@@ -18,7 +18,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("No types registered for `NanoIoC.Tests.MultipleRegistrations+InterfaceA, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`", e.Message);
+				Assert.AreEqual("No types registered for `NanoIoC.Tests.MultipleRegistrations+InterfaceA, NanoIoC.Tests`", e.Message);
 			}
 		}
 

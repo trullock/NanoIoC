@@ -16,7 +16,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cyclic dependency detected when trying to construct `NanoIoC.Tests.CyclicDependencies+ClassA, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`\nBuild Stack:\nNanoIoC.Tests.CyclicDependencies+ClassA\nNanoIoC.Tests.CyclicDependencies+ClassB", e.Message);
+				Assert.AreEqual("Cyclic dependency detected when trying to construct `NanoIoC.Tests.CyclicDependencies+ClassA, NanoIoC.Tests`\nBuild Stack:\nNanoIoC.Tests.CyclicDependencies+ClassA\nNanoIoC.Tests.CyclicDependencies+ClassB", e.Message);
 				Assert.AreEqual(typeof (ClassA), e.BuildStack[0]);
 				Assert.AreEqual(typeof(ClassB), e.BuildStack[1]);
 				Assert.AreEqual(2, e.BuildStack.Length);
@@ -36,7 +36,7 @@ namespace NanoIoC.Tests
 			}
 			catch (ContainerException e)
 			{
-				Assert.AreEqual("Cyclic dependency detected when trying to construct `NanoIoC.Tests.CyclicDependencies+ClassC, NanoIoC.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null`\nBuild Stack:\nNanoIoC.Tests.CyclicDependencies+ClassC\nNanoIoC.Tests.CyclicDependencies+ClassD", e.Message);
+				Assert.AreEqual("Cyclic dependency detected when trying to construct `NanoIoC.Tests.CyclicDependencies+ClassC, NanoIoC.Tests`\nBuild Stack:\nNanoIoC.Tests.CyclicDependencies+ClassC\nNanoIoC.Tests.CyclicDependencies+ClassD", e.Message);
 				Assert.AreEqual(typeof(ClassC), e.BuildStack[0]);
 				Assert.AreEqual(typeof(ClassD), e.BuildStack[1]);
 				Assert.AreEqual(2, e.BuildStack.Length);

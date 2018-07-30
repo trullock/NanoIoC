@@ -161,7 +161,7 @@ namespace NanoIoC
 					break;
 				}
 
-				//throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+				//throw new ContainerException("Unable to construct `" + registration.ConcreteType.GetNameForException() + "`", buildStack);
 			}
 		}
 
@@ -173,7 +173,7 @@ namespace NanoIoC
 			var registrations = this.GetRegistrationsFor(type, null).ToList();
 
 			if (registrations.Count > 1)
-				throw new ContainerException("Cannot return single instance for type `" + type.AssemblyQualifiedName + "`, There are multiple instances stored.", buildStack);
+				throw new ContainerException("Cannot return single instance for type `" + type.GetNameForException() + "`, There are multiple instances stored.", buildStack);
 
 			if (registrations.Count == 1)
 				return this.GetOrCreateInstances(type, registrations[0].Lifecycle, tempInstanceStore, buildStack).First();
@@ -185,7 +185,7 @@ namespace NanoIoC
 		object CreateInstance(Registration registration, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			if (buildStack.Contains(registration.ConcreteType))
-				throw new ContainerException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+				throw new ContainerException("Cyclic dependency detected when trying to construct `" + registration.ConcreteType.GetNameForException() + "`", buildStack);
 
 			buildStack.Push(registration.ConcreteType);
 
@@ -226,7 +226,7 @@ namespace NanoIoC
 					                  }
 				                  }
 
-				                  throw new ContainerException("Unable to construct `" + registration.ConcreteType.AssemblyQualifiedName + "`", buildStack);
+				                  throw new ContainerException("Unable to construct `" + registration.ConcreteType.GetNameForException() + "`", buildStack);
 			                  });
 
 			return constructor(this);
@@ -367,10 +367,10 @@ namespace NanoIoC
 				throw new ArgumentNullException(nameof(concreteType), "ConcreteType cannot be null");
 
 			if (!concreteType.IsOrDerivesFrom(abstractType))
-				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not assignable to abstract type `" + abstractType.AssemblyQualifiedName + "`");
+				throw new ContainerException("Concrete type `" + concreteType.GetNameForException() + "` is not assignable to abstract type `" + abstractType.GetNameForException() + "`");
 
 			if (concreteType.IsInterface || concreteType.IsAbstract)
-				throw new ContainerException("Concrete type `" + concreteType.AssemblyQualifiedName + "` is not a concrete type");
+				throw new ContainerException("Concrete type `" + concreteType.GetNameForException() + "` is not a concrete type");
 
 			var store = this.GetStore(lifecycle);
 
@@ -437,7 +437,7 @@ namespace NanoIoC
 				if (!p.IsAbstract && !p.IsInterface)
 					return true;
 
-				throw new ContainerException("Cannot create dependency `" + p.AssemblyQualifiedName + "` of dependee `" + dependeeType.AssemblyQualifiedName + "`", buildStack);
+				throw new ContainerException("Cannot create dependency `" + p.GetNameForException() + "` of dependee `" + dependeeType.GetNameForException() + "`", buildStack);
 			});
 		}
 
@@ -447,10 +447,10 @@ namespace NanoIoC
 			if (registrations.Any())
 			{
 				if (!allowMultiple && registrations.Count > 1)
-					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`, there are multiple concrete types registered for it.", buildStack);
+					throw new ContainerException("Cannot create dependency `" + requestedType.GetNameForException() + "`, there are multiple concrete types registered for it.", buildStack);
 
 				if (registrations[0].Lifecycle < lifecycle)
-					throw new ContainerException("Cannot create dependency `" + requestedType.AssemblyQualifiedName + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.AssemblyQualifiedName + "` (" + lifecycle + ")", buildStack);
+					throw new ContainerException("Cannot create dependency `" + requestedType.GetNameForException() + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.GetNameForException() + "` (" + lifecycle + ")", buildStack);
 
 				return true;
 			}

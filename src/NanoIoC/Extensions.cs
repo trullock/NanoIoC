@@ -131,5 +131,10 @@ namespace NanoIoC
 
 			return friendlyName;
 		}
+
+		public static string GetNameForException(this Type type)
+		{
+			return type.FullName + ", " + type.Assembly.GetName().Name;
+		}
 	}
 }

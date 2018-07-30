@@ -16,7 +16,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Concrete type `" + typeof(TestInterface).AssemblyQualifiedName + "` is not a concrete type", e.Message);
+				Assert.AreEqual("Concrete type `" + typeof(TestInterface).GetNameForException() + "` is not a concrete type", e.Message);
 			}
         }
 
@@ -31,7 +31,7 @@ namespace NanoIoC.Tests
 			}
 			catch (ContainerException e)
 			{
-				Assert.AreEqual("Concrete type `" + typeof(TestClass).AssemblyQualifiedName + "` is not a concrete type", e.Message);
+				Assert.AreEqual("Concrete type `" + typeof(TestClass).GetNameForException() + "` is not a concrete type", e.Message);
 			}
 		}
 
