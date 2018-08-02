@@ -8,11 +8,18 @@ A tiny IoC container, does exactly what you want, and only that.
 
 ### Manually Registering Dependencies
 
-Use either of these methods:
+Use either of these methods to register a concrete type as an abstract type:
 
 ```
-void IContainer.Register&lt;TAbstract, TConcrete&gt;(Lifecycle lifecycle = Lifecycle.Singleton);
+void IContainer.Register<TAbstract, TConcrete>(Lifecycle lifecycle = Lifecycle.Singleton);
 void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle = Lifecycle.Singleton);
+```
+
+You can tell NanoIoC to construct a concrete type for an abstract type in a custom way, using either of these methods:
+
+```
+void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle);
+void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton);
 ```
 
 You will typically want to put your registrations inside an `IContainerRegistry`.
@@ -74,4 +81,13 @@ You can inject existing instances:
 ```
 void IContainer.Inject<T>(T instance, Lifecycle lifeCycle = Lifecycle.Singleton);
 void IContainer.Inject(object instance, Type type, Lifecycle lifecycle);
+```
+
+### Analysis and Debug
+
+You can ask NanoIoC for the dependency graph for a given type. This will return a graph of all the types dependencies, and their dependencies and so on.
+Note that this cannot traverse custom constructor registrations, and so the graph will have a leaf node at that point.
+
+```
+GraphNode DependencyGraph(Type type);
 ```
