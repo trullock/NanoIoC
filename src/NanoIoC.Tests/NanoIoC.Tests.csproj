@@ -45,6 +45,7 @@
     <Compile Include="HttpContextInstanceStoreMutexInitialisation.cs" />
     <Compile Include="LifecycleDependencyRules.cs" />
     <Compile Include="MixedLifecycleHierarchy.cs" />
+    <Compile Include="SelfResolution.cs" />
     <Compile Include="Reset.cs" />
     <Compile Include="SlowCtor.cs" />
     <Compile Include="DependencyStore.cs" />
