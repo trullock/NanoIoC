@@ -74,6 +74,20 @@ IEnumerable<T> IContainer.ResolveAll<T>()
 IEnumerable IContainer.ResolveAll(Type type);
 ```
 
+### Self-Resolution
+
+You can resolve the container itself as either `IContainer` or its read-only method subset; `IResolverContainer`, for example:
+
+```
+sealed class MyClass
+{
+	// take a dependency on a read-only version of the container
+	public MyClass(IResolverContainer container)
+	{
+	}
+}
+```
+
 ### Injecting instances:
 
 You can inject existing instances:

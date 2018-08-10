@@ -7,7 +7,7 @@ namespace NanoIoC.Tests
 	public class SelfResolution
 	{
 		[Test]
-		public void ContainerShouldResolveItselfAsIContianer()
+		public void ContainerShouldResolveItselfAsIContainer()
 		{
 			var container = new Container();
 
@@ -15,7 +15,7 @@ namespace NanoIoC.Tests
 		}
 
 		[Test]
-		public void ContainerShouldResolveItselfAsIResolverContianer()
+		public void ContainerShouldResolveItselfAsIResolverContainer()
 		{
 			var container = new Container();
 

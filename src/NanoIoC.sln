@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{16F31FC6-E1BB-4399-9A25-9E4215A41B72}"
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
+		..\appveyor.yml = ..\appveyor.yml
 		..\paket.dependencies = ..\paket.dependencies
 		..\readme.md = ..\readme.md
 	EndProjectSection

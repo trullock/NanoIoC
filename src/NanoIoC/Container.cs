@@ -66,6 +66,7 @@ namespace NanoIoC
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
+			this.Inject<IResolverContainer>(this);
 		}
 
 		internal Container(Container container)
