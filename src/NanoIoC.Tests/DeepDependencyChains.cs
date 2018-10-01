@@ -16,7 +16,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.DeepDependencyChains+InterfaceC, NanoIoC.Tests` of dependee `NanoIoC.Tests.DeepDependencyChains+ClassB, NanoIoC.Tests`\nBuild Stack:\nNanoIoC.Tests.DeepDependencyChains+ClassA\nNanoIoC.Tests.DeepDependencyChains+ClassB", e.Message);
+				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.DeepDependencyChains+InterfaceC, NanoIoC.Tests` of dependee `NanoIoC.Tests.DeepDependencyChains+ClassB, NanoIoC.Tests`\nBuild Stack:\nNanoIoC.Tests.DeepDependencyChains+ClassB\nNanoIoC.Tests.DeepDependencyChains+ClassA", e.Message);
 			}
 		}
 

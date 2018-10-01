@@ -20,9 +20,9 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual(typeof(ClassC), e.BuildStack[0]);
+				Assert.AreEqual(typeof(ClassC), e.BuildStack[2]);
 				Assert.AreEqual(typeof(ClassB), e.BuildStack[1]);
-				Assert.AreEqual(typeof(ClassA), e.BuildStack[2]);
+				Assert.AreEqual(typeof(ClassA), e.BuildStack[0]);
 				Assert.AreEqual(3, e.BuildStack.Length);
 			}
 		}

@@ -50,7 +50,7 @@ namespace NanoIoC
 
 		void StackToString(Stack<Type> buildStack)
 		{
-			this.BuildStack = buildStack.Reverse().ToArray();
+			this.BuildStack = buildStack.ToArray();
 			this.buildStack = string.Empty;
 
 			foreach (var t in this.BuildStack)

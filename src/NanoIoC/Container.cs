@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace NanoIoC
 {
-	public sealed class Container : MarshalByRefObject, IContainer
+	public sealed partial class Container : MarshalByRefObject, IContainer
 	{
 		readonly IInstanceStore singletonInstanceStore;
 		readonly IInstanceStore httpContextOrExecutionContextLocalStore;
@@ -136,10 +136,8 @@ namespace NanoIoC
 			}
 			else
 			{
-				var constructors = registration.ConcreteType.GetConstructors();
-				var ctorsWithParams = constructors.Select(c => new { ctor = c, parameters = c.GetParameters() });
-				var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length);
-				foreach (var ctor in orderedEnumerable)
+				var constructors = GetConstructors(registration);
+				foreach (var ctor in constructors)
 				{
 					var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
@@ -163,6 +161,21 @@ namespace NanoIoC
 				}
 
 				//throw new ContainerException("Unable to construct `" + registration.ConcreteType.GetNameForException() + "`", buildStack);
+			}
+		}
+
+		private static IEnumerable<TypeCtor> GetConstructors(Registration registration)
+		{
+			try
+			{
+				var constructors = registration.ConcreteType.GetConstructors();
+				var ctorsWithParams = constructors.Select(c => new TypeCtor(c, c.GetParameters()));
+				var orderedEnumerable = ctorsWithParams.OrderBy(x => x.parameters.Length).ToArray();
+				return orderedEnumerable;
+			}
+			catch (Exception e)
+			{
+				throw new ContainerException("Unable to get constructors for `" + registration.ConcreteType.FullName + "`", e);
 			}
 		}
 

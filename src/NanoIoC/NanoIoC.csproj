@@ -61,6 +61,7 @@
     <Compile Include="SingletonInstanceStore.cs" />
     <Compile Include="TempInstanceStore.cs" />
     <Compile Include="TransientInstanceStore.cs" />
+    <Compile Include="TypeCtor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.template" />
