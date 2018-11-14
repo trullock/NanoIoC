@@ -18,6 +18,7 @@ namespace NanoIoC
 		/// <summary>
 		/// Global container instance
 		/// </summary>
+		[Obsolete("Do not use, this is an antipattern")]
 		public static readonly IContainer Global;
 
 		static Container()
