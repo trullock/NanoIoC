@@ -8,6 +8,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 configuration: Release
 before_build:
+- dotnet restore src\NanoIoC.sln
 - .paket\paket.exe restore
 for:
   - branches:
