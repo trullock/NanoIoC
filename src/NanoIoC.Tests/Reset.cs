@@ -13,8 +13,8 @@ namespace NanoIoC.Tests
 
 			container.Register<TestInterface, TestClass1>(Lifecycle.Transient);
 
-			container.Register<TestInterface, TestClass1>(Lifecycle.HttpContextOrExecutionContextLocal);
-			container.Inject<TestInterface>(new TestClass1(), Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass1>(Lifecycle.ExecutionContextLocal);
+			container.Inject<TestInterface>(new TestClass1(), Lifecycle.ExecutionContextLocal);
 
 			container.Register<TestInterface, TestClass1>(Lifecycle.Singleton);
 			container.Inject<TestInterface>(new TestClass1(), Lifecycle.Singleton);

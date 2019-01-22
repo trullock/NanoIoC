@@ -18,7 +18,7 @@ namespace NanoIoC.Tests
 
 			var container = new Container();
 			container.Register<IOuter, Outer>(Lifecycle.Transient);
-			container.Register<IInner, Inner>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<IInner, Inner>(Lifecycle.ExecutionContextLocal);
 			container.Register<IService, Service>();
 
 			var cde = new CountdownEvent(5);

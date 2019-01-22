@@ -161,7 +161,7 @@ namespace NanoIoC
 			if (newContainer.HasRegistrationFor<T>())
 				newContainer.RemoveAllRegistrationsAndInstancesOf<T>();
 
-			newContainer.Inject<T>(replacement, Lifecycle.HttpContextOrExecutionContextLocal);
+			newContainer.Inject<T>(replacement, Lifecycle.ExecutionContextLocal);
 
 			return newContainer;
 		}

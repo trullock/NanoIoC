@@ -8,9 +8,9 @@ namespace NanoIoC.Tests
 		{
 			return new[]
 			{
-				new[] {Lifecycle.Singleton, Lifecycle.HttpContextOrExecutionContextLocal},
+				new[] {Lifecycle.Singleton, Lifecycle.ExecutionContextLocal},
 				new[] {Lifecycle.Singleton, Lifecycle.Transient},
-				new[] {Lifecycle.HttpContextOrExecutionContextLocal, Lifecycle.Transient}
+				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Transient}
 			};
 		}
 
@@ -31,10 +31,10 @@ namespace NanoIoC.Tests
 			return new[]
 			{
 				new[] {Lifecycle.Singleton, Lifecycle.Singleton},
-				new[] {Lifecycle.HttpContextOrExecutionContextLocal, Lifecycle.Singleton},
-				new[] {Lifecycle.HttpContextOrExecutionContextLocal, Lifecycle.HttpContextOrExecutionContextLocal},
+				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Singleton},
+				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.ExecutionContextLocal},
 				new[] {Lifecycle.Transient, Lifecycle.Singleton},
-				new[] {Lifecycle.Transient, Lifecycle.HttpContextOrExecutionContextLocal},
+				new[] {Lifecycle.Transient, Lifecycle.ExecutionContextLocal},
 				new[] {Lifecycle.Transient, Lifecycle.Transient}
 			};
 		}

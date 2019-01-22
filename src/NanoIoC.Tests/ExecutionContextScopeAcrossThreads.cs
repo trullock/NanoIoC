@@ -10,7 +10,7 @@ namespace NanoIoC.Tests
 		public void ShouldConstruct()
 		{
 			var container = new Container();
-			container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 
 			TestInterface instance = null;

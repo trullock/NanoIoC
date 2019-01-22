@@ -3,5 +3,3 @@ strategy: min
 source https://www.nuget.org/api/v2
 
 nuget NUnit 2.6.4
-nuget Microsoft.AspNetCore.Http.Abstractions 2.1.1
-nuget Microsoft.AspNetCore.Http 2.1.1

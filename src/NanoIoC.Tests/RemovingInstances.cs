@@ -24,18 +24,18 @@ namespace NanoIoC.Tests
 			var instance2 = new TestClass();
 
 			var container = new Container();
-			container.Inject<TestInterface>(instance1, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject<TestInterface>(instance1, Lifecycle.ExecutionContextLocal);
 
 			TestInterface[] thread2ResolvedTestClasses = null;
 			bool thread2HasRegistration = true;
 			ExecutionContext.SuppressFlow();
 			var thread2 = new Thread(() =>
 			{
-				container.Inject<TestInterface>(instance2, Lifecycle.HttpContextOrExecutionContextLocal);
+				container.Inject<TestInterface>(instance2, Lifecycle.ExecutionContextLocal);
 
 				thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
 
-				container.RemoveInstancesOf<TestInterface>(Lifecycle.HttpContextOrExecutionContextLocal);
+				container.RemoveInstancesOf<TestInterface>(Lifecycle.ExecutionContextLocal);
 
 				thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
 			});

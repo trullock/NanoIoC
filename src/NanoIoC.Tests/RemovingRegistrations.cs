@@ -56,11 +56,11 @@ namespace NanoIoC.Tests
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class1, Lifecycle.ExecutionContextLocal);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
 
-			container.Inject(class2, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class2, Lifecycle.ExecutionContextLocal);
 
 			var classA1 = container.Resolve<ClassA1>();
 			Assert.AreSame(class2, classA1);
@@ -73,11 +73,11 @@ namespace NanoIoC.Tests
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class1, Lifecycle.ExecutionContextLocal);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
 
-			container.Inject(class2, Lifecycle.HttpContextOrExecutionContextLocal);
+			container.Inject(class2, Lifecycle.ExecutionContextLocal);
 
 			var classA1 = container.Resolve<ClassA1>();
 			Assert.AreSame(class2, classA1);

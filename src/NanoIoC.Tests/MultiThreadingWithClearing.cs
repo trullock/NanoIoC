@@ -14,7 +14,7 @@ namespace NanoIoC.Tests
         public void ShouldConstruct()
         {
             this.container = new Container();
-			this.container.Register<TestInterface, TestClass>(Lifecycle.HttpContextOrExecutionContextLocal);
+			this.container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
 
 			for (var i = 0; i < 10; i++)
 				ThreadPool.QueueUserWorkItem(this.Test);
@@ -29,7 +29,7 @@ namespace NanoIoC.Tests
 			try
 			{
 				container.Resolve<TestInterface>();
-				container.RemoveAllInstancesWithLifecycle(Lifecycle.HttpContextOrExecutionContextLocal);
+				container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
 			}
 			catch(Exception e)
 			{
