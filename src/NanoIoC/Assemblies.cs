@@ -17,7 +17,7 @@ namespace NanoIoC
 			if (Directory.Exists(baseDirectory))
 				assemblies.AddRange(AllFromPath(baseDirectory, filter));
 
-			var binPath = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
+			var binPath = Path.Combine(baseDirectory, "bin");
 			if (Directory.Exists(binPath))
 				assemblies.AddRange(AllFromPath(binPath, filter));
 

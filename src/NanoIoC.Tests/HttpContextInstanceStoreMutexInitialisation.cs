@@ -1,17 +1,25 @@
 ﻿using System.IO;
-using System.Text;
-using System.Web;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
 	public class HttpContextInstanceStoreMutexInitialisation
 	{
+		HttpContextAccessor httpContextAccessor;
+
+		void SetupStupContext()
+		{
+			this.httpContextAccessor = new HttpContextAccessor();
+			this.httpContextAccessor.HttpContext = new DefaultHttpContext();
+		}
+
 		[Test]
 		public void MutexIsInitialisedWhenCurrentHttpContextIsNonNull()
 		{
-			SetupStupContext();
-			var instanceStore = new HttpContextOrExecutionContextLocalInstanceStore();
+			this.SetupStupContext();
+			
+			var instanceStore = new HttpContextOrExecutionContextLocalInstanceStore(this.httpContextAccessor);
 
 			Assert.IsNotNull(instanceStore.Mutex);
 		}
@@ -19,15 +27,7 @@ namespace NanoIoC.Tests
 		[TearDown]
 		public void Cleanup()
 		{
-			HttpContext.Current = null;
-		}
-
-		private static void SetupStupContext()
-		{
-			HttpContext.Current = new HttpContext(
-				new HttpRequest(string.Empty, "http://localhost/", string.Empty),
-				new HttpResponse(new StringWriter())
-			);
+			this.httpContextAccessor.HttpContext = null;
 		}
 	}
 }

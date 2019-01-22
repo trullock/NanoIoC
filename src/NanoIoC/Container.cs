@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 
 namespace NanoIoC
 {
@@ -63,7 +64,7 @@ namespace NanoIoC
 		public Container()
 		{
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore();
+			this.httpContextOrExecutionContextLocalStore = new HttpContextOrExecutionContextLocalInstanceStore(new HttpContextAccessor());
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
