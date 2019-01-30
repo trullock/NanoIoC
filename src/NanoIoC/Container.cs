@@ -41,9 +41,15 @@ namespace NanoIoC
 				{
 					types = assembly.GetTypes();
 				}
+				catch (TypeInitializationException e)
+				{
+					if (e.InnerException is ReflectionTypeLoadException inner)
+						throw new ContainerException(inner.LoaderExceptions, e);
+					throw;
+				}
 				catch (ReflectionTypeLoadException e)
 				{
-					throw new ContainerException("Unable to load one or more types: " + string.Join(", ", e.LoaderExceptions.Select(x => x.Message).ToArray()), e);
+					throw new ContainerException(e.LoaderExceptions, e);
 				}
 
 				foreach (var type in types)

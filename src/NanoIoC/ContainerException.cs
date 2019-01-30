@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -31,13 +32,13 @@ namespace NanoIoC
 		internal ContainerException(string message, Stack<Type> buildStack)
 			: base(message)
 		{
-			StackToString(buildStack);
+			this.StackToString(buildStack);
 		}
 
 		internal ContainerException(string message, Stack<Type> buildStack, Exception innerException)
 			:this(message, innerException)
 		{
-			StackToString(buildStack);
+			this.StackToString(buildStack);
 		}
 
         internal ContainerException(SerializationInfo info, StreamingContext context) : base(info, context)
@@ -45,6 +46,21 @@ namespace NanoIoC
         }
 
         internal ContainerException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        internal ContainerException(IEnumerable<Exception> exceptions, Exception innerException) :
+	        base("Unable to load one or more types\n" + string.Join("\n", exceptions.Select(e =>
+	        {
+		        var message = e.Message;
+
+		        if (e is FileNotFoundException fnfe)
+			        message += "\n" + fnfe.FusionLog;
+
+		        if (e is FileLoadException fle)
+			        message += "\n" + fle.FusionLog;
+		        return message;
+	        })), innerException)
         {
         }
 
