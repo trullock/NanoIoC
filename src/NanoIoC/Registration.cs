@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
@@ -7,21 +8,21 @@ namespace NanoIoC
 		public readonly Type AbstractType;
 		public readonly Type ConcreteType;
 		public readonly Func<IContainer, object> Ctor;
-		public readonly Lifecycle Lifecycle;
+		public readonly ServiceLifetime ServiceLifetime;
 		public readonly InjectionBehaviour InjectionBehaviour;
 
-		internal Registration(Type abstractType, Type concreteType, Func<IContainer, object> ctor, Lifecycle lifecycle, InjectionBehaviour injectionBehaviour)
+		internal Registration(Type abstractType, Type concreteType, Func<IContainer, object> ctor, ServiceLifetime serviceLifetime, InjectionBehaviour injectionBehaviour)
         {
     		this.AbstractType = abstractType;
     		this.ConcreteType = concreteType;
     		this.Ctor = ctor;
-    		this.Lifecycle = lifecycle;
+    		this.ServiceLifetime = serviceLifetime;
 			this.InjectionBehaviour = injectionBehaviour;
         }
 
 	    public override string ToString()
 	    {
-		    return "Abstract: " + this.AbstractType?.GetFriendlyName() + ", Concrete: " + this.ConcreteType?.GetFriendlyName() + ", Lifecycle: " + this.Lifecycle;
+		    return "Abstract: " + this.AbstractType?.GetFriendlyName() + ", Concrete: " + this.ConcreteType?.GetFriendlyName() + ", ServiceLifetime: " + this.ServiceLifetime;
 	    }
     }
 }

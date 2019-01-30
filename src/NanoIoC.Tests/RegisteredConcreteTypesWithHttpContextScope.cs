@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
@@ -9,7 +10,7 @@ namespace NanoIoC.Tests
         public void ShouldConstruct()
         {
             var container = new Container();
-			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(ServiceLifetime.Scoped);
 
 			var instance = container.Resolve<TestInterface>();
             Assert.IsInstanceOf<TestClass>(instance);

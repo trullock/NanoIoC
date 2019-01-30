@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
@@ -13,7 +14,7 @@ namespace NanoIoC
 		protected abstract IDictionary<Type, IList<Tuple<Registration, object>>> Store { get; }
 		protected IDictionary<Type, IList<Registration>> Registrations { get; set; }
 		protected abstract IDictionary<Type, IList<Registration>> InjectedRegistrations { get; }
-		protected abstract Lifecycle Lifecycle { get; }
+		protected abstract ServiceLifetime ServiceLifetime { get; }
 		public abstract object Mutex { get; }
 
 		protected InstanceStore()
@@ -37,7 +38,7 @@ namespace NanoIoC
 			if (!this.InjectedRegistrations.ContainsKey(type))
 				this.InjectedRegistrations.Add(type, new List<Registration>());
 
-			var registration = new Registration(type, instance?.GetType() ?? type, null, this.Lifecycle, injectionBehaviour);
+			var registration = new Registration(type, instance?.GetType() ?? type, null, this.ServiceLifetime, injectionBehaviour);
 			this.InjectedRegistrations[type].Add(registration);
 
 			this.Insert(registration, type, instance);

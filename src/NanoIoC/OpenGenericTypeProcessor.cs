@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
@@ -6,7 +7,7 @@ namespace NanoIoC
 	{
 		protected abstract Type OpenGenericTypeToClose { get; }
 
-		public abstract Lifecycle Lifecycle { get; }
+		public abstract ServiceLifetime ServiceLifetime { get; }
 
 		public void Process(Type type, IContainer container)
 		{
@@ -21,7 +22,7 @@ namespace NanoIoC
 			foreach (var typeArguments in typeArgumentsForInterfaces)
 			{
 				var closedType = this.OpenGenericTypeToClose.MakeGenericType(typeArguments);
-				container.Register(closedType, type, this.Lifecycle);	
+				container.Register(closedType, type, this.ServiceLifetime);	
 			}
 		}
 	}

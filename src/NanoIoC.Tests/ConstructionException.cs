@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -10,9 +11,9 @@ namespace NanoIoC.Tests
 		public void ShouldUseExistingInstancesForDependencies()
 		{
 			var container = new Container();
-			container.Register<ClassA>(Lifecycle.Singleton);
-			container.Register<ClassB>(Lifecycle.Transient);
-			container.Register<ClassC>(Lifecycle.Transient);
+			container.Register<ClassA>(ServiceLifetime.Singleton);
+			container.Register<ClassB>(ServiceLifetime.Transient);
+			container.Register<ClassC>(ServiceLifetime.Transient);
 
 			try
 			{

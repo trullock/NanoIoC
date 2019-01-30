@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -9,63 +10,63 @@ namespace NanoIoC.Tests
 		[Test]
 		public void RegisteredTransient()
 		{
-			RegisteredLifecycle(Lifecycle.Singleton);
+			RegisteredServiceLifetime(ServiceLifetime.Singleton);
 		}
 
 		[Test]
 		public void RegisteredSingleton()
 		{
-			RegisteredLifecycle(Lifecycle.Singleton);
+			RegisteredServiceLifetime(ServiceLifetime.Singleton);
 		}
 
 		[Test]
 		public void RegisteredThreadLocal()
 		{
-			RegisteredLifecycle(Lifecycle.ExecutionContextLocal);
+			RegisteredServiceLifetime(ServiceLifetime.Scoped);
 		}
 
 		[Test]
 		public void RegisteredExecutionContextLocal()
 		{
-			RegisteredLifecycle(Lifecycle.ExecutionContextLocal);
+			RegisteredServiceLifetime(ServiceLifetime.Scoped);
 		}
 
 		[Test]
 		public void InjectedSingleton()
 		{
-			InjectedLifecycle(Lifecycle.Singleton);
+			InjectedServiceLifetime(ServiceLifetime.Singleton);
 		}
 
 		[Test]
 		public void InjectedThreadLocal()
 		{
-			InjectedLifecycle(Lifecycle.ExecutionContextLocal);
+			InjectedServiceLifetime(ServiceLifetime.Scoped);
 		}
 
 		[Test]
 		public void InjectedExecutionContextLocal()
 		{
-			InjectedLifecycle(Lifecycle.ExecutionContextLocal);
+			InjectedServiceLifetime(ServiceLifetime.Scoped);
 		}
 
-		static void InjectedLifecycle(Lifecycle lifecycle)
+		static void InjectedServiceLifetime(ServiceLifetime serviceLifetime)
 		{
 			var container = new Container();
 
 			Assert.IsFalse(container.HasRegistrationsFor(typeof(TestClass)));
 
-			container.Inject(new TestClass(), lifecycle);
+			container.Inject(new TestClass(), serviceLifetime);
 
 			Assert.IsTrue(container.HasRegistrationsFor(typeof(TestClass)));
 		}
 
-		static void RegisteredLifecycle(Lifecycle lifecycle)
+		static void RegisteredServiceLifetime(ServiceLifetime serviceLifetime)
 		{
 			var container = new Container();
 
 			Assert.IsFalse(container.HasRegistrationsFor(typeof(ITestClass)));
 
-			container.Register(typeof(ITestClass), typeof(TestClass), lifecycle);
+			container.Register(typeof(ITestClass), typeof(TestClass), serviceLifetime);
 
 			Assert.IsTrue(container.HasRegistrationsFor(typeof(ITestClass)));
 		}

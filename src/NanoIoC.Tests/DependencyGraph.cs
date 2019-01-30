@@ -18,18 +18,18 @@ namespace NanoIoC.Tests
 
 			var graph = container.DependencyGraph<ClassA>();
 			Assert.AreEqual(@"
-Abstract: ClassA, Concrete: ClassA, Lifecycle: Transient
-     -> Abstract: ClassB, Concrete: ClassB, Lifecycle: Transient
-          -> Abstract: InterfaceC, Concrete: ClassC, Lifecycle: Singleton
-               -> Abstract: IEnumerable<InterfaceMultiple>, Concrete: , Lifecycle: Transient
-                    -> Abstract: InterfaceMultiple, Concrete: ClassMultipleA, Lifecycle: Singleton
-                    -> Abstract: InterfaceMultiple, Concrete: ClassMultipleB, Lifecycle: Singleton
-          -> Abstract: InterfaceD, Concrete: ClassD, Lifecycle: Singleton
-               -> Abstract: InterfaceE, Concrete: ClassE, Lifecycle: Singleton
-                    -> Abstract: InterfaceC, Concrete: ClassC, Lifecycle: Singleton
-                         -> Abstract: IEnumerable<InterfaceMultiple>, Concrete: , Lifecycle: Transient
-                              -> Abstract: InterfaceMultiple, Concrete: ClassMultipleA, Lifecycle: Singleton
-                              -> Abstract: InterfaceMultiple, Concrete: ClassMultipleB, Lifecycle: Singleton
+Abstract: ClassA, Concrete: ClassA, ServiceLifetime: Transient
+     -> Abstract: ClassB, Concrete: ClassB, ServiceLifetime: Transient
+          -> Abstract: InterfaceC, Concrete: ClassC, ServiceLifetime: Singleton
+               -> Abstract: IEnumerable<InterfaceMultiple>, Concrete: , ServiceLifetime: Transient
+                    -> Abstract: InterfaceMultiple, Concrete: ClassMultipleA, ServiceLifetime: Singleton
+                    -> Abstract: InterfaceMultiple, Concrete: ClassMultipleB, ServiceLifetime: Singleton
+          -> Abstract: InterfaceD, Concrete: ClassD, ServiceLifetime: Singleton
+               -> Abstract: InterfaceE, Concrete: ClassE, ServiceLifetime: Singleton
+                    -> Abstract: InterfaceC, Concrete: ClassC, ServiceLifetime: Singleton
+                         -> Abstract: IEnumerable<InterfaceMultiple>, Concrete: , ServiceLifetime: Transient
+                              -> Abstract: InterfaceMultiple, Concrete: ClassMultipleA, ServiceLifetime: Singleton
+                              -> Abstract: InterfaceMultiple, Concrete: ClassMultipleB, ServiceLifetime: Singleton
 ".TrimStart(), graph.ToString());
 		}
 

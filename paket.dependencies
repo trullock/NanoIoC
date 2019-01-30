@@ -3,3 +3,4 @@ strategy: min
 source https://www.nuget.org/api/v2
 
 nuget NUnit 2.6.4
+nuget Microsoft.Extensions.DependencyInjection.Abstractions

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -10,7 +11,7 @@ namespace NanoIoC.Tests
 		public void ShouldConstruct()
 		{
 			var container = new Container();
-			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(ServiceLifetime.Scoped);
 
 
 			TestInterface instance = null;

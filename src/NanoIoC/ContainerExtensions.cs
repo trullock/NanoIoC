@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
 	public static class ContainerExtensions
 	{
 		/// <summary>
-		/// Registers a concrete type with a lifecycle.
-		/// You should only be using this for Singleton or HttpContextOrThreadLocal lifecycles.
+		/// Registers a concrete type with a serviceLifetime.
+		/// You should only be using this for Singleton or HttpContextOrThreadLocal serviceLifetimes.
 		/// Registering a concrete type as Transient is pointless, as you get this behaviour by default.
 		/// </summary>
 		/// <typeparam name="TConcrete">The concrete type to register</typeparam>
 		/// <param name="container"></param>
-		/// <param name="lifecycle">The lifecycle of the instance</param>
-		public static void Register<TConcrete>(this IContainer container, Lifecycle lifecycle)
+		/// <param name="serviceLifetime">The serviceLifetime of the instance</param>
+		public static void Register<TConcrete>(this IContainer container, ServiceLifetime serviceLifetime)
 		{
-			container.Register(typeof(TConcrete), typeof(TConcrete), lifecycle);
+			container.Register(typeof(TConcrete), typeof(TConcrete), serviceLifetime);
 		}
 
 		/// <summary>
@@ -25,15 +26,15 @@ namespace NanoIoC
 		/// <typeparam name="TAbstract">The abstract type you want to resolve later</typeparam>
 		/// <typeparam name="TConcrete">The concrete type implementing the abstract type</typeparam>
 		/// <param name="container"></param>
-		/// <param name="lifecycle"></param>
-		public static void Register<TAbstract, TConcrete>(this IContainer container, Lifecycle lifecycle = Lifecycle.Singleton) where TConcrete : TAbstract
+		/// <param name="serviceLifetime"></param>
+		public static void Register<TAbstract, TConcrete>(this IContainer container, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton) where TConcrete : TAbstract
 		{
-			container.Register(typeof(TAbstract), typeof(TConcrete), lifecycle);
+			container.Register(typeof(TAbstract), typeof(TConcrete), serviceLifetime);
 		}
 
-		public static void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton)
+		public static void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
 		{
-			container.Register(typeof(TAbstract), c => ctor(c), lifecycle);
+			container.Register(typeof(TAbstract), c => ctor(c), serviceLifetime);
 		}
 		
 		/// <summary>
@@ -71,7 +72,7 @@ namespace NanoIoC
 		/// <param name="instance"></param>
 		/// <param name="lifeCycle"></param>
 		/// <param name="injectionBehaviour"></param>
-		public static void Inject<T>(this IContainer container, T instance, Lifecycle lifeCycle = Lifecycle.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
+		public static void Inject<T>(this IContainer container, T instance, ServiceLifetime lifeCycle = ServiceLifetime.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
 		{
 			container.Inject(instance, typeof(T), lifeCycle, injectionBehaviour);
 		}
@@ -92,9 +93,9 @@ namespace NanoIoC
 			container.RemoveAllRegistrationsAndInstancesOf(typeof(T));
 		}
 
-		public static void RemoveInstancesOf<T>(this IContainer container, Lifecycle lifecycle)
+		public static void RemoveInstancesOf<T>(this IContainer container, ServiceLifetime serviceLifetime)
 		{
-			container.RemoveInstancesOf(typeof(T), lifecycle);
+			container.RemoveInstancesOf(typeof(T), serviceLifetime);
 		}
 
 		public static bool HasRegistrationFor<T>(this IContainer container)
@@ -161,7 +162,7 @@ namespace NanoIoC
 			if (newContainer.HasRegistrationFor<T>())
 				newContainer.RemoveAllRegistrationsAndInstancesOf<T>();
 
-			newContainer.Inject<T>(replacement, Lifecycle.ExecutionContextLocal);
+			newContainer.Inject<T>(replacement, ServiceLifetime.Scoped);
 
 			return newContainer;
 		}

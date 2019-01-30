@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -88,41 +89,41 @@ namespace NanoIoC.Tests
 		
 
 		[Test]
-		public void ShouldResolveInjectedOverRegisteredWithThreadLifecycles()
+		public void ShouldResolveInjectedOverRegisteredWithThreadServiceLifetimes()
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(ServiceLifetime.Scoped);
 
 			var injector = new TestClass2();
-			container.Inject<TestInterface>(injector, Lifecycle.ExecutionContextLocal, InjectionBehaviour.Override);
+			container.Inject<TestInterface>(injector, ServiceLifetime.Scoped, InjectionBehaviour.Override);
 
 			Assert.AreSame(injector, container.Resolve<TestInterface>());
 		}
 		
 
 		[Test]
-		public void ShouldResolveInjectedOverRegisteredWithShorterLifecycles()
+		public void ShouldResolveInjectedOverRegisteredWithShorterServiceLifetimes()
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass>(Lifecycle.Singleton);
+			container.Register<TestInterface, TestClass>(ServiceLifetime.Singleton);
 
 			var injector = new TestClass2();
-			container.Inject<TestInterface>(injector, Lifecycle.ExecutionContextLocal, InjectionBehaviour.Override);
+			container.Inject<TestInterface>(injector, ServiceLifetime.Scoped, InjectionBehaviour.Override);
 
 			Assert.AreSame(injector, container.Resolve<TestInterface>());
 		}
 		
 		[Test]
-		public void ShouldResolveInjectedOverRegisteredWithLongerLifecycles()
+		public void ShouldResolveInjectedOverRegisteredWithLongerServiceLifetimes()
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
+			container.Register<TestInterface, TestClass>(ServiceLifetime.Scoped);
 
 			var injector = new TestClass2();
-			container.Inject<TestInterface>(injector, Lifecycle.Singleton, InjectionBehaviour.Override);
+			container.Inject<TestInterface>(injector, ServiceLifetime.Singleton, InjectionBehaviour.Override);
 
 			Assert.AreSame(injector, container.Resolve<TestInterface>());
 		}

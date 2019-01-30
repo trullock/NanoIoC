@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -46,7 +47,7 @@ namespace NanoIoC.Tests
 			public void Process(Type type, IContainer container)
 			{
 				if(typeof(TestInterface).IsAssignableFrom(type) && type != typeof(TestInterface))
-					container.Register(typeof(TestInterface), type, Lifecycle.Singleton);
+					container.Register(typeof(TestInterface), type, ServiceLifetime.Singleton);
 			}
 		}
     }

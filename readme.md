@@ -11,15 +11,15 @@ A tiny IoC container, does exactly what you want, and only that.
 Use either of these methods to register a concrete type as an abstract type:
 
 ```
-void IContainer.Register<TAbstract, TConcrete>(Lifecycle lifecycle = Lifecycle.Singleton);
-void IContainer.Register(Type abstract, Type concrete, Lifecycle lifecycle = Lifecycle.Singleton);
+void IContainer.Register<TAbstract, TConcrete>(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
+void IContainer.Register(Type abstract, Type concrete, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
 ```
 
 You can tell NanoIoC to construct a concrete type for an abstract type in a custom way, using either of these methods:
 
 ```
-void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle);
-void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, Lifecycle lifecycle = Lifecycle.Singleton);
+void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime serviceLifetime);
+void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
 ```
 
 You will typically want to put your registrations inside an `IContainerRegistry`.
@@ -51,7 +51,7 @@ public class ExampleTypeProcessor : ITypeProcessor
 	public void Process(Type type, IContainer container)
 	{
 		if(typeof(MyInterface).IsAssignableFrom(type) && type != typeof(MyInterface))
-			container.Register(typeof(MyInterface), type, Lifecycle.Singleton);
+			container.Register(typeof(MyInterface), type, ServiceLifetime.Singleton);
 	}
 }
 ```
@@ -93,8 +93,8 @@ sealed class MyClass
 You can inject existing instances:
 
 ```
-void IContainer.Inject<T>(T instance, Lifecycle lifeCycle = Lifecycle.Singleton);
-void IContainer.Inject(object instance, Type type, Lifecycle lifecycle);
+void IContainer.Inject<T>(T instance, ServiceLifetime lifeCycle = ServiceLifetime.Singleton);
+void IContainer.Inject(object instance, Type type, ServiceLifetime serviceLifetime);
 ```
 
 ### Analysis and Debug

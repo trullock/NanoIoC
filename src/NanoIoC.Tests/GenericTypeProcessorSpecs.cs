@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -21,15 +22,9 @@ namespace NanoIoC.Tests
 
 		public class TISTypeProcessor : OpenGenericTypeProcessor
 		{
-			protected override Type OpenGenericTypeToClose
-			{
-				get { return typeof (ITestInterface<>); }
-			}
+			protected override Type OpenGenericTypeToClose => typeof (ITestInterface<>);
 
-			public override Lifecycle Lifecycle
-			{
-				get { return Lifecycle.Singleton; }
-			}
+			public override ServiceLifetime ServiceLifetime => ServiceLifetime.Singleton;
 		}
 
         public interface ITestInterface<T>

@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -28,15 +29,9 @@ namespace NanoIoC.Tests
 
 		public class MsgHandlerTypeProcessor : OpenGenericTypeProcessor
 		{
-			protected override Type OpenGenericTypeToClose
-			{
-				get { return typeof (IMsgHandler<>); }
-			}
+			protected override Type OpenGenericTypeToClose => typeof (IMsgHandler<>);
 
-			public override Lifecycle Lifecycle
-			{
-				get { return Lifecycle.Singleton; }
-			}
+			public override ServiceLifetime ServiceLifetime => ServiceLifetime.Singleton;
 		}
 
 		[Test]
@@ -60,7 +55,7 @@ namespace NanoIoC.Tests
 			container.RunAllTypeProcessors();
 
 			// Not a test, but an assertion of state we rely on.
-			Assert.That(new MsgHandlerTypeProcessor().Lifecycle, Is.EqualTo(Lifecycle.Singleton));
+			Assert.That(new MsgHandlerTypeProcessor().ServiceLifetime, Is.EqualTo(ServiceLifetime.Singleton));
 
 			var fooHandler = container.Resolve<IMsgHandler<FooMsg>>();
 			var bahHandler = container.Resolve<IMsgHandler<BahMsg>>();

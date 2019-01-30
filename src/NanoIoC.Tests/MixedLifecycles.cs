@@ -1,16 +1,17 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
     [TestFixture]
-    public class MixedLifecycles
+    public class MixedServiceLifetimes
     {
         [Test]
-        public void ShouldThrowWhenADependencyHasAShorterLifecycle()
+        public void ShouldThrowWhenADependencyHasAShorterServiceLifetime()
         {
             var container = new Container();
-            container.Register<TestSingletonClass>(Lifecycle.Singleton);
-            container.Register<TestTransientClass>(Lifecycle.Transient);
+            container.Register<TestSingletonClass>(ServiceLifetime.Singleton);
+            container.Register<TestTransientClass>(ServiceLifetime.Transient);
 
 			try
 			{
@@ -18,7 +19,7 @@ namespace NanoIoC.Tests
 			}
 			catch(ContainerException e)
 			{
-				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.MixedLifecycles+TestTransientClass, NanoIoC.Tests`. It's lifecycle (Transient) is shorter than the dependee's `NanoIoC.Tests.MixedLifecycles+TestSingletonClass, NanoIoC.Tests` (Singleton)\nBuild Stack:\nNanoIoC.Tests.MixedLifecycles+TestSingletonClass", e.Message);
+				Assert.AreEqual("Cannot create dependency `NanoIoC.Tests.MixedServiceLifetimes+TestTransientClass, NanoIoC.Tests`. It's serviceLifetime (Transient) is shorter than the dependee's `NanoIoC.Tests.MixedServiceLifetimes+TestSingletonClass, NanoIoC.Tests` (Singleton)\nBuild Stack:\nNanoIoC.Tests.MixedServiceLifetimes+TestSingletonClass", e.Message);
 			}
         }
 

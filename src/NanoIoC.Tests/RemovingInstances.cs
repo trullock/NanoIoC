@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -12,7 +13,7 @@ namespace NanoIoC.Tests
 		{
 			var container = new Container();
 			container.Inject<TestInterface>(new TestClass());
-			container.RemoveInstancesOf<TestInterface>(Lifecycle.Singleton);
+			container.RemoveInstancesOf<TestInterface>(ServiceLifetime.Singleton);
 
 			Assert.IsFalse(container.HasRegistrationFor<TestInterface>());
 		}
@@ -24,18 +25,18 @@ namespace NanoIoC.Tests
 			var instance2 = new TestClass();
 
 			var container = new Container();
-			container.Inject<TestInterface>(instance1, Lifecycle.ExecutionContextLocal);
+			container.Inject<TestInterface>(instance1, ServiceLifetime.Scoped);
 
 			TestInterface[] thread2ResolvedTestClasses = null;
 			bool thread2HasRegistration = true;
 			ExecutionContext.SuppressFlow();
 			var thread2 = new Thread(() =>
 			{
-				container.Inject<TestInterface>(instance2, Lifecycle.ExecutionContextLocal);
+				container.Inject<TestInterface>(instance2, ServiceLifetime.Scoped);
 
 				thread2ResolvedTestClasses = container.ResolveAll<TestInterface>().ToArray();
 
-				container.RemoveInstancesOf<TestInterface>(Lifecycle.ExecutionContextLocal);
+				container.RemoveInstancesOf<TestInterface>(ServiceLifetime.Scoped);
 
 				thread2HasRegistration = container.HasRegistrationFor<TestInterface>();
 			});

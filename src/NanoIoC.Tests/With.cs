@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -33,7 +34,7 @@ namespace NanoIoC.Tests
 		public void ShouldResolveHybridReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.ExecutionContextLocal);
+			container.Register<InterfaceA, ClassA1>(ServiceLifetime.Scoped);
 
 			var x = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceA>();
 
@@ -43,8 +44,8 @@ namespace NanoIoC.Tests
 		public void ShouldResolveDependantReplacement()
 		{
 			var container = new Container();
-			container.Register<InterfaceA, ClassA1>(Lifecycle.ExecutionContextLocal);
-			container.Register<InterfaceB, ClassB>(Lifecycle.ExecutionContextLocal);
+			container.Register<InterfaceA, ClassA1>(ServiceLifetime.Scoped);
+			container.Register<InterfaceB, ClassB>(ServiceLifetime.Scoped);
 
 			var b = container.With<InterfaceA>(new ClassA2()).Resolve<InterfaceB>();
 

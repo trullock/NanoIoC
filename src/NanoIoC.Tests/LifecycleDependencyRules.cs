@@ -1,21 +1,22 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
-	public class LifecycleDependencyRules
+	public class ServiceLifetimeDependencyRules
 	{
-		private static Lifecycle[][] InvalidCombinations()
+		private static ServiceLifetime[][] InvalidCombinations()
 		{
 			return new[]
 			{
-				new[] {Lifecycle.Singleton, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Singleton, Lifecycle.Transient},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Transient}
+				new[] {ServiceLifetime.Singleton, ServiceLifetime.Scoped},
+				new[] {ServiceLifetime.Singleton, ServiceLifetime.Transient},
+				new[] {ServiceLifetime.Scoped, ServiceLifetime.Transient}
 			};
 		}
 
 		[TestCaseSource(nameof(InvalidCombinations))]
-		public void CannotDependOnAnInstanceWithShorterLifecycle(Lifecycle dependant, Lifecycle dependency)
+		public void CannotDependOnAnInstanceWithShorterServiceLifetime(ServiceLifetime dependant, ServiceLifetime dependency)
 		{
 			var container = new Container();
 			container.Register<Dependant>(dependant);
@@ -23,24 +24,24 @@ namespace NanoIoC.Tests
 
 			Assert.That(() => container.Resolve<Dependant>(),
 				Throws.InstanceOf<ContainerException>()
-					.With.Message.StringMatching("It's lifecycle \\(.*\\) is shorter than the dependee's"));
+					.With.Message.StringMatching("It's serviceLifetime \\(.*\\) is shorter than the dependee's"));
 		}
 
-		private static Lifecycle[][] ValidCombinations()
+		private static ServiceLifetime[][] ValidCombinations()
 		{
 			return new[]
 			{
-				new[] {Lifecycle.Singleton, Lifecycle.Singleton},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.Singleton},
-				new[] {Lifecycle.ExecutionContextLocal, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Transient, Lifecycle.Singleton},
-				new[] {Lifecycle.Transient, Lifecycle.ExecutionContextLocal},
-				new[] {Lifecycle.Transient, Lifecycle.Transient}
+				new[] {ServiceLifetime.Singleton, ServiceLifetime.Singleton},
+				new[] {ServiceLifetime.Scoped, ServiceLifetime.Singleton},
+				new[] {ServiceLifetime.Scoped, ServiceLifetime.Scoped},
+				new[] {ServiceLifetime.Transient, ServiceLifetime.Singleton},
+				new[] {ServiceLifetime.Transient, ServiceLifetime.Scoped},
+				new[] {ServiceLifetime.Transient, ServiceLifetime.Transient}
 			};
 		}
 
 		[TestCaseSource(nameof(ValidCombinations))]
-		public void CanDependOnAnInstanceWithLongerOrSameLifecycle(Lifecycle dependant, Lifecycle dependency)
+		public void CanDependOnAnInstanceWithLongerOrSameServiceLifetime(ServiceLifetime dependant, ServiceLifetime dependency)
 		{
 			var container = new Container();
 			container.Register<Dependant>(dependant);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -56,11 +57,11 @@ namespace NanoIoC.Tests
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.ExecutionContextLocal);
+			container.Inject(class1, ServiceLifetime.Scoped);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
+			container.RemoveAllInstancesWithServiceLifetime(ServiceLifetime.Scoped);
 
-			container.Inject(class2, Lifecycle.ExecutionContextLocal);
+			container.Inject(class2, ServiceLifetime.Scoped);
 
 			var classA1 = container.Resolve<ClassA1>();
 			Assert.AreSame(class2, classA1);
@@ -73,11 +74,11 @@ namespace NanoIoC.Tests
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			container.Inject(class1, Lifecycle.ExecutionContextLocal);
+			container.Inject(class1, ServiceLifetime.Scoped);
 
-			container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
+			container.RemoveAllInstancesWithServiceLifetime(ServiceLifetime.Scoped);
 
-			container.Inject(class2, Lifecycle.ExecutionContextLocal);
+			container.Inject(class2, ServiceLifetime.Scoped);
 
 			var classA1 = container.Resolve<ClassA1>();
 			Assert.AreSame(class2, classA1);

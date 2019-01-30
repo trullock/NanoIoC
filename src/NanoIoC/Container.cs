@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
 	public sealed partial class Container : MarshalByRefObject, IContainer
 	{
 		readonly IInstanceStore singletonInstanceStore;
-		readonly IInstanceStore executionContextLocalStore;
+		readonly IInstanceStore scopedStore;
 		readonly IInstanceStore transientInstanceStore;
 
 		internal static IEnumerable<IContainerRegistry> Registries;
@@ -69,7 +70,7 @@ namespace NanoIoC
 		public Container()
 		{
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.executionContextLocalStore = new ExecutionContextLocalInstanceStore();
+			this.scopedStore = new ExecutionContextLocalInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
@@ -79,7 +80,7 @@ namespace NanoIoC
 		internal Container(Container container)
 		{
 			this.singletonInstanceStore = container.singletonInstanceStore.Clone();
-			this.executionContextLocalStore = container.executionContextLocalStore.Clone();
+			this.scopedStore = container.scopedStore.Clone();
 			this.transientInstanceStore = container.transientInstanceStore.Clone();
 
 			// remove old container
@@ -115,7 +116,7 @@ namespace NanoIoC
 
 			if (registrations.Count() > 1)
 			{
-				var enumerableNode = new GraphNode(new Registration(typeof(IEnumerable<>).MakeGenericType(type), null, null, Lifecycle.Transient, InjectionBehaviour.Default));
+				var enumerableNode = new GraphNode(new Registration(typeof(IEnumerable<>).MakeGenericType(type), null, null, ServiceLifetime.Transient, InjectionBehaviour.Default));
 
 				foreach (var reg in registrations)
 				{
@@ -148,7 +149,7 @@ namespace NanoIoC
 				{
 					var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
-					this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle, null, buildStack);
+					this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.ServiceLifetime, null, buildStack);
 
 					for (var i = 0; i < ctor.parameters.Length; i++)
 					{
@@ -197,7 +198,7 @@ namespace NanoIoC
 				throw new ContainerException("Cannot return single instance for type `" + type.GetNameForException() + "`, There are multiple instances stored.", buildStack);
 
 			if (registrations.Count == 1)
-				return this.GetOrCreateInstances(type, registrations[0].Lifecycle, tempInstanceStore, buildStack).First();
+				return this.GetOrCreateInstances(type, registrations[0].ServiceLifetime, tempInstanceStore, buildStack).First();
 
 			var typesToCreate = this.GetRegistrationsForTypesToCreate(type, buildStack);
 			return this.CreateInstance(typesToCreate.First(), tempInstanceStore, buildStack);
@@ -220,7 +221,7 @@ namespace NanoIoC
 				                  {
 					                  var parameterInfos = ctor.parameters.Select(p => p.ParameterType);
 
-					                  this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.Lifecycle, tempInstanceStore, buildStack);
+					                  this.CheckDependencies(registration.ConcreteType, parameterInfos, registration.ServiceLifetime, tempInstanceStore, buildStack);
 
 					                  var parameters = new object[ctor.parameters.Length];
 					                  for (var i = 0; i < ctor.parameters.Length; i++)
@@ -254,24 +255,24 @@ namespace NanoIoC
 		}
 
 		/// <summary>
-		/// Trys to get an instance from the registered lifecycle store, creating it if it dosent exist
+		/// Trys to get an instance from the registered serviceLifetime store, creating it if it dosent exist
 		/// </summary>
 		/// <param name="type"></param>
-		/// <param name="lifecycle"></param>
+		/// <param name="serviceLifetime"></param>
 		/// <param name="tempInstanceStore"></param>
 		/// <param name="buildStack"></param>
 		/// <returns></returns>
-		IEnumerable GetOrCreateInstances(Type type, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
+		IEnumerable GetOrCreateInstances(Type type, ServiceLifetime serviceLifetime, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
-			switch (lifecycle)
+			switch (serviceLifetime)
 			{
-				case Lifecycle.Singleton:
+				case ServiceLifetime.Singleton:
 					lock (this.singletonInstanceStore.Mutex)
 						return this.GetOrCreateInstances(type, this.singletonInstanceStore, tempInstanceStore, buildStack);
 
-				case Lifecycle.ExecutionContextLocal:
-					lock (this.executionContextLocalStore.Mutex)
-						return this.GetOrCreateInstances(type, this.executionContextLocalStore, tempInstanceStore, buildStack);
+				case ServiceLifetime.Scoped:
+					lock (this.scopedStore.Mutex)
+						return this.GetOrCreateInstances(type, this.scopedStore, tempInstanceStore, buildStack);
 
 				default:
 					var typesToCreate = this.GetRegistrationsForTypesToCreate(type, buildStack);
@@ -336,9 +337,9 @@ namespace NanoIoC
 					return true;
 			}
 
-			lock (this.executionContextLocalStore.Mutex)
+			lock (this.scopedStore.Mutex)
 			{
-				return this.executionContextLocalStore.ContainsRegistrationsFor(type);
+				return this.scopedStore.ContainsRegistrationsFor(type);
 			}
 		}
 
@@ -371,8 +372,8 @@ namespace NanoIoC
 			lock (this.singletonInstanceStore.Mutex)
 				registrations.AddRange(this.singletonInstanceStore.GetRegistrationsFor(type));
 
-			lock (this.executionContextLocalStore.Mutex)
-				registrations.AddRange(this.executionContextLocalStore.GetRegistrationsFor(type));
+			lock (this.scopedStore.Mutex)
+				registrations.AddRange(this.scopedStore.GetRegistrationsFor(type));
 
 			if (registrations.Any(r => r.InjectionBehaviour == InjectionBehaviour.Override))
 				return registrations.Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
@@ -380,7 +381,7 @@ namespace NanoIoC
 			return registrations;
 		}
 
-		public void Register(Type abstractType, Type concreteType, Lifecycle lifecycle = Lifecycle.Singleton)
+		public void Register(Type abstractType, Type concreteType, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
 		{
 			if (abstractType == null)
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
@@ -393,25 +394,25 @@ namespace NanoIoC
 			if (concreteType.IsInterface || concreteType.IsAbstract)
 				throw new ContainerException("Concrete type `" + concreteType.GetNameForException() + "` is not a concrete type");
 
-			var store = this.GetStore(lifecycle);
+			var store = this.GetStore(serviceLifetime);
 
 			lock (store.Mutex)
-				store.AddRegistration(new Registration(abstractType, concreteType, null, lifecycle, InjectionBehaviour.Default));
+				store.AddRegistration(new Registration(abstractType, concreteType, null, serviceLifetime, InjectionBehaviour.Default));
 		}
 
-		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, Lifecycle lifecycle)
+		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime serviceLifetime)
 		{
 			if (abstractType == null)
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
 
-			var store = this.GetStore(lifecycle);
+			var store = this.GetStore(serviceLifetime);
 			lock (store.Mutex)
-				store.AddRegistration(new Registration(abstractType, null, ctor, lifecycle, InjectionBehaviour.Default));
+				store.AddRegistration(new Registration(abstractType, null, ctor, serviceLifetime, InjectionBehaviour.Default));
 		}
 
-		public void Inject(object instance, Type type, Lifecycle lifeCycle, InjectionBehaviour injectionBehaviour)
+		public void Inject(object instance, Type type, ServiceLifetime lifeCycle, InjectionBehaviour injectionBehaviour)
 		{
-			if (lifeCycle == Lifecycle.Transient)
+			if (lifeCycle == ServiceLifetime.Transient)
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 
 			var store = this.GetStore(lifeCycle);
@@ -435,21 +436,21 @@ namespace NanoIoC
 					var genericArguments = requestedType.GetGenericArguments();
 					registrations = this.GetRegistrationsFor(genericTypeDefinition);
 
-					return registrations.Select(r => new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.Lifecycle, InjectionBehaviour.Default));
+					return registrations.Select(r => new Registration(requestedType, r.ConcreteType.MakeGenericType(genericArguments), null, r.ServiceLifetime, InjectionBehaviour.Default));
 				}
 			}
 
 			if (!requestedType.IsAbstract && !requestedType.IsInterface)
-				return new[] {new Registration(requestedType, requestedType, null, Lifecycle.Transient, InjectionBehaviour.Default)};
+				return new[] {new Registration(requestedType, requestedType, null, ServiceLifetime.Transient, InjectionBehaviour.Default)};
 
 			throw new ContainerException("Cannot resolve `" + requestedType + "`, it is not constructable and has no associated registration.", buildStack);
 		}
 
-		void CheckDependencies(Type dependeeType, IEnumerable<Type> parameters, Lifecycle lifecycle, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
+		void CheckDependencies(Type dependeeType, IEnumerable<Type> parameters, ServiceLifetime serviceLifetime, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
 			parameters.All(p =>
 			{
-				if (this.CanCreateDependency(dependeeType, p, lifecycle, tempInstanceStore, false, buildStack))
+				if (this.CanCreateDependency(dependeeType, p, serviceLifetime, tempInstanceStore, false, buildStack))
 					return true;
 
 				if (p.IsGenericType && p.GetGenericTypeDefinition() == typeof (IEnumerable<>))
@@ -462,7 +463,7 @@ namespace NanoIoC
 			});
 		}
 
-		bool CanCreateDependency(Type dependeeType, Type requestedType, Lifecycle lifecycle, IInstanceStore tempInstanceStore, bool allowMultiple, Stack<Type> buildStack)
+		bool CanCreateDependency(Type dependeeType, Type requestedType, ServiceLifetime serviceLifetime, IInstanceStore tempInstanceStore, bool allowMultiple, Stack<Type> buildStack)
 		{
 			var registrations = this.GetRegistrationsFor(requestedType, tempInstanceStore).ToList();
 			if (registrations.Any())
@@ -470,8 +471,8 @@ namespace NanoIoC
 				if (!allowMultiple && registrations.Count > 1)
 					throw new ContainerException("Cannot create dependency `" + requestedType.GetNameForException() + "`, there are multiple concrete types registered for it.", buildStack);
 
-				if (registrations[0].Lifecycle < lifecycle)
-					throw new ContainerException("Cannot create dependency `" + requestedType.GetNameForException() + "`. It's lifecycle (" + registrations[0].Lifecycle + ") is shorter than the dependee's `" + dependeeType.GetNameForException() + "` (" + lifecycle + ")", buildStack);
+				if (registrations[0].ServiceLifetime.IsShorterThan(serviceLifetime))
+					throw new ContainerException("Cannot create dependency `" + requestedType.GetNameForException() + "`. It's serviceLifetime (" + registrations[0].ServiceLifetime + ") is shorter than the dependee's `" + dependeeType.GetNameForException() + "` (" + serviceLifetime + ")", buildStack);
 
 				return true;
 			}
@@ -493,43 +494,43 @@ namespace NanoIoC
 			lock (this.singletonInstanceStore.Mutex)
 				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances(type);
 
-			lock (this.executionContextLocalStore.Mutex)
-				this.executionContextLocalStore.RemoveAllRegistrationsAndInstances(type);
+			lock (this.scopedStore.Mutex)
+				this.scopedStore.RemoveAllRegistrationsAndInstances(type);
 
 			lock (this.transientInstanceStore.Mutex)
 				this.transientInstanceStore.RemoveAllRegistrationsAndInstances(type);
 		}
 
-		public void RemoveAllInstancesWithLifecycle(Lifecycle lifecycle)
+		public void RemoveAllInstancesWithServiceLifetime(ServiceLifetime serviceLifetime)
 		{
-			switch (lifecycle)
+			switch (serviceLifetime)
 			{
-				case Lifecycle.ExecutionContextLocal:
-					this.executionContextLocalStore.RemoveAllInstances();
+				case ServiceLifetime.Scoped:
+					this.scopedStore.RemoveAllInstances();
 					break;
-				case Lifecycle.Singleton:
+				case ServiceLifetime.Singleton:
 					this.singletonInstanceStore.RemoveAllInstances();
 					this.Inject<IContainer>(this);
 					break;
-				case Lifecycle.Transient:
+				case ServiceLifetime.Transient:
 					throw new ArgumentException("Can't clear transient instances, they're transient!");
 			}
 		}
 
-		public void RemoveInstancesOf(Type type, Lifecycle lifecycle)
+		public void RemoveInstancesOf(Type type, ServiceLifetime serviceLifetime)
 		{
-			if (lifecycle == Lifecycle.Transient)
+			if (serviceLifetime == ServiceLifetime.Transient)
 				throw new ArgumentException("You cannot remove a Transient instance. That doesn't make sense, does it? Think about it...");
 
-			var store = this.GetStore(lifecycle);
+			var store = this.GetStore(serviceLifetime);
 			lock (store.Mutex)
 				store.RemoveInstances(type);
 		}
 
 		public void Reset()
 		{
-			lock(this.executionContextLocalStore.Mutex)
-				this.executionContextLocalStore.RemoveAllRegistrationsAndInstances();
+			lock(this.scopedStore.Mutex)
+				this.scopedStore.RemoveAllRegistrationsAndInstances();
 
 			lock(this.singletonInstanceStore.Mutex)
 				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances();
@@ -553,17 +554,17 @@ namespace NanoIoC
 			var instances = new List<object>();
 
 			var registrations = this.GetRegistrationsFor(abstractType);
-			foreach (var lifecycle in registrations.Select(r => r.Lifecycle).Distinct())
+			foreach (var serviceLifetime in registrations.Select(r => r.ServiceLifetime).Distinct())
 			{
-				switch (lifecycle)
+				switch (serviceLifetime)
 				{
-					case Lifecycle.Singleton:
+					case ServiceLifetime.Singleton:
 						lock (this.singletonInstanceStore.Mutex)
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
 						break;
-					case Lifecycle.ExecutionContextLocal:
-						lock (this.executionContextLocalStore.Mutex)
-							instances.AddRange(this.GetOrCreateInstances(abstractType, this.executionContextLocalStore, null, buildStack).Cast<object>());
+					case ServiceLifetime.Scoped:
+						lock (this.scopedStore.Mutex)
+							instances.AddRange(this.GetOrCreateInstances(abstractType, this.scopedStore, null, buildStack).Cast<object>());
 						break;
 					default:
 						var typesToCreate = this.GetRegistrationsForTypesToCreate(abstractType, buildStack);
@@ -576,17 +577,17 @@ namespace NanoIoC
 		}
 
 
-		IInstanceStore GetStore(Lifecycle lifecycle)
+		IInstanceStore GetStore(ServiceLifetime serviceLifetime)
 		{
-			switch (lifecycle)
+			switch (serviceLifetime)
 			{
-				case Lifecycle.ExecutionContextLocal:
-					return this.executionContextLocalStore;
+				case ServiceLifetime.Scoped:
+					return this.scopedStore;
 
-				case Lifecycle.Singleton:
+				case ServiceLifetime.Singleton:
 					return this.singletonInstanceStore;
 
-				case Lifecycle.Transient:
+				case ServiceLifetime.Transient:
 					return this.transientInstanceStore;
 
 				default:

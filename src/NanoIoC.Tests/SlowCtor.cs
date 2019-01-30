@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -17,7 +18,7 @@ namespace NanoIoC.Tests
 			{
 				Thread.Sleep(1000);
 				return new TestClass();
-			}, Lifecycle.Transient);
+			}, ServiceLifetime.Transient);
 
 			var stopwatch = new Stopwatch();
 			stopwatch.Start();

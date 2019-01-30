@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -14,7 +15,7 @@ namespace NanoIoC.Tests
         public void ShouldConstruct()
         {
             this.container = new Container();
-			this.container.Register<TestInterface, TestClass>(Lifecycle.ExecutionContextLocal);
+			this.container.Register<TestInterface, TestClass>(ServiceLifetime.Scoped);
 
 			for (var i = 0; i < 10; i++)
 				ThreadPool.QueueUserWorkItem(this.Test);
@@ -29,7 +30,7 @@ namespace NanoIoC.Tests
 			try
 			{
 				container.Resolve<TestInterface>();
-				container.RemoveAllInstancesWithLifecycle(Lifecycle.ExecutionContextLocal);
+				container.RemoveAllInstancesWithServiceLifetime(ServiceLifetime.Scoped);
 			}
 			catch(Exception e)
 			{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
@@ -13,7 +14,7 @@ namespace NanoIoC
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
 		readonly AsyncLocal<object> mutex;
 		readonly Guid id = new Guid();
-		protected override Lifecycle Lifecycle => Lifecycle.ExecutionContextLocal;
+		protected override ServiceLifetime ServiceLifetime => ServiceLifetime.Scoped;
 
 		public override object Mutex => this.mutex;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
@@ -11,13 +12,13 @@ namespace NanoIoC.Tests
 		{
 			var container = new Container();
 
-			container.Register<TestInterface, TestClass1>(Lifecycle.Transient);
+			container.Register<TestInterface, TestClass1>(ServiceLifetime.Transient);
 
-			container.Register<TestInterface, TestClass1>(Lifecycle.ExecutionContextLocal);
-			container.Inject<TestInterface>(new TestClass1(), Lifecycle.ExecutionContextLocal);
+			container.Register<TestInterface, TestClass1>(ServiceLifetime.Scoped);
+			container.Inject<TestInterface>(new TestClass1(), ServiceLifetime.Scoped);
 
-			container.Register<TestInterface, TestClass1>(Lifecycle.Singleton);
-			container.Inject<TestInterface>(new TestClass1(), Lifecycle.Singleton);
+			container.Register<TestInterface, TestClass1>(ServiceLifetime.Singleton);
+			container.Inject<TestInterface>(new TestClass1(), ServiceLifetime.Singleton);
 			try
 			{
 				container.Reset();

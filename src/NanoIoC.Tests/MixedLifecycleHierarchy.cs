@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace NanoIoC.Tests
 {
-	public class MixedLifecycleHierarchy
+	public class MixedServiceLifetimeHierarchy
 	{
 		[Test]
 		public void ShouldNotBlock()
@@ -17,8 +18,8 @@ namespace NanoIoC.Tests
 				Assert.Ignore("Test not currently functional inside AppVeyor");
 
 			var container = new Container();
-			container.Register<IOuter, Outer>(Lifecycle.Transient);
-			container.Register<IInner, Inner>(Lifecycle.ExecutionContextLocal);
+			container.Register<IOuter, Outer>(ServiceLifetime.Transient);
+			container.Register<IInner, Inner>(ServiceLifetime.Scoped);
 			container.Register<IService, Service>();
 
 			var cde = new CountdownEvent(5);
