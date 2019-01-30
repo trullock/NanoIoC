@@ -8,7 +8,7 @@ namespace NanoIoC
 	/// <summary>
 	/// Stores instances in the current ExecutionContext
 	/// </summary>
-	sealed class ExecutionContextLocalInstanceStore : InstanceStore
+	sealed class ScopedInstanceStore : InstanceStore
 	{
 		readonly AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> registrationStore;
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
@@ -18,7 +18,7 @@ namespace NanoIoC
 
 		public override object Mutex => this.mutex;
 
-		public ExecutionContextLocalInstanceStore()
+		public ScopedInstanceStore()
 		{
 			this.registrationStore = new AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>>
 			{
@@ -58,7 +58,7 @@ namespace NanoIoC
 
 		public override IInstanceStore Clone()
 		{
-			var instanceStore = new ExecutionContextLocalInstanceStore();
+			var instanceStore = new ScopedInstanceStore();
 			
 			// todo: replace ILists with new lists, and registrations with new registrations
 			instanceStore.registrationStore.Value = new Dictionary<Type, IList<Tuple<Registration, object>>>(this.Store);

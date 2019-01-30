@@ -70,7 +70,7 @@ namespace NanoIoC
 		public Container()
 		{
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.scopedStore = new ExecutionContextLocalInstanceStore();
+			this.scopedStore = new ScopedInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
@@ -593,6 +593,11 @@ namespace NanoIoC
 				default:
 					return null;
 			}
+		}
+
+		object IServiceProvider.GetService(Type serviceType)
+		{
+			return this.Resolve(serviceType);
 		}
 	}
 }
