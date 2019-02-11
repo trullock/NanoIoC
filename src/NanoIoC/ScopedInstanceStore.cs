@@ -16,7 +16,7 @@ namespace NanoIoC
 		readonly Guid id = new Guid();
 		protected override ServiceLifetime ServiceLifetime => ServiceLifetime.Scoped;
 
-		public override object Mutex => this.mutex;
+		public override object Mutex => this.mutex.Value ?? (this.mutex.Value = new object());
 
 		public ScopedInstanceStore()
 		{
