@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
@@ -15,6 +16,8 @@ namespace NanoIoC
 
 		internal static IEnumerable<IContainerRegistry> Registries;
 		internal static IEnumerable<ITypeProcessor> TypeProcessors;
+
+		public Func<IDictionary> HttpContextItemsGetter { get; set;  }
 
 		/// <summary>
 		/// Global container instance
@@ -69,8 +72,9 @@ namespace NanoIoC
 
 		public Container()
 		{
+			this.HttpContextItemsGetter = () => null;
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.scopedStore = new ScopedInstanceStore();
+			this.scopedStore = new HttpContextOrExecutionContextLocalInstanceStore(this);
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);

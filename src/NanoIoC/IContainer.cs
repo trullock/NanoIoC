@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ namespace NanoIoC
 		/// <param name="type"></param>
 		/// <returns></returns>
         IEnumerable<Registration> GetRegistrationsFor(Type type);
+
+		Func<IDictionary> HttpContextItemsGetter { get; set; }
 
 		/// <summary>
 		/// Registers the given concrete type against the given abstract type with the given serviceLifetime
