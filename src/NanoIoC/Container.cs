@@ -12,6 +12,7 @@ namespace NanoIoC
 		readonly IInstanceStore singletonInstanceStore;
 		readonly IInstanceStore scopedStore;
 		readonly IInstanceStore transientInstanceStore;
+		readonly object mutex;
 
 		internal static IEnumerable<IContainerRegistry> Registries;
 		internal static IEnumerable<ITypeProcessor> TypeProcessors;
@@ -71,6 +72,8 @@ namespace NanoIoC
 
 		public Container()
 		{
+			this.mutex = new object();
+
 			this.HttpContextItemsGetter = () => null;
 			this.singletonInstanceStore = new SingletonInstanceStore();
 			this.scopedStore = new HttpContextOrExecutionContextLocalInstanceStore(this);
@@ -82,6 +85,7 @@ namespace NanoIoC
 
 		internal Container(Container container)
 		{
+			this.mutex = new object();
 			this.singletonInstanceStore = container.singletonInstanceStore.Clone();
 			this.scopedStore = container.scopedStore.Clone();
 			this.transientInstanceStore = container.transientInstanceStore.Clone();
@@ -270,11 +274,11 @@ namespace NanoIoC
 			switch (serviceLifetime)
 			{
 				case ServiceLifetime.Singleton:
-					lock (this.singletonInstanceStore.Mutex)
+					lock (this.mutex)
 						return this.GetOrCreateInstances(type, this.singletonInstanceStore, tempInstanceStore, buildStack);
 
 				case ServiceLifetime.Scoped:
-					lock (this.scopedStore.Mutex)
+					lock (this.mutex)
 						return this.GetOrCreateInstances(type, this.scopedStore, tempInstanceStore, buildStack);
 
 				default:
@@ -328,19 +332,19 @@ namespace NanoIoC
 			if(type == null)
 				throw new ArgumentNullException(nameof(type), "Type cannot be null");
 
-			lock (this.transientInstanceStore.Mutex)
+			lock (this.mutex)
 			{
 				if (this.transientInstanceStore.ContainsRegistrationsFor(type))
 					return true;
 			}
 
-			lock (this.singletonInstanceStore.Mutex)
+			lock (this.mutex)
 			{
 				if (this.singletonInstanceStore.ContainsRegistrationsFor(type))
 					return true;
 			}
 
-			lock (this.scopedStore.Mutex)
+			lock (this.mutex)
 			{
 				return this.scopedStore.ContainsRegistrationsFor(type);
 			}
@@ -361,7 +365,7 @@ namespace NanoIoC
 			// use temp instance store first
 			if (tempInstanceStore != null)
 			{
-				lock (tempInstanceStore.Mutex)
+				lock (tempInstanceStore)
 				{
 					if (tempInstanceStore.ContainsRegistrationsFor(type))
 						registrations.AddRange(tempInstanceStore.GetRegistrationsFor(type));
@@ -369,13 +373,13 @@ namespace NanoIoC
 			}
 
 			// TODO: send to bottom?
-			lock (this.transientInstanceStore.Mutex)
+			lock (this.mutex)
 				registrations.AddRange(this.transientInstanceStore.GetRegistrationsFor(type));
 
-			lock (this.singletonInstanceStore.Mutex)
+			lock (this.mutex)
 				registrations.AddRange(this.singletonInstanceStore.GetRegistrationsFor(type));
 
-			lock (this.scopedStore.Mutex)
+			lock (this.mutex)
 				registrations.AddRange(this.scopedStore.GetRegistrationsFor(type));
 
 			if (registrations.Any(r => r.InjectionBehaviour == InjectionBehaviour.Override))
@@ -399,7 +403,7 @@ namespace NanoIoC
 
 			var store = this.GetStore(serviceLifetime);
 
-			lock (store.Mutex)
+			lock (this.mutex)
 				store.AddRegistration(new Registration(abstractType, concreteType, null, serviceLifetime, InjectionBehaviour.Default));
 		}
 
@@ -409,7 +413,7 @@ namespace NanoIoC
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
 
 			var store = this.GetStore(serviceLifetime);
-			lock (store.Mutex)
+			lock (this.mutex)
 				store.AddRegistration(new Registration(abstractType, null, ctor, serviceLifetime, InjectionBehaviour.Default));
 		}
 
@@ -419,7 +423,7 @@ namespace NanoIoC
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 
 			var store = this.GetStore(lifeCycle);
-			lock (store.Mutex)
+			lock (this.mutex)
 				store.Inject(type, instance, injectionBehaviour);
 		}
 
@@ -494,13 +498,13 @@ namespace NanoIoC
 			if (type == null)
 				throw new ArgumentNullException(nameof(type), "Type cannot be null");
 
-			lock (this.singletonInstanceStore.Mutex)
+			lock (this.mutex)
 				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances(type);
 
-			lock (this.scopedStore.Mutex)
+			lock (this.mutex)
 				this.scopedStore.RemoveAllRegistrationsAndInstances(type);
 
-			lock (this.transientInstanceStore.Mutex)
+			lock (this.mutex)
 				this.transientInstanceStore.RemoveAllRegistrationsAndInstances(type);
 		}
 
@@ -526,19 +530,19 @@ namespace NanoIoC
 				throw new ArgumentException("You cannot remove a Transient instance. That doesn't make sense, does it? Think about it...");
 
 			var store = this.GetStore(serviceLifetime);
-			lock (store.Mutex)
+			lock (this.mutex)
 				store.RemoveInstances(type);
 		}
 
 		public void Reset()
 		{
-			lock(this.scopedStore.Mutex)
+			lock(this.mutex)
 				this.scopedStore.RemoveAllRegistrationsAndInstances();
 
-			lock(this.singletonInstanceStore.Mutex)
+			lock(this.mutex)
 				this.singletonInstanceStore.RemoveAllRegistrationsAndInstances();
 
-			lock(this.transientInstanceStore.Mutex)
+			lock(this.mutex)
 				this.transientInstanceStore.RemoveAllRegistrationsAndInstances();
 
 			this.Inject<IContainer>(this);
@@ -562,11 +566,11 @@ namespace NanoIoC
 				switch (serviceLifetime)
 				{
 					case ServiceLifetime.Singleton:
-						lock (this.singletonInstanceStore.Mutex)
+						lock (this.mutex)
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.singletonInstanceStore, null, buildStack).Cast<object>());
 						break;
 					case ServiceLifetime.Scoped:
-						lock (this.scopedStore.Mutex)
+						lock (this.mutex)
 							instances.AddRange(this.GetOrCreateInstances(abstractType, this.scopedStore, null, buildStack).Cast<object>());
 						break;
 					default:

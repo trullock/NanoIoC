@@ -60,13 +60,7 @@ namespace NanoIoC
 		/// </summary>
 		/// <param name="type"></param>
 		void RemoveInstances(Type type);
-
-		/// <summary>
-		/// Return a lockable object to prevent concurrent instance construction
-		/// </summary>
-		/// <returns></returns>
-		object Mutex { get; }
-
+		
 		/// <summary>
 		/// Clones the instance store
 		/// </summary>
