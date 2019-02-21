@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NanoIoC
 {
-	internal static class Extensions
+	static class Extensions
 	{
 		public static IEnumerable Cast(this IEnumerable self, Type innerType)
 		{
@@ -89,11 +89,11 @@ namespace NanoIoC
 			if(other.IsInterface)
 			{
 				if(!other.IsGenericType)
-					throw new ArgumentException("Must be open generic", "other");
+					throw new ArgumentException("Must be open generic", nameof(other));
 
 				var genericDefinition = other.GetGenericTypeDefinition();
 				if(genericDefinition != other)
-					throw new ArgumentException("Must be open generic", "other");
+					throw new ArgumentException("Must be open generic", nameof(other));
 
 				var interfaces = self.GetInterfaces();
 				foreach(var @interface in interfaces)
@@ -104,7 +104,7 @@ namespace NanoIoC
 			}
 
 			if(arguments.Count == 0)
-				throw new ArgumentException("Current type does not close other type", "other");
+				throw new ArgumentException("Current type does not close other type", nameof(other));
 
 			return arguments;
 		}

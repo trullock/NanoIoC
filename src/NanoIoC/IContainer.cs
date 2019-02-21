@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
-    public interface IContainer : IResolverContainer, IServiceProvider
+    public interface IContainer : IResolverContainer
     {
 		/// <summary>
 		/// Gets the registered concrete types for the requested type

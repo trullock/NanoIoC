@@ -12,11 +12,8 @@ namespace NanoIoC
 	{
 		readonly AsyncLocal<IDictionary<Type, IList<Tuple<Registration, object>>>> registrationStore;
 		readonly AsyncLocal<IDictionary<Type, IList<Registration>>> injectedRegistrations;
-		readonly AsyncLocal<object> mutex;
-		readonly Guid id = new Guid();
 		protected override ServiceLifetime ServiceLifetime => ServiceLifetime.Scoped;
-
-		public override object Mutex => this.mutex.Value ?? (this.mutex.Value = new object());
+		
 
 		public ScopedInstanceStore()
 		{
@@ -27,10 +24,6 @@ namespace NanoIoC
 			this.injectedRegistrations = new AsyncLocal<IDictionary<Type, IList<Registration>>>
 			{
 				Value = new Dictionary<Type, IList<Registration>>()
-			};
-			this.mutex = new AsyncLocal<object>
-			{
-				Value = new object()
 			};
 		}
 

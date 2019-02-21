@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace NanoIoC
 {
-	public interface IResolverContainer
+	public interface IResolverContainer : IServiceProvider
 	{
 		/// <summary>
 		/// Resolve an instance of the requested type
