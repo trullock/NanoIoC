@@ -76,7 +76,7 @@ namespace NanoIoC
 
 			this.HttpContextItemsGetter = () => null;
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.scopedStore = new HttpContextOrExecutionContextLocalInstanceStore(this);
+			this.scopedStore = new ScopedInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
