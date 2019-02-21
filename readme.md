@@ -93,8 +93,8 @@ sealed class MyClass
 You can inject existing instances:
 
 ```
-void IContainer.Inject<T>(T instance, ServiceLifetime lifeCycle = ServiceLifetime.Singleton);
-void IContainer.Inject(object instance, Type type, ServiceLifetime serviceLifetime);
+void IContainer.Inject<T>(T instance, ServiceLifetime lifetime = ServiceLifetime.Singleton);
+void IContainer.Inject(object instance, Type type, ServiceLifetime lifetime);
 ```
 
 ### Analysis and Debug

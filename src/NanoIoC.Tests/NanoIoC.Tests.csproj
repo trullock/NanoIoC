@@ -46,6 +46,7 @@
     <Compile Include="LifecycleDependencyRules.cs" />
     <Compile Include="MixedLifecycleHierarchy.cs" />
     <Compile Include="AsyncLocalBehaviour.cs" />
+    <Compile Include="SpeedTest_ScopedResolution.cs" />
     <Compile Include="SpeedTest.cs" />
     <Compile Include="MultiThreadingWithMixedServiceLifetimes.cs" />
     <Compile Include="SelfResolution.cs" />

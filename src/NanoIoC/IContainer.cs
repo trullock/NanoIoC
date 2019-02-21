@@ -21,19 +21,19 @@ namespace NanoIoC
 		/// </summary>
 		/// <param name="abstractType"></param>
 		/// <param name="concreteType"></param>
-		/// <param name="serviceLifetime"></param>
-        void Register(Type abstractType, Type concreteType, ServiceLifetime serviceLifetime);
+		/// <param name="lifetime"></param>
+        void Register(Type abstractType, Type concreteType, ServiceLifetime lifetime);
 
-		void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime serviceLifetime);
+		void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime lifetime);
 
 	    /// <summary>
 	    /// Injects the given instance as the given type with the given serviceLifetime
 	    /// </summary>
 	    /// <param name="instance"></param>
 	    /// <param name="type"></param>
-	    /// <param name="serviceLifetime">Must not be Transient</param>
+	    /// <param name="lifetime">Must not be Transient</param>
 	    /// <param name="injectionBehaviour"></param>
-	    void Inject(object instance, Type type, ServiceLifetime serviceLifetime, InjectionBehaviour injectionBehaviour);
+	    void Inject(object instance, Type type, ServiceLifetime lifetime, InjectionBehaviour injectionBehaviour);
 
 		void RemoveAllRegistrationsAndInstancesOf(Type type);
 

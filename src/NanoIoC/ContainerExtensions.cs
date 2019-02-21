@@ -14,10 +14,10 @@ namespace NanoIoC
 		/// </summary>
 		/// <typeparam name="TConcrete">The concrete type to register</typeparam>
 		/// <param name="container"></param>
-		/// <param name="serviceLifetime">The serviceLifetime of the instance</param>
-		public static void Register<TConcrete>(this IContainer container, ServiceLifetime serviceLifetime)
+		/// <param name="lifetime">The serviceLifetime of the instance</param>
+		public static void Register<TConcrete>(this IContainer container, ServiceLifetime lifetime)
 		{
-			container.Register(typeof(TConcrete), typeof(TConcrete), serviceLifetime);
+			container.Register(typeof(TConcrete), typeof(TConcrete), lifetime);
 		}
 
 		/// <summary>
@@ -26,15 +26,15 @@ namespace NanoIoC
 		/// <typeparam name="TAbstract">The abstract type you want to resolve later</typeparam>
 		/// <typeparam name="TConcrete">The concrete type implementing the abstract type</typeparam>
 		/// <param name="container"></param>
-		/// <param name="serviceLifetime"></param>
-		public static void Register<TAbstract, TConcrete>(this IContainer container, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton) where TConcrete : TAbstract
+		/// <param name="lifetime"></param>
+		public static void Register<TAbstract, TConcrete>(this IContainer container, ServiceLifetime lifetime = ServiceLifetime.Singleton) where TConcrete : TAbstract
 		{
-			container.Register(typeof(TAbstract), typeof(TConcrete), serviceLifetime);
+			container.Register(typeof(TAbstract), typeof(TConcrete), lifetime);
 		}
 
-		public static void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+		public static void Register<TAbstract>(this IContainer container, Func<IResolverContainer, TAbstract> ctor, ServiceLifetime lifetime = ServiceLifetime.Singleton)
 		{
-			container.Register(typeof(TAbstract), c => ctor(c), serviceLifetime);
+			container.Register(typeof(TAbstract), c => ctor(c), lifetime);
 		}
 		
 		/// <summary>
@@ -70,11 +70,11 @@ namespace NanoIoC
 		/// <typeparam name="T"></typeparam>
 		/// <param name="container"></param>
 		/// <param name="instance"></param>
-		/// <param name="lifeCycle"></param>
+		/// <param name="lifetime"></param>
 		/// <param name="injectionBehaviour"></param>
-		public static void Inject<T>(this IContainer container, T instance, ServiceLifetime lifeCycle = ServiceLifetime.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
+		public static void Inject<T>(this IContainer container, T instance, ServiceLifetime lifetime = ServiceLifetime.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
 		{
-			container.Inject(instance, typeof(T), lifeCycle, injectionBehaviour);
+			container.Inject(instance, typeof(T), lifetime, injectionBehaviour);
 		}
 		
 		/// <summary>
@@ -93,9 +93,9 @@ namespace NanoIoC
 			container.RemoveAllRegistrationsAndInstancesOf(typeof(T));
 		}
 
-		public static void RemoveInstancesOf<T>(this IContainer container, ServiceLifetime serviceLifetime)
+		public static void RemoveInstancesOf<T>(this IContainer container, ServiceLifetime lifetime)
 		{
-			container.RemoveInstancesOf(typeof(T), serviceLifetime);
+			container.RemoveInstancesOf(typeof(T), lifetime);
 		}
 
 		public static bool HasRegistrationFor<T>(this IContainer container)

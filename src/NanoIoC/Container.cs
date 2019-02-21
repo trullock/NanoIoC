@@ -107,11 +107,7 @@ namespace NanoIoC
 			return this.Resolve(type, new TempInstanceStore(dependencies), new Stack<Type>());
 		}
 
-		/// <summary>
-		/// Returns the dependency graph for the given type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
+		/// <inheritdoc />
 		public GraphNode DependencyGraph(Type type)
 		{
 			return this.DependencyGraph_Visit(type, new Stack<Type>());
@@ -179,7 +175,7 @@ namespace NanoIoC
 			}
 		}
 
-		private static IEnumerable<TypeCtor> GetConstructors(Registration registration)
+		static IEnumerable<TypeCtor> GetConstructors(Registration registration)
 		{
 			try
 			{
@@ -372,15 +368,13 @@ namespace NanoIoC
 				}
 			}
 
-			// TODO: send to bottom?
 			lock (this.mutex)
+			{
+				// TODO: send to bottom?
 				registrations.AddRange(this.transientInstanceStore.GetRegistrationsFor(type));
-
-			lock (this.mutex)
 				registrations.AddRange(this.singletonInstanceStore.GetRegistrationsFor(type));
-
-			lock (this.mutex)
 				registrations.AddRange(this.scopedStore.GetRegistrationsFor(type));
+			}
 
 			if (registrations.Any(r => r.InjectionBehaviour == InjectionBehaviour.Override))
 				return registrations.Where(r => r.InjectionBehaviour == InjectionBehaviour.Override).ToArray();
@@ -388,7 +382,7 @@ namespace NanoIoC
 			return registrations;
 		}
 
-		public void Register(Type abstractType, Type concreteType, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+		public void Register(Type abstractType, Type concreteType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
 		{
 			if (abstractType == null)
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
@@ -401,28 +395,28 @@ namespace NanoIoC
 			if (concreteType.IsInterface || concreteType.IsAbstract)
 				throw new ContainerException("Concrete type `" + concreteType.GetNameForException() + "` is not a concrete type");
 
-			var store = this.GetStore(serviceLifetime);
+			var store = this.GetStore(lifetime);
 
 			lock (this.mutex)
-				store.AddRegistration(new Registration(abstractType, concreteType, null, serviceLifetime, InjectionBehaviour.Default));
+				store.AddRegistration(new Registration(abstractType, concreteType, null, lifetime, InjectionBehaviour.Default));
 		}
 
-		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime serviceLifetime)
+		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime lifetime)
 		{
 			if (abstractType == null)
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
 
-			var store = this.GetStore(serviceLifetime);
+			var store = this.GetStore(lifetime);
 			lock (this.mutex)
-				store.AddRegistration(new Registration(abstractType, null, ctor, serviceLifetime, InjectionBehaviour.Default));
+				store.AddRegistration(new Registration(abstractType, null, ctor, lifetime, InjectionBehaviour.Default));
 		}
 
-		public void Inject(object instance, Type type, ServiceLifetime lifeCycle, InjectionBehaviour injectionBehaviour)
+		public void Inject(object instance, Type type, ServiceLifetime lifetime, InjectionBehaviour injectionBehaviour)
 		{
-			if (lifeCycle == ServiceLifetime.Transient)
+			if (lifetime == ServiceLifetime.Transient)
 				throw new ArgumentException("You cannot inject an instance as Transient. That doesn't make sense, does it? Think about it...");
 
-			var store = this.GetStore(lifeCycle);
+			var store = this.GetStore(lifetime);
 			lock (this.mutex)
 				store.Inject(type, instance, injectionBehaviour);
 		}
