@@ -29,6 +29,27 @@ namespace NanoIoC.Tests
         	container.Register<InterfaceA, ClassA1>();
         	container.Register<InterfaceA, ClassA2>();
 
+            var all = container.ResolveAll(typeof(InterfaceA));
+
+			// check casting works
+            foreach (InterfaceA a in all) a.Noop();
+
+            var interfaceAs = new List<InterfaceA>();
+            foreach (var instance in all)
+	            interfaceAs.Add(instance as InterfaceA);
+
+            Assert.AreEqual(2, interfaceAs.Count);
+			Assert.IsInstanceOf<ClassA1>(interfaceAs[0]);
+			Assert.IsInstanceOf<ClassA2>(interfaceAs[1]);
+        }
+
+        [Test]
+        public void ShouldResolveAllStronglyTyped()
+        {
+            var container = new Container();
+        	container.Register<InterfaceA, ClassA1>();
+        	container.Register<InterfaceA, ClassA2>();
+
         	var all = container.ResolveAll<InterfaceA>().ToArray();
 
 			Assert.AreEqual(2, all.Length);
@@ -37,7 +58,7 @@ namespace NanoIoC.Tests
         }
 
 		[Test]
-		public void ShouldNotBuildTwice()
+		public void ShouldNotBuildTwiceStronglyTyped()
 		{
 			var container = new Container();
 			container.Register<InterfaceA, ClassA1>();
@@ -89,15 +110,23 @@ namespace NanoIoC.Tests
 
 		public interface InterfaceA
 		{
-			
+			void Noop();
 		}
 
         public class ClassA1 : InterfaceA
         {
+	        public void Noop()
+	        {
+		        
+	        }
         }
 
 		public class ClassA2 : InterfaceA
 		{
+			public void Noop()
+			{
+				
+			}
 		}
 
 		public class ClassB

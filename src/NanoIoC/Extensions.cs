@@ -10,7 +10,18 @@ namespace NanoIoC
 	{
 		public static IEnumerable Cast(this IEnumerable self, Type innerType)
 		{
-			return typeof (Enumerable).GetMethod("Cast").MakeGenericMethod(innerType).Invoke(null, new [] { self }) as IEnumerable;
+			var castMethod = typeof (Enumerable).GetMethod("Cast").MakeGenericMethod(innerType);
+			var castedEnumerable = castMethod.Invoke(null, new object[] { self });
+			
+			return castedEnumerable as IEnumerable;
+		}
+
+		public static IEnumerable ToArray(this IEnumerable self, Type innerType)
+		{
+			var toArrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(innerType);
+			var arrayedEnumerable = toArrayMethod.Invoke(null, new object[] { self });
+
+			return arrayedEnumerable as IEnumerable;
 		}
 
 		public static object First(this IEnumerable self)

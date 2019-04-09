@@ -573,11 +573,10 @@ namespace NanoIoC
 						break;
 				}
 			}
-
-			return instances.Cast(abstractType);
+			
+			return instances.Cast(abstractType).ToArray(abstractType);
 		}
-
-
+		
 		IInstanceStore GetStore(ServiceLifetime serviceLifetime)
 		{
 			switch (serviceLifetime)
