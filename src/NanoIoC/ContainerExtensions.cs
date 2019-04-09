@@ -85,7 +85,7 @@ namespace NanoIoC
 		/// <returns></returns>
 		public static IEnumerable<T> ResolveAll<T>(this IResolverContainer container)
 		{
-			return container.ResolveAll(typeof (T)).Cast<T>();
+			return container.ResolveAll(typeof (T)).Cast<T>().ToArray();
 		}
 
 		public static void RemoveAllRegistrationsAndInstancesOf<T>(this IContainer container)
