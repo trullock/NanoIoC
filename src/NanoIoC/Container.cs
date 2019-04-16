@@ -16,9 +16,7 @@ namespace NanoIoC
 
 		internal static IEnumerable<IContainerRegistry> Registries;
 		internal static IEnumerable<ITypeProcessor> TypeProcessors;
-
-		public Func<IDictionary> HttpContextItemsGetter { get; set;  }
-
+		
 		/// <summary>
 		/// Global container instance
 		/// </summary>
@@ -73,8 +71,7 @@ namespace NanoIoC
 		public Container()
 		{
 			this.mutex = new object();
-
-			this.HttpContextItemsGetter = () => null;
+			
 			this.singletonInstanceStore = new SingletonInstanceStore();
 			this.scopedStore = new ScopedInstanceStore();
 			this.transientInstanceStore = new TransientInstanceStore();
@@ -111,6 +108,12 @@ namespace NanoIoC
 		public GraphNode DependencyGraph(Type type)
 		{
 			return this.DependencyGraph_Visit(type, new Stack<Type>());
+		}
+
+		/// <inheritdoc />
+		public GraphNode DependencyGraph<T>()
+		{
+			return this.DependencyGraph(typeof(T));
 		}
 
 		GraphNode DependencyGraph_Visit(Type type, Stack<Type> buildStack)
@@ -206,6 +209,20 @@ namespace NanoIoC
 			var typesToCreate = this.GetRegistrationsForTypesToCreate(type, buildStack);
 			return this.CreateInstance(typesToCreate.First(), tempInstanceStore, buildStack);
 		}
+
+
+		/// <inheritdoc />
+		public T Resolve<T>()
+		{
+			return (T)this.Resolve(typeof(T));
+		}
+
+		/// <inheritdoc />
+		public object Resolve<T>(params object[] dependencies)
+		{
+			return this.Resolve(typeof(T), dependencies);
+		}
+
 
 		object CreateInstance(Registration registration, IInstanceStore tempInstanceStore, Stack<Type> buildStack)
 		{
@@ -318,11 +335,8 @@ namespace NanoIoC
 			return instances.Select(i => i.Item2).ToArray();
 		}
 
-		/// <summary>
-		/// Determines if there is a registration for the requested type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
+
+		/// <inheritdoc />
 		public bool HasRegistrationsFor(Type type)
 		{
 			if(type == null)
@@ -346,6 +360,14 @@ namespace NanoIoC
 			}
 		}
 
+		/// <inheritdoc />
+		public bool HasRegistrationFor<T>()
+		{
+			return this.HasRegistrationsFor(typeof(T));
+		}
+
+
+		/// <inheritdoc />
 		public IEnumerable<Registration> GetRegistrationsFor(Type type)
 		{
 			if (type == null)
@@ -382,6 +404,7 @@ namespace NanoIoC
 			return registrations;
 		}
 
+		/// <inheritdoc />
 		public void Register(Type abstractType, Type concreteType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
 		{
 			if (abstractType == null)
@@ -401,6 +424,7 @@ namespace NanoIoC
 				store.AddRegistration(new Registration(abstractType, concreteType, null, lifetime, InjectionBehaviour.Default));
 		}
 
+		/// <inheritdoc />
 		public void Register(Type abstractType, Func<IResolverContainer, object> ctor, ServiceLifetime lifetime)
 		{
 			if (abstractType == null)
@@ -411,6 +435,26 @@ namespace NanoIoC
 				store.AddRegistration(new Registration(abstractType, null, ctor, lifetime, InjectionBehaviour.Default));
 		}
 
+		/// <inheritdoc />
+		public void Register<TConcrete>(ServiceLifetime lifetime)
+		{
+			this.Register(typeof(TConcrete), typeof(TConcrete), lifetime);
+		}
+
+		/// <inheritdoc />
+		public void Register<TAbstract, TConcrete>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TConcrete : TAbstract
+		{
+			this.Register(typeof(TAbstract), typeof(TConcrete), lifetime);
+		}
+
+		/// <inheritdoc />
+		public void Register<TAbstract>(Func<IResolverContainer, TAbstract> ctor, ServiceLifetime lifetime = ServiceLifetime.Singleton)
+		{
+			this.Register(typeof(TAbstract), c => ctor(c), lifetime);
+		}
+
+
+		/// <inheritdoc />
 		public void Inject(object instance, Type type, ServiceLifetime lifetime, InjectionBehaviour injectionBehaviour)
 		{
 			if (lifetime == ServiceLifetime.Transient)
@@ -420,6 +464,13 @@ namespace NanoIoC
 			lock (this.mutex)
 				store.Inject(type, instance, injectionBehaviour);
 		}
+
+		/// <inheritdoc />
+		public void Inject<T>(T instance, ServiceLifetime lifetime = ServiceLifetime.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default)
+		{
+			this.Inject(instance, typeof(T), lifetime, injectionBehaviour);
+		}
+
 
 		IEnumerable<Registration> GetRegistrationsForTypesToCreate(Type requestedType, Stack<Type> buildStack)
 		{
@@ -487,6 +538,8 @@ namespace NanoIoC
 			return false;
 		}
 
+
+		/// <inheritdoc />
 		public void RemoveAllRegistrationsAndInstancesOf(Type type)
 		{
 			if (type == null)
@@ -502,6 +555,14 @@ namespace NanoIoC
 				this.transientInstanceStore.RemoveAllRegistrationsAndInstances(type);
 		}
 
+		/// <inheritdoc />
+		public void RemoveAllRegistrationsAndInstancesOf<T>()
+		{
+			this.RemoveAllRegistrationsAndInstancesOf(typeof(T));
+		}
+
+
+		/// <inheritdoc />
 		public void RemoveAllInstancesWithServiceLifetime(ServiceLifetime serviceLifetime)
 		{
 			switch (serviceLifetime)
@@ -518,6 +579,8 @@ namespace NanoIoC
 			}
 		}
 
+
+		/// <inheritdoc />
 		public void RemoveInstancesOf(Type type, ServiceLifetime serviceLifetime)
 		{
 			if (serviceLifetime == ServiceLifetime.Transient)
@@ -528,6 +591,14 @@ namespace NanoIoC
 				store.RemoveInstances(type);
 		}
 
+		/// <inheritdoc />
+		public void RemoveInstancesOf<T>(ServiceLifetime lifetime)
+		{
+			this.RemoveInstancesOf(typeof(T), lifetime);
+		}
+
+
+		/// <inheritdoc />
 		public void Reset()
 		{
 			lock(this.mutex)
@@ -542,12 +613,20 @@ namespace NanoIoC
 			this.Inject<IContainer>(this);
 		}
 
+
+		/// <inheritdoc />
 		public IEnumerable ResolveAll(Type abstractType)
 		{
 			if (abstractType == null)
 				throw new ArgumentNullException(nameof(abstractType), "AbstractType cannot be null");
 
 			return this.ResolveAll(abstractType, new Stack<Type>());
+		}
+
+		/// <inheritdoc />
+		public IEnumerable<T> ResolveAll<T>()
+		{
+			return this.ResolveAll(typeof(T)).Cast<T>().ToArray();
 		}
 
 		IEnumerable ResolveAll(Type abstractType, Stack<Type> buildStack)

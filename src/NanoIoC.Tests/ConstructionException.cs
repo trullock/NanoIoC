@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace NanoIoC.Tests
 {
 	[TestFixture]
-	public class ConstructionException
+	public class ConstructionExceptions
 	{
 		[Test]
 		public void ShouldUseExistingInstancesForDependencies()
@@ -25,6 +25,25 @@ namespace NanoIoC.Tests
 				Assert.AreEqual(typeof(ClassB), e.BuildStack[1]);
 				Assert.AreEqual(typeof(ClassA), e.BuildStack[0]);
 				Assert.AreEqual(3, e.BuildStack.Length);
+			}
+		}
+
+		[Test]
+		public void ShouldThrowContainerException()
+		{
+			var container = new Container();
+
+			try
+			{
+				container.Resolve<ClassD>();
+			}
+			catch(ContainerException e)
+			{
+				
+			}
+			catch(Exception e)
+			{
+				Assert.Fail("Shouldn't get here");
 			}
 		}
 
@@ -53,6 +72,23 @@ namespace NanoIoC.Tests
 			public ClassC(ClassB dependency)
 			{
 				this.dependency = dependency;
+			}
+		}
+		public class ClassD
+		{
+			readonly ClassE dependency;
+
+			public ClassD(ClassE dependency)
+			{
+				this.dependency = dependency;
+			}
+		}
+
+		public class ClassE
+		{
+			public ClassE()
+			{
+				throw new Exception("Aren't I exceptional?");
 			}
 		}
 	}

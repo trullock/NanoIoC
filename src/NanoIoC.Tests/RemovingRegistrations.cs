@@ -40,11 +40,11 @@ namespace NanoIoC.Tests
 			var class1 = new ClassA1();
 			var class2 = new ClassA1();
 
-			ContainerExtensions.Inject(container, class1);
+			container.Inject(class1);
 
 			container.RemoveAllRegistrationsAndInstancesOf<ClassA1>();
 
-			ContainerExtensions.Inject(container, class2);
+			container.Inject(class2);
 
 			var classA1 = container.Resolve<ClassA1>();
 			Assert.AreSame(class2, classA1);

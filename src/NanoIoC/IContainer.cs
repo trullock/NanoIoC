@@ -44,5 +44,55 @@ namespace NanoIoC
     	void Reset();
 
 	    void RemoveInstancesOf(Type type, ServiceLifetime serviceLifetime);
+	    void Register<TAbstract>(Func<IResolverContainer, TAbstract> ctor, ServiceLifetime lifetime = ServiceLifetime.Singleton);
+
+	    /// <summary>
+	    /// Registers a concrete type for an abstract type
+	    /// </summary>
+	    /// <typeparam name="TAbstract">The abstract type you want to resolve later</typeparam>
+	    /// <typeparam name="TConcrete">The concrete type implementing the abstract type</typeparam>
+	    /// <param name="lifetime"></param>
+	    void Register<TAbstract, TConcrete>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TConcrete : TAbstract;
+
+	    /// <summary>
+	    /// Registers a concrete type with a serviceLifetime.
+	    /// You should only be using this for Singleton or HttpContextOrThreadLocal serviceLifetimes.
+	    /// Registering a concrete type as Transient is pointless, as you get this behaviour by default.
+	    /// </summary>
+	    /// <typeparam name="TConcrete">The concrete type to register</typeparam>
+	    /// <param name="lifetime">The serviceLifetime of the instance</param>
+	    void Register<TConcrete>(ServiceLifetime lifetime);
+
+	    /// <summary>
+	    /// Injects an instance 
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <param name="instance"></param>
+	    /// <param name="lifetime"></param>
+	    /// <param name="injectionBehaviour"></param>
+	    void Inject<T>(T instance, ServiceLifetime lifetime = ServiceLifetime.Singleton, InjectionBehaviour injectionBehaviour = InjectionBehaviour.Default);
+
+	    /// <summary>
+	    /// Resolves all registered instances of T
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <returns></returns>
+	    IEnumerable<T> ResolveAll<T>();
+
+	    /// <summary>
+	    /// Resolves
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <returns></returns>
+	    T Resolve<T>();
+
+	    object Resolve<T>(params object[] dependencies);
+
+	    /// <summary>
+	    /// Returns the dependency graph for the given type
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <returns></returns>
+	    GraphNode DependencyGraph<T>();
     }
 }

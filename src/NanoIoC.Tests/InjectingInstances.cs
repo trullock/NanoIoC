@@ -11,7 +11,7 @@ namespace NanoIoC.Tests
 		public void ShouldWorkForNullInstances()
         {
             var container = new Container();
-            ContainerExtensions.Inject(container, new TestClass());
+            container.Inject(new TestClass());
             container.Inject<TestClass2>(null);
 
             var instance = container.Resolve<TestClass3>();
@@ -22,7 +22,7 @@ namespace NanoIoC.Tests
         {
             var container = new Container();
             var testClass = new TestClass();
-            ContainerExtensions.Inject(container, testClass);
+            container.Inject(testClass);
 
             var instance = container.Resolve<TestClass>();
             Assert.AreSame(testClass, instance);
