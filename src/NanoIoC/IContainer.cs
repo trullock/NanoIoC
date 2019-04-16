@@ -94,5 +94,14 @@ namespace NanoIoC
 	    /// <typeparam name="T"></typeparam>
 	    /// <returns></returns>
 	    GraphNode DependencyGraph<T>();
+
+	    /// <inheritdoc />
+	    void RemoveAllRegistrationsAndInstancesOf<T>();
+
+	    /// <inheritdoc />
+	    void RemoveInstancesOf<T>(ServiceLifetime lifetime);
+
+	    /// <inheritdoc />
+	    bool HasRegistrationFor<T>();
     }
 }
