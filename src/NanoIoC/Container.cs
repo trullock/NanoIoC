@@ -13,9 +13,6 @@ namespace NanoIoC
 		readonly IInstanceStore scopedStore;
 		readonly IInstanceStore transientInstanceStore;
 		readonly object mutex;
-
-		internal static IEnumerable<IContainerRegistry> Registries;
-		internal static IEnumerable<ITypeProcessor> TypeProcessors;
 		
 		/// <summary>
 		/// Global container instance
@@ -26,48 +23,8 @@ namespace NanoIoC
 		static Container()
 		{
 			Global = new Container();
-			FindAllRegistriesAndTypeProcessors();
 		}
-
-		static void FindAllRegistriesAndTypeProcessors()
-		{
-			var registries = new List<IContainerRegistry>();
-			var typeProcessors = new List<ITypeProcessor>();
-
-			var assemblies = Assemblies.AllFromApplicationBaseDirectory(a => !a.FullName.StartsWith("System"));
-			foreach (var assembly in assemblies)
-			{
-				Type[] types;
-
-				try
-				{
-					types = assembly.GetTypes();
-				}
-				catch (TypeInitializationException e)
-				{
-					if (e.InnerException is ReflectionTypeLoadException inner)
-						throw new ContainerException(inner.LoaderExceptions, e);
-					throw;
-				}
-				catch (ReflectionTypeLoadException e)
-				{
-					throw new ContainerException(e.LoaderExceptions, e);
-				}
-
-				foreach (var type in types)
-				{
-					if (typeof (IContainerRegistry).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
-						registries.Add(Activator.CreateInstance(type) as IContainerRegistry);
-
-					if (typeof (ITypeProcessor).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && !type.ContainsGenericParameters)
-						typeProcessors.Add(Activator.CreateInstance(type) as ITypeProcessor);
-				}
-			}
-
-			TypeProcessors = typeProcessors;
-			Registries = registries;
-		}
-
+		
 		public Container()
 		{
 			this.mutex = new object();
