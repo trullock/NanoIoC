@@ -1,10 +1,14 @@
 using System;
+using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
     public interface IContainer : IResolverContainer
     {
+		// Temporary hack until we implement IServiceProvider properly
+		Func<IDictionary> HttpContextItemsGetter { get; set; }
+
 		/// <summary>
 		/// Registers the given concrete type against the given abstract type with the given serviceLifetime
 		/// </summary>

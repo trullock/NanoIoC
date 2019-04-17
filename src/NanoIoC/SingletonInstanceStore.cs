@@ -14,13 +14,14 @@ namespace NanoIoC
 
 		protected override IDictionary<Type, IList<Tuple<Registration, object>>> Store => this.store;
 		protected override IDictionary<Type, IList<Registration>> InjectedRegistrations => this.injectedRegistrations;
-
 		protected override ServiceLifetime ServiceLifetime => ServiceLifetime.Singleton;
+		public override object Mutex { get; }
 
 		public SingletonInstanceStore()
 		{
 			this.store = new Dictionary<Type, IList<Tuple<Registration, object>>>();
 			this.injectedRegistrations = new Dictionary<Type, IList<Registration>>();
+			this.Mutex = new object();
 		}
 		
 		public override IInstanceStore Clone()

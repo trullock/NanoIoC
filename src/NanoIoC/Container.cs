@@ -28,9 +28,10 @@ namespace NanoIoC
 		public Container()
 		{
 			this.mutex = new object();
-			
+			this.HttpContextItemsGetter = () => null;
+
 			this.singletonInstanceStore = new SingletonInstanceStore();
-			this.scopedStore = new ScopedInstanceStore();
+			this.scopedStore = new ScopedInstanceStore(this);
 			this.transientInstanceStore = new TransientInstanceStore();
 
 			this.Inject<IContainer>(this);
@@ -360,6 +361,9 @@ namespace NanoIoC
 
 			return registrations;
 		}
+
+		/// <inheritdoc />
+		public Func<IDictionary> HttpContextItemsGetter { get; set; }
 
 		/// <inheritdoc />
 		public void Register(Type abstractType, Type concreteType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
