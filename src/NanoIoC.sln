@@ -7,16 +7,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Container", "Container", "{
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
 		..\appveyor.yml = ..\appveyor.yml
-		..\paket.dependencies = ..\paket.dependencies
-		..\paket.lock = ..\paket.lock
 		..\readme.md = ..\readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC", "NanoIoC\NanoIoC.csproj", "{BC37B674-AD78-4F37-9D8D-3AE092AA11BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Extensions.DependencyInjection", "NanoIoC.Extensions.DependencyInjection\NanoIoC.Extensions.DependencyInjection.csproj", "{F95EADAF-B587-4432-8537-ED55F4C05C29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC.Extensions.DependencyInjection", "NanoIoC.Extensions.DependencyInjection\NanoIoC.Extensions.DependencyInjection.csproj", "{F95EADAF-B587-4432-8537-ED55F4C05C29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Test", "NanoIoC.Test\NanoIoC.Test.csproj", "{4172F924-3AC3-4777-BB0F-87042C469AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{4172F924-3AC3-4777-BB0F-87042C469AC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Extensions.DependencyInjection.Tests", "NanoIoC.Extensions.DependencyInjection.Tests\NanoIoC.Extensions.DependencyInjection.Tests.csproj", "{9D5F088A-6CEA-4DBD-A9BB-7C31F9B08D35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +36,10 @@ Global
 		{4172F924-3AC3-4777-BB0F-87042C469AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4172F924-3AC3-4777-BB0F-87042C469AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4172F924-3AC3-4777-BB0F-87042C469AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D5F088A-6CEA-4DBD-A9BB-7C31F9B08D35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D5F088A-6CEA-4DBD-A9BB-7C31F9B08D35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D5F088A-6CEA-4DBD-A9BB-7C31F9B08D35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D5F088A-6CEA-4DBD-A9BB-7C31F9B08D35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
