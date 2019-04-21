@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
@@ -633,77 +632,6 @@ namespace NanoIoC
 				default:
 					return null;
 			}
-		}
-
-		object IServiceProvider.GetService(Type serviceType)
-		{
-			return this.Resolve(serviceType);
-		}
-
-
-		IEnumerator<ServiceDescriptor> IEnumerable<ServiceDescriptor>.GetEnumerator()
-		{
-			throw new NotSupportedException("Enumerating items in a Container doesn't make any sense. What on earth are you trying to achieve?");
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			throw new NotSupportedException("Enumerating items in a Container doesn't make any sense. What on earth are you trying to achieve?");
-		}
-
-		void ICollection<ServiceDescriptor>.Add(ServiceDescriptor item)
-		{
-			// These are assumptions about how ServiceDescriptor looks based on how its been created
-			if(item.ImplementationFactory != null)
-				this.Register(item.ServiceType, item.ImplementationFactory, item.Lifetime);
-			else if(item.ImplementationInstance != null)
-				this.Inject(item.ImplementationInstance, item.ServiceType, item.Lifetime, InjectionBehaviour.Default);
-			else
-				this.Register(item.ServiceType, item.ImplementationType, item.Lifetime);
-		}
-
-		void ICollection<ServiceDescriptor>.Clear()
-		{
-			this.Reset();
-		}
-
-		bool ICollection<ServiceDescriptor>.Contains(ServiceDescriptor item)
-		{
-			throw new NotImplementedException();
-		}
-
-		void ICollection<ServiceDescriptor>.CopyTo(ServiceDescriptor[] array, int arrayIndex)
-		{
-			throw new NotSupportedException("God help you and whatever you are trying to achieve.");
-		}
-
-		bool ICollection<ServiceDescriptor>.Remove(ServiceDescriptor item)
-		{
-			throw new NotImplementedException();
-		}
-
-		int ICollection<ServiceDescriptor>.Count => throw new NotSupportedException("Counting items in a Container doesn't make any sense. What on earth are you trying to achieve?");
-		bool ICollection<ServiceDescriptor>.IsReadOnly => false;
-
-		int IList<ServiceDescriptor>.IndexOf(ServiceDescriptor item)
-		{
-			throw new NotSupportedException("Getting the index of a ServiceDescriptor from a Container doesn't make any sense. What on earth are you trying to achieve?");
-		}
-
-		void IList<ServiceDescriptor>.Insert(int index, ServiceDescriptor item)
-		{
-			throw new NotSupportedException("Inserting items by index to a Container doesn't make any sense. What on earth are you trying to achieve?");
-		}
-
-		void IList<ServiceDescriptor>.RemoveAt(int index)
-		{
-			throw new NotSupportedException("Removing items by index from a Container doesn't make any sense. What on earth are you trying to achieve?");
-		}
-
-		ServiceDescriptor IList<ServiceDescriptor>.this[int index]
-		{
-			get => throw new NotImplementedException();
-			set => throw new NotImplementedException();
 		}
 	}
 }

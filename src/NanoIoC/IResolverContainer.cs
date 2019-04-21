@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NanoIoC
 {
-	public interface IResolverContainer : IServiceProvider
+	public interface IResolverContainer
 	{
 		/// <summary>
 		/// Resolve an instance of the requested type

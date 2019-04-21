@@ -16,6 +16,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NanoIoC", "NanoIoC\NanoIoC.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Tests", "NanoIoC.Tests\NanoIoC.Tests.csproj", "{421F01D9-2D1C-4D75-AAAF-EE13131B455C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoIoC.Extensions.DependencyInjection", "NanoIoC.Extensions.DependencyInjection\NanoIoC.Extensions.DependencyInjection.csproj", "{F95EADAF-B587-4432-8537-ED55F4C05C29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{421F01D9-2D1C-4D75-AAAF-EE13131B455C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95EADAF-B587-4432-8537-ED55F4C05C29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95EADAF-B587-4432-8537-ED55F4C05C29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95EADAF-B587-4432-8537-ED55F4C05C29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95EADAF-B587-4432-8537-ED55F4C05C29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
