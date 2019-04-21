@@ -2,5 +2,5 @@ strategy: min
 
 source https://www.nuget.org/api/v2
 
-nuget NUnit 2.6.4
+nuget xUnit
 nuget Microsoft.Extensions.DependencyInjection.Abstractions
