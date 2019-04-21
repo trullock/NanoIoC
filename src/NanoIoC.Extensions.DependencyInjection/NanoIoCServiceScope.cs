@@ -5,11 +5,17 @@ namespace NanoIoC.Extensions.DependencyInjection
 {
 	public class NanoIoCServiceScope : IServiceScope
 	{
-		public void Dispose()
+		readonly IResolverContainer container;
+
+		public NanoIoCServiceScope(IResolverContainer container)
 		{
-			throw new NotImplementedException();
+			this.container = container;
 		}
 
-		public IServiceProvider ServiceProvider { get; }
+		public void Dispose()
+		{
+		}
+
+		public IServiceProvider ServiceProvider => new ServiceProviderAdaptor(container);
 	}
 }
