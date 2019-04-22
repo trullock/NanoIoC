@@ -120,5 +120,19 @@ namespace NanoIoC
 		}
 
 		public abstract IInstanceStore Clone();
+
+		public void Dispose()
+		{
+			foreach (var storedThing in this.Store.Values)
+			{
+				foreach (var instance in storedThing)
+				{
+					if(instance.Item2 is IDisposable disposable)
+						disposable.Dispose();
+				}
+			}
+
+			this.RemoveAllRegistrationsAndInstances();
+		}
     }
 }

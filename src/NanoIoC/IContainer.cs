@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace NanoIoC
 {
-    public interface IContainer : IResolverContainer
+    public interface IContainer : IResolverContainer, IDisposable
     {
 		// Temporary hack until we implement IServiceProvider properly
 		Func<IDictionary> HttpContextItemsGetter { get; set; }

@@ -87,5 +87,10 @@ namespace NanoIoC
 		{
 			throw new InvalidOperationException();
 		}
+
+		public void Dispose()
+		{
+			this.registrations.Clear();
+		}
 	}
 }

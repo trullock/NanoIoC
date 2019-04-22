@@ -7,7 +7,7 @@ namespace NanoIoC
 	/// <summary>
 	/// Stores instances
 	/// </summary>
-    public interface IInstanceStore
+    public interface IInstanceStore : IDisposable
     {
 		/// <summary>
 		/// Inserts an instance

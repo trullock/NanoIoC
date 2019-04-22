@@ -633,5 +633,12 @@ namespace NanoIoC
 					return null;
 			}
 		}
+
+		public void Dispose()
+		{
+			this.singletonInstanceStore.Dispose();
+			this.scopedStore.Dispose();
+			this.transientInstanceStore.Dispose();
+		}
 	}
 }
